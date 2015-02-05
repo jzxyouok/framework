@@ -11,7 +11,7 @@
 namespace Leaps\Cache;
 
 use Leaps\Cache;
-use Leaps\Base\InvalidConfigException;
+use Leaps\InvalidConfigException;
 
 /**
  * MemCache implements a cache application component based on [memcache](http://pecl.php.net/package/memcache)

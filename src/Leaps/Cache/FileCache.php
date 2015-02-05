@@ -12,7 +12,6 @@ namespace Leaps\Cache;
 
 use Leaps\Kernel;
 use Leaps\Cache;
-use Leaps\Helper\FileHelper;
 
 class FileCache extends Cache
 {
@@ -75,7 +74,7 @@ class FileCache extends Cache
 		parent::init ();
 		$this->cachePath = Kernel::getAlias ( $this->cachePath );
 		if (! is_dir ( $this->cachePath )) {
-			FileHelper::createDirectory ( $this->cachePath, $this->dirMode, true );
+			$this->file->createDirectory ( $this->cachePath, $this->dirMode, true );
 		}
 	}
 
@@ -93,7 +92,6 @@ class FileCache extends Cache
 	public function exists($key)
 	{
 		$cacheFile = $this->getCacheFile ( $this->buildKey ( $key ) );
-
 		return @filemtime ( $cacheFile ) > time ();
 	}
 
@@ -127,7 +125,7 @@ class FileCache extends Cache
 	{
 		$cacheFile = $this->getCacheFile ( $key );
 		if ($this->directoryLevel > 0) {
-			@FileHelper::createDirectory ( dirname ( $cacheFile ), $this->dirMode, true );
+			@$this->file->createDirectory ( dirname ( $cacheFile ), $this->dirMode, true );
 		}
 		if (@file_put_contents ( $cacheFile, $value, LOCK_EX ) !== false) {
 			if ($this->fileMode !== null) {
