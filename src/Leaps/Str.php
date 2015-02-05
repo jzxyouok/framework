@@ -9,16 +9,13 @@
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
 namespace Leaps;
-class Str {
 
+class Str
+{
 	const RANDOM_ALNUM = 0;
-
 	const RANDOM_ALPHA = 1;
-
 	const RANDOM_HEXDEC = 2;
-
 	const RANDOM_NUMERIC = 3;
-
 	const RANDOM_NOZERO = 4;
 
 	/**
@@ -67,25 +64,27 @@ class Str {
 	/**
 	 * Returns the portion of string specified by the start and length parameters.
 	 * This method ensures the string is treated as a byte array by using `mb_substr()`.
+	 *
 	 * @param string $string the input string. Must be one character or longer.
 	 * @param integer $start the starting position
 	 * @param integer $length the desired portion length. If not specified or `null`, there will be
-	 * no limit on length i.e. the output will be until the end of the string.
+	 *        no limit on length i.e. the output will be until the end of the string.
 	 * @return string the extracted part of string, or FALSE on failure or an empty string.
 	 * @see http://www.php.net/manual/en/function.substr.php
 	 */
-	public static function byteSubstr($string, $start, $length = null,$dot = "")
+	public static function byteSubstr($string, $start, $length = null, $dot = "")
 	{
-		$length = $length === null ? mb_strlen($string, "8bit") : $length;
+		$length = $length === null ? mb_strlen ( $string, "8bit" ) : $length;
 		return mb_substr ( $string, $start, $length, '8bit' ) . ! is_null ( $dot ) ? $dot : '';
 	}
 
 	/**
-	 * Generates a random string based on the given type. Type is one of the RANDOM_* constants
+	 * Generates a random string based on the given type.
+	 * Type is one of the RANDOM_* constants
 	 *
-	 *<code>
-	 *	echo Leaps\Str::random(Leaps\Str::RANDOM_ALNUM); //"aloiwkqz"
-	 *</code>
+	 * <code>
+	 * echo Leaps\Str::random(Leaps\Str::RANDOM_ALNUM); //"aloiwkqz"
+	 * </code>
 	 *
 	 * @param int type
 	 * @param int length
@@ -96,32 +95,32 @@ class Str {
 		$str = "";
 		switch ($type) {
 
-			case Str::RANDOM_ALPHA:
-				$pool = array_merge(range("a", "z"), range("A", "Z"));
+			case Str::RANDOM_ALPHA :
+				$pool = array_merge ( range ( "a", "z" ), range ( "A", "Z" ) );
 				break;
 
-			case Str::RANDOM_HEXDEC:
-				$pool = array_merge(range(0, 9), range("a", "f"));
+			case Str::RANDOM_HEXDEC :
+				$pool = array_merge ( range ( 0, 9 ), range ( "a", "f" ) );
 				break;
 
-			case Str::RANDOM_NUMERIC:
-				$pool = range(0, 9);
+			case Str::RANDOM_NUMERIC :
+				$pool = range ( 0, 9 );
 				break;
 
-			case Str::RANDOM_NOZERO:
-				$pool = range(1, 9);
+			case Str::RANDOM_NOZERO :
+				$pool = range ( 1, 9 );
 				break;
 
-			default:
+			default :
 				// Default type \Leaps\Str::RANDOM_ALNUM
-				$pool = array_merge(range(0, 9), range("a", "z"), range("A", "Z"));
+				$pool = array_merge ( range ( 0, 9 ), range ( "a", "z" ), range ( "A", "Z" ) );
 				break;
 		}
 
-		$end = count($pool) - 1;
+		$end = count ( $pool ) - 1;
 
-		while (strlen($str) < $length) {
-			$str .= $pool[mt_rand(0, $end)];
+		while ( strlen ( $str ) < $length ) {
+			$str .= $pool [mt_rand ( 0, $end )];
 		}
 
 		return $str;
@@ -143,11 +142,11 @@ class Str {
 	/**
 	 * Check if a string starts with a given string
 	 *
-	 *<code>
-	 *	echo Leaps\Str::startsWith("Hello", "He"); // true
-	 *	echo Leaps\Str::startsWith("Hello", "he"); // false
-	 *	echo Leaps\Str::startsWith("Hello", "he", false); // true
-	 *</code>
+	 * <code>
+	 * echo Leaps\Str::startsWith("Hello", "He"); // true
+	 * echo Leaps\Str::startsWith("Hello", "he"); // false
+	 * echo Leaps\Str::startsWith("Hello", "he", false); // true
+	 * </code>
 	 *
 	 * @param string str
 	 * @param string start
