@@ -11,7 +11,6 @@
 namespace Leaps;
 
 use Leaps\Di\Injectable;
-use Leaps\Helper\StringHelper;
 
 abstract class Cache extends Injectable
 {
@@ -32,7 +31,7 @@ abstract class Cache extends Injectable
 	 */
 	public function buildKey($key)
 	{
-		$key = ctype_alnum ( $key ) && StringHelper::byteLength ( $key ) <= 32 ? $key : md5 ( $key );
+		$key = ctype_alnum ( $key ) && Str::byteLength ( $key ) <= 32 ? $key : md5 ( $key );
 		return $this->keyPrefix . $key;
 	}
 

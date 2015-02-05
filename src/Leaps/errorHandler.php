@@ -10,7 +10,8 @@
 // +----------------------------------------------------------------------
 namespace Leaps;
 
-abstract class errorHandler
+use Leaps\Di\Injectable;
+abstract class errorHandler extends Injectable
 {
 
 	/**

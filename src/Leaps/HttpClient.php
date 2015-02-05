@@ -10,7 +10,8 @@
 // +----------------------------------------------------------------------
 namespace Leaps;
 
-class HttpClient
+use Leaps\Di\Injectable;
+class HttpClient extends Injectable
 {
 
 	/**
