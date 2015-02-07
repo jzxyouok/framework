@@ -10,22 +10,70 @@
 // +----------------------------------------------------------------------
 namespace Leaps;
 
-abstract class Application extends Di
+abstract class Application extends Module
 {
 	/**
-	 * 当前app名称
+	 * 应用程序启动事件
+	 * @event Event
+	 */
+	const EVENT_BEFORE_REQUEST = 'beforeRequest';
+
+	/**
+	 * 应用程序退出事件
+	 * @event Event
+	 */
+	const EVENT_AFTER_REQUEST = 'afterRequest';
+
+	/**
+	 * 当前应用程序编码
 	 *
 	 * @var string
 	 */
-	protected $id;
+	public $charset = 'UTF-8';
 
 	/**
-	 * 应用配置
+	 * 最终用户语言
+	 * @var string
+	 * @see sourceLanguage
+	 */
+	public $language = 'en-US';
+
+	/**
+	 * 当前活跃的控制器实例
+	 * @var Controller
+	 */
+	public $controller;
+
+	/**
+	 * 应用程序布局，false为禁用
+	 * @var string|boolean
+	 */
+	public $layout = 'main';
+
+	/**
+	 * 请求的操作
+	 * @var Action
+	 */
+	public $requestedAction;
+
+	/**
+	 * 请求的路由
+	 *
+	 * @var string
+	 */
+	public $requestedRoute;
+
+	/**
+	 * 请求操作参数
 	 * @var array
 	 */
-	protected $config = [];
+	public $requestedParams;
 
-	protected $_defaultModule;
+	/**
+	 *
+	 * @var array 已经加载的模块列表
+	 */
+	public $loadedModules = [ ];
 
 	/**
 	 * 构造方法
@@ -34,11 +82,88 @@ abstract class Application extends Di
 	 */
 	public function __construct($config = [])
 	{
-		parent::__construct();
 		Kernel::$app = $this;
-		$this->config = $config;
-		$this->preInit ();
+		$this->setInstance($this);
+		$this->preInit ( $config );
 		$this->init ();
+		Di::__construct();
+	}
+
+	/**
+	 * 初始化配置信息
+	 */
+	public function preInit($config)
+	{
+		if (isset ( $config ['id'] )) {
+			$this->id = $config ['id'];
+			unset ( $config ['id'] );
+		} else {
+			throw new InvalidConfigException ( 'The "id" configuration for the Application is required.' );
+		}
+
+		if (isset ( $config ['charset'] )) {
+			$this->id = $config ['charset'];
+			unset ( $config ['charset'] );
+		}
+
+		if (isset ( $config ['language'] )) {
+			$this->language = $config ['language'];
+			unset ( $config ['language'] );
+		}
+
+		if (isset ( $config ['layout'] )) {
+			$this->layout = $config ['layout'];
+			unset ( $config ['layout'] );
+		}
+
+		if (isset ( $config ['basePath'] )) {
+			$this->setBasePath ( $config ['basePath'] );
+			unset ( $config ['basePath'] );
+		} else {
+			throw new InvalidConfigException ( 'The "basePath" configuration for the Application is required.' );
+		}
+
+		if (isset ( $config ['vendorPath'] )) {
+			$this->setVendorPath ( $config ['vendorPath'] );
+			unset ( $config ['vendorPath'] );
+		} else {
+			// set "@vendor"
+			$this->getVendorPath ();
+		}
+
+		if (isset ( $config ['runtimePath'] )) {
+			$this->setRuntimePath ( $config ['runtimePath'] );
+			unset ( $config ['runtimePath'] );
+		} else {
+			// set "@runtime"
+			$this->getRuntimePath ();
+		}
+
+		if (isset ( $config ['timeZone'] )) {
+			$this->setTimeZone ( $config ['timeZone'] );
+			unset ( $config ['timeZone'] );
+		} elseif (! ini_get ( 'date.timezone' )) {
+			$this->setTimeZone ( 'UTC' );
+		}
+
+		// 注册Module
+		if (isset ( $config ['modules'] )) {
+			$this->setModules ( $config ['modules'] );
+			unset ( $config ['modules'] );
+		}
+
+		$config ['services'] = Arr::mergeArray ( $this->coreServices (), $config ['services'] );
+		foreach ( $config ['services'] as $id => $service ) {
+			$this->set ( $id, $service );
+		}
+		unset ( $config ['services'] );
+	}
+
+	/**
+	 * 初始化模块信息
+	 */
+	public function init()
+	{
 	}
 
 	/**
@@ -56,176 +181,48 @@ abstract class Application extends Di
 	 * 这是应用程序入口
 	 *
 	 * @return integer 退出状态 (0 means normal, non-zero values mean abnormal)
-	*/
+	 */
 	public function run()
 	{
 		try {
-			//$this->get('event')->trigger(self::EVENT_BEFORE_REQUEST);
-			$response = $this->handleRequest($this->getRequest());
-			//$this->event->trigger(self::EVENT_AFTER_REQUEST);
-			$response->send();
+			$this->get ( 'event' )->trigger ( self::EVENT_BEFORE_REQUEST );
+			$response = $this->handleRequest ( $this->getRequest () );
+			$this->event->trigger ( self::EVENT_AFTER_REQUEST );
+			$response->send ();
 			return $response->exitStatus;
 		} catch ( ExitException $e ) {
-			//$this->end($e->statusCode, isset($response) ? $response : null);
 			return $e->statusCode;
 		}
 	}
 
 	/**
-	 * 初始化
-	 */
-	public function init(){
-
-	}
-
-	/**
-	 * 初始化配置信息
-	 */
-	public function preInit()
-	{
-		if (isset($this->config['isclosed']) && $this->config['isclosed']) {
-			throw new Exception('Sorry, Site has been closed!');
-		}
-		if (isset($this->config['id'])) {
-			$this->id = $this->config['id'];
-			unset($this->config['id']);
-		} else {
-			throw new InvalidConfigException('The "id" configuration for the Application is required.');
-		}
-
-		if (isset($this->config['basePath'])) {
-			$this->setBasePath($this->config['basePath']);
-			unset($this->config['basePath']);
-		} else {
-			throw new InvalidConfigException('The "basePath" configuration for the Application is required.');
-		}
-
-		if (isset($this->config['vendorPath'])) {
-			$this->setVendorPath($this->config['vendorPath']);
-			unset($this->config['vendorPath']);
-		} else {
-			// set "@vendor"
-			$this->getVendorPath();
-		}
-
-		if (isset($this->config['runtimePath'])) {
-			$this->setRuntimePath($this->config['runtimePath']);
-			unset($this->config['runtimePath']);
-		} else {
-			// set "@runtime"
-			$this->getRuntimePath();
-		}
-
-		if (isset($this->config['timeZone'])) {
-			$this->setTimeZone($this->config['timeZone']);
-			unset($this->config['timeZone']);
-		} elseif (!ini_get('date.timezone')) {
-			$this->setTimeZone('UTC');
-		}
-		$this->config ['services'] = Arr::mergeArray($this->coreServices(),$this->config ['services']);
-		foreach ( $this->config ['services'] as $id => $service ) {
-			$this->set ( $id, $service );
-		}
-	}
-
-	/**
-	 * Register an array of modules present in the application
+	 * 返回应用程序的唯一ID
 	 *
-	 *<code>
-	 *	$this->registerModules(array(
-	 *		'frontend' => array(
-	 *			'className' => 'Multiple\Frontend\Module',
-	 *			'path' => '../apps/frontend/Module.php'
-	 *		),
-	 *		'backend' => array(
-	 *			'className' => 'Multiple\Backend\Module',
-	 *			'path' => '../apps/backend/Module.php'
-	 *		)
-	 *	));
-	 *</code>
-	 *
-	 * @param array modules
-	 * @param boolean merge
-	 * @param Leaps\Application
+	 * @return string the unique ID of the module.
 	 */
-	public function registerModules($modules, $merge = false)
+	public function getUniqueId()
 	{
-		if ($merge === false) {
-			$this->_modules = $modules;
-		} else {
-			if (is_array($this->_modules)) {
-				$this->_modules = array_merge($this->_modules, $modules);
-			} else {
-				$this->_modules = $modules;
-			}
-		}
-		return $this;
-	}
-
-	/**
-	 * Return the modules registered in the application
-	 *
-	 * @return array
-	 */
-	public function getModules()
-	{
-		return $this->_modules;
-	}
-
-	/**
-	 * Gets the module definition registered in the application via module name
-	 *
-	 * @param string name
-	 * @return array|object
-	 */
-	public function getModule($name)
-	{
-		if (isset($this->_modules[$name])) {
-			throw new Exception("Module '" . $name . "' isn't registered in the application container");
-		}
-		return $this->_modules[$name];
-	}
-
-
-	private $_basePath;
-
-	/**
-	 * Returns the root directory of the module.
-	 * It defaults to the directory containing the module class file.
-	 * @return string the root directory of the module.
-	 */
-	public function getBasePath()
-	{
-		if ($this->_basePath === null) {
-			$class = new \ReflectionClass($this);
-			$this->_basePath = dirname($class->getFileName());
-		}
-
-		return $this->_basePath;
+		return '';
 	}
 
 	/**
 	 * 设置应用程序的根目录和@App别名。
 	 *
-	 * @param string $path the root directory of the application.
+	 * @param string $path 应用程序跟目录
 	 * @property string the root directory of the application.
-	 * @throws InvalidParamException if the directory does not exist.
+	 * @throws InvalidParamException 如果文件夹不存在抛出异常
 	 */
 	public function setBasePath($path)
 	{
-		$path = Kernel::getAlias($path);
-		$p = realpath($path);
-		if ($p !== false && is_dir($p)) {
-			$this->_basePath = $p;
-		} else {
-			throw new InvalidParamException("The directory does not exist: $path");
-		}
-		Kernel::setAlias('@app', $this->getBasePath());
+		parent::setBasePath ( $path );
+		Kernel::setAlias ( '@app', $this->getBasePath () );
+		Kernel::setAlias ( '@Module', $this->getBasePath ().'/Module' );
 	}
 
 	/**
+	 * 运行时文件目录
 	 *
-	 * @var string 运行时文件目录
+	 * @var string
 	 */
 	private $_runtimePath;
 
@@ -253,18 +250,18 @@ abstract class Application extends Di
 		$this->_runtimePath = Kernel::getAlias ( $path );
 		Kernel::setAlias ( '@Runtime', $this->_runtimePath );
 	}
-
 	private $_vendorPath;
 
 	/**
 	 * Returns the directory that stores vendor files.
+	 *
 	 * @return string the directory that stores vendor files.
-	 * Defaults to "vendor" directory under [[basePath]].
+	 *         Defaults to "vendor" directory under [[basePath]].
 	 */
 	public function getVendorPath()
 	{
 		if ($this->_vendorPath === null) {
-			$this->setVendorPath($this->getBasePath() . DIRECTORY_SEPARATOR . 'Vendor');
+			$this->setVendorPath ( $this->getBasePath () . DIRECTORY_SEPARATOR . 'Vendor' );
 		}
 
 		return $this->_vendorPath;
@@ -272,14 +269,15 @@ abstract class Application extends Di
 
 	/**
 	 * Sets the directory that stores vendor files.
+	 *
 	 * @param string $path the directory that stores vendor files.
 	 */
 	public function setVendorPath($path)
 	{
-		$this->_vendorPath = Kernel::getAlias($path);
-		Kernel::setAlias('@vendor', $this->_vendorPath);
-		Kernel::setAlias('@bower', $this->_vendorPath . DIRECTORY_SEPARATOR . 'bower');
-		Kernel::setAlias('@npm', $this->_vendorPath . DIRECTORY_SEPARATOR . 'npm');
+		$this->_vendorPath = Kernel::getAlias ( $path );
+		Kernel::setAlias ( '@vendor', $this->_vendorPath );
+		Kernel::setAlias ( '@bower', $this->_vendorPath . DIRECTORY_SEPARATOR . 'bower' );
+		Kernel::setAlias ( '@npm', $this->_vendorPath . DIRECTORY_SEPARATOR . 'npm' );
 	}
 
 	/**
@@ -306,17 +304,30 @@ abstract class Application extends Di
 
 	/**
 	 * 核心服务
+	 *
 	 * @return multitype:multitype:string
 	 */
 	public function coreServices()
 	{
 		return [
-				'file'=>['className'=>'Leaps\Filesystem\Filesystem'],
-				'crypt'=>['className'=>'Leaps\Crypt\Crypt'],
-				'event' => [ 'className' => 'Leaps\Event\Dispatcher'],
-				'registry' => ['className' => 'Leaps\Registry'],
-				'log'=>['className'=>'Leaps\Log\Logger'],
-				'cache'=>['className'=>'Leaps\Cache\DummyCache'],
+				'file' => [
+						'className' => 'Leaps\Filesystem\Filesystem'
+				],
+				'crypt' => [
+						'className' => 'Leaps\Crypt\Crypt'
+				],
+				'event' => [
+						'className' => 'Leaps\Event\Dispatcher'
+				],
+				'registry' => [
+						'className' => 'Leaps\Registry'
+				],
+				'log' => [
+						'className' => 'Leaps\Log\Logger'
+				],
+				'cache' => [
+						'className' => 'Leaps\Cache\FileCache'
+				]
 		];
 	}
 }

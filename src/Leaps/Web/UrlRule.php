@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
+
 namespace Leaps\Web;
 
 use Leaps\Base;
@@ -126,7 +127,7 @@ class UrlRule extends Base  implements UrlRuleInterface
 
 	/**
 	 * 初始化这个规则
-	*/
+	 */
 	public function init()
 	{
 		if ($this->pattern === null) {

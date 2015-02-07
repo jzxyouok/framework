@@ -37,13 +37,16 @@ class Request extends \Leaps\Request
 	 */
 	public function resolve()
 	{
-		$router = new \Leaps\Router\Router ();
-		$result = $router->parseRequest ( $this );
-		// $result = Kernel::$app->getRouter ()->parseRequest ( $this );
+		//print_r($this);
+		$result = $this->router->parseRequest ( $this );
+
 		if ($result !== false) {
 			list ( $route, $params ) = $result;
 			$_GET = array_merge ( $_GET, $params );
-			return [ $route,$_GET ];
+			return [
+					$route,
+					$_GET
+			];
 		} else {
 			throw new \Exception ( 'Page not found.' );
 		}
@@ -51,17 +54,18 @@ class Request extends \Leaps\Request
 
 	/**
 	 * 处理路由
+	 *
 	 * @param string $route
 	 */
 	public function resolveRoute($route)
 	{
-		$action = explode ( '/', $route,3 );
+		$action = explode ( '/', $route, 3 );
 		end ( $action );
-		print_r($action);
-		//$this->_action = array_pop($action);
-		//$this->_controller = array_pop($action);
-		//$this->_module = array_pop($action);
-		//$a = array('action'=>array_pop($action), 'controller'=>array_pop($action), 'module'=>array_pop($action));
+		print_r ( $action );
+		// $this->_action = array_pop($action);
+		// $this->_controller = array_pop($action);
+		// $this->_module = array_pop($action);
+		// $a = array('action'=>array_pop($action), 'controller'=>array_pop($action), 'module'=>array_pop($action));
 	}
 
 	/**
@@ -69,7 +73,6 @@ class Request extends \Leaps\Request
 	 */
 	public function getModule()
 	{
-
 	}
 
 	/**
@@ -949,7 +952,13 @@ class Request extends \Leaps\Request
 			if (empty ( $params )) {
 				continue;
 			}
-			$values = [ 'q' => [ $i,array_shift ( $params ),1 ] ];
+			$values = [
+					'q' => [
+							$i,
+							array_shift ( $params ),
+							1
+					]
+			];
 			foreach ( $params as $param ) {
 				if (strpos ( $param, '=' ) !== false) {
 					list ( $key, $value ) = explode ( '=', $param, 2 );

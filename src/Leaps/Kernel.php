@@ -78,6 +78,40 @@ class Kernel
 	public static $objectConfig = [ ];
 
 	/**
+	 * classMap
+	 *
+	 * @var array
+	 */
+	public static $classMap = [ ];
+
+	/**
+	 * 自动装载器
+	 *
+	 * @param string $className 类的完全限定名称
+	 */
+	public static function autoload($className)
+	{
+		if (isset ( static::$classMap [$className] )) {
+			$classFile = static::$classMap [$className];
+			if ($classFile [0] === '@') {
+				$classFile = static::getAlias ( $classFile );
+			}
+		} elseif (strpos ( $className, '\\' ) !== false) {
+			$classFile = static::getAlias ( '@' . str_replace ( '\\', '/', $className ) . '.php', false );
+			if ($classFile === false || ! is_file ( $classFile )) {
+
+				return;
+			}
+		} else {
+			return;
+		}
+		include ($classFile);
+		if (static::$env == static::DEVELOPMENT && ! class_exists ( $className, false ) && ! interface_exists ( $className, false ) && ! trait_exists ( $className, false )) {
+			throw new UnknownClassException ( "Unable to find '$className' in file: $classFile. Namespace missing?" );
+		}
+	}
+
+	/**
 	 * 获取classmap
 	 *
 	 * @return multitype:
@@ -237,7 +271,6 @@ class Kernel
 		}
 		if (($n = func_num_args ()) > 1) {
 			/**
-			 *
 			 * @var \ReflectionClass $reflection
 			 */
 			if (isset ( $reflections [$class] )) {

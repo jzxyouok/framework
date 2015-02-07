@@ -137,26 +137,24 @@ class Service implements ServiceInterface
 	 */
 	public function resolve($parameters = null, \Leaps\DiInterface $dependencyInjector = null)
 	{
-		$shared = $this->_shared;
 		/**
 		 * 判断服务是否是共享的
 		 */
-		if ($shared) {
-			$sharedInstance = $this->_sharedInstance;
-			if ($sharedInstance !== null) {
-				return $sharedInstance;
+		if ($this->_shared) {
+			if ($this->_sharedInstance !== null) {
+				return $$this->_sharedInstance;
 			}
 		}
 		$found = true;
 		$instance = null;
 
 		$definition = $this->_definition;
-		if (gettype ( $definition ) == "string") {
+		if (is_string($definition)) {
 			/**
 			 * 定义是字符串
 			 */
 			if (class_exists ( $definition )) {
-				if (gettype ( $parameters ) == "array") {
+				if (is_array($parameters)) {
 					if (count ( $parameters )) {
 						if (version_compare ( PHP_VERSION, '5.6.0', '>=' )) {
 							$reflection = new \ReflectionClass ( $definition );
@@ -190,7 +188,7 @@ class Service implements ServiceInterface
 			 */
 			if (gettype ( $definition ) == "object") {
 				if ($definition instanceof \Closure) {
-					if (gettype ( $parameters ) == "array") {
+					if (is_array($definition)) {
 						$instance = call_user_func_array ( $definition, $parameters );
 					} else {
 						$instance = call_user_func ( $definition );
@@ -202,7 +200,7 @@ class Service implements ServiceInterface
 				/**
 				 * 数组定义需要'className'参数
 				 */
-				if (gettype ( $definition ) == "array") {
+				if (is_array($definition)) {
 					$instance = Kernel::createObject ( $definition );
 				} else {
 					$found = false;
@@ -220,7 +218,7 @@ class Service implements ServiceInterface
 		/**
 		 * 更新服务共享实例
 		 */
-		if ($shared) {
+		if ($this->_shared) {
 			$this->_sharedInstance = $instance;
 		}
 

@@ -8,18 +8,18 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Web;
+namespace Leaps\Web\Router;
 
-abstract class Controller {
+class Exception extends \Leaps\Exception
+{
 
 	/**
-	 * 构造方法
+	 * 返回用户友好的异常名称
+	 *
+	 * @return string
 	 */
-	public function __construct(){
-
-	}
-
-	public function IndexAction(){
-		echo 'index';
+	public function getName()
+	{
+		return 'Router Class';
 	}
 }

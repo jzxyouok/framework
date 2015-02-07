@@ -14,7 +14,7 @@ use Leaps\Di\Service;
 use Leaps\Di\ServiceInterface;
 use Leaps\Di\ServiceProviderInterface;
 
-class Di implements \ArrayAccess, DiInterface
+class Di extends Base implements \ArrayAccess, DiInterface
 {
 	protected $_services;
 	protected $_sharedInstances;
@@ -24,12 +24,13 @@ class Di implements \ArrayAccess, DiInterface
 	/**
 	 * Leaps\Di constructor
 	 */
-	public function __construct()
+	public function __construct($config = [])
 	{
 		$defaultDi = self::$_default;
 		if (! $defaultDi) {
 			self::$_default = $this;
 		}
+		parent::__construct($config);
 	}
 
 	/**
@@ -155,7 +156,7 @@ class Di implements \ArrayAccess, DiInterface
 			/**
 			 * 服务已经注册
 			 */
-			$instance = $this->_services [$name]->resolve ( $parameters );
+			$instance = $this->_services [$name]->resolve ( $parameters,$this );
 		} else {
 			/**
 			 * The DI also acts as builder for any class even if it isn't defined in the DI
@@ -327,9 +328,8 @@ class Di implements \ArrayAccess, DiInterface
 		 */
 		if (substr ( $method, 0, 3 ) == "get") {
 			// if (starts_with ( $method, "get" )) {
-			$services = $this->_services;
 			$possibleService = lcfirst ( substr ( $method, 3 ) );
-			if (isset ( $services [$possibleService] )) {
+			if (isset ( $this->_services [$possibleService] )) {
 				if (count ( $arguments )) {
 					$instance = $this->get ( $possibleService, $arguments );
 				} else {
