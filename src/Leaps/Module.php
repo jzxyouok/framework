@@ -14,7 +14,6 @@ use Leaps\Web\Router\Exception as RouteException;
 
 abstract class Module extends Di
 {
-
 	/**
 	 *
 	 * @var string an ID that uniquely identifies this module among other modules which have the same [[module|parent]].
@@ -52,7 +51,6 @@ abstract class Module extends Di
 	 * @var string
 	 */
 	private $_layoutPath;
-
 
 	public $_viewPath;
 
@@ -265,7 +263,7 @@ abstract class Module extends Di
 			} elseif ($load) {
 				Kernel::trace("Loading module: $id", __METHOD__);
 				/* @var $module Module */
-				$module = Kernel::createObject($this->_modules[$id], [$id, $this]);
+				$module = Kernel::createObject($this->_modules[$id], $id, $this);
 				$module->setInstance($module);
 				return $this->_modules[$id] = $module;
 			}
@@ -352,8 +350,6 @@ abstract class Module extends Di
 	public function runAction($route, $params = [])
 	{
 		$parts = $this->createController ( $route );
-		print_r($parts);
-		exit;
 		if (is_array ( $parts )) {
 			/* @var $controller Controller */
 			list ( $controller, $actionID ) = $parts;
@@ -454,7 +450,7 @@ abstract class Module extends Di
 		}
 
 		if (is_subclass_of($className, 'Leaps\Controller')) {
-			return Kernel::createObject($className, [$id, $this]);
+			return Kernel::createObject($className, $id, $this);
 		} elseif (Kernel::$env == Kernel::DEVELOPMENT) {
 			throw new InvalidConfigException("Controller class must extend from \\Leaps\\Controller.");
 		} else {

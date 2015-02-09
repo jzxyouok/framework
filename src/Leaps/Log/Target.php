@@ -73,9 +73,9 @@ abstract class Target extends Injectable
 		$this->messages = array_merge ( $this->messages, $this->filterMessages ( $messages, $this->getLevels () ) );
 		$count = count ( $this->messages );
 		if ($count > 0 && ($isFinal || $this->exportInterval > 0 && $count >= $this->exportInterval)) {
-			if (($context = $this->getContextMessage ()) !== '') {
-				$this->messages [] = [ $context,Logger::LEVEL_INFO,"application",START_TIME ];
-			}
+			//if (($context = $this->getContextMessage ()) !== '') {
+			//	$this->messages [] = [ $context,Logger::LEVEL_INFO,"application",START_TIME ];
+			//}
 			$this->export ();
 			$this->messages = [ ];
 		}

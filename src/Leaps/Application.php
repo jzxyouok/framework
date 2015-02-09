@@ -102,7 +102,7 @@ abstract class Application extends Module
 		}
 
 		if (isset ( $config ['charset'] )) {
-			$this->id = $config ['charset'];
+			$this->charset = $config ['charset'];
 			unset ( $config ['charset'] );
 		}
 
@@ -187,7 +187,7 @@ abstract class Application extends Module
 		try {
 			$this->get ( 'event' )->trigger ( self::EVENT_BEFORE_REQUEST );
 			$response = $this->handleRequest ( $this->getRequest () );
-			$this->event->trigger ( self::EVENT_AFTER_REQUEST );
+			$this->get ( 'event' )->trigger ( self::EVENT_AFTER_REQUEST );
 			$response->send ();
 			return $response->exitStatus;
 		} catch ( ExitException $e ) {

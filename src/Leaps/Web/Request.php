@@ -37,9 +37,7 @@ class Request extends \Leaps\Request
 	 */
 	public function resolve()
 	{
-		//print_r($this);
 		$result = $this->router->parseRequest ( $this );
-
 		if ($result !== false) {
 			list ( $route, $params ) = $result;
 			$_GET = array_merge ( $_GET, $params );
@@ -50,22 +48,6 @@ class Request extends \Leaps\Request
 		} else {
 			throw new \Exception ( 'Page not found.' );
 		}
-	}
-
-	/**
-	 * 处理路由
-	 *
-	 * @param string $route
-	 */
-	public function resolveRoute($route)
-	{
-		$action = explode ( '/', $route, 3 );
-		end ( $action );
-		print_r ( $action );
-		// $this->_action = array_pop($action);
-		// $this->_controller = array_pop($action);
-		// $this->_module = array_pop($action);
-		// $a = array('action'=>array_pop($action), 'controller'=>array_pop($action), 'module'=>array_pop($action));
 	}
 
 	/**

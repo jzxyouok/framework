@@ -8,18 +8,29 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Web\Router;
+namespace Leaps\Web\Response;
 
-class Exception extends \Leaps\Exception
+use yii\base\Component;
+
+class HtmlResponseFormatter extends Component implements ResponseFormatterInterface
 {
+	/**
+	 *
+	 * @var string the Content-Type header for the response
+	 */
+	public $contentType = 'text/html';
 
 	/**
-	 * 返回用户友好的异常名称
+	 * Formats the specified response.
 	 *
-	 * @return string
+	 * @param Response $response the response to be formatted.
 	 */
-	public function getName()
+	public function format($response)
 	{
-		return 'Router Exception';
+		if (stripos ( $this->contentType, 'charset' ) === false) {
+			$this->contentType .= '; charset=' . $response->charset;
+		}
+		$response->getHeaders ()->set ( 'Content-Type', $this->contentType );
+		$response->content = $response->data;
 	}
 }

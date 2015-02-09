@@ -29,8 +29,6 @@ class Action extends Injectable {
 	 */
 	public $actionMethod;
 
-
-
 	/**
 	 * Constructor.
 	 *

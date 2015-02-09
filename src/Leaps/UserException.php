@@ -8,18 +8,9 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Web\Router;
+namespace Leaps;
 
-class Exception extends \Leaps\Exception
+
+class UserException extends Exception
 {
-
-	/**
-	 * 返回用户友好的异常名称
-	 *
-	 * @return string
-	 */
-	public function getName()
-	{
-		return 'Router Exception';
-	}
 }

@@ -8,18 +8,14 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Web\Router;
+namespace Leaps\Web;
 
-class Exception extends \Leaps\Exception
+interface ResponseFormatterInterface
 {
-
 	/**
-	 * 返回用户友好的异常名称
+	 * Formats the specified response.
 	 *
-	 * @return string
+	 * @param Response $response the response to be formatted.
 	 */
-	public function getName()
-	{
-		return 'Router Exception';
-	}
+	public function format($response);
 }

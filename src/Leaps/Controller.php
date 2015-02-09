@@ -11,10 +11,10 @@
 namespace Leaps;
 
 use Leaps\Di\Injectable;
+use Leaps\Web\ViewContextInterface;
 use Leaps\Web\Router\Exception as RouteException;
 
-class Controller extends Injectable
-{
+abstract class Controller extends Injectable  implements ViewContextInterface {
 
 	/**
 	 *
@@ -29,11 +29,11 @@ class Controller extends Injectable
 	public $module;
 
 	/**
-	 *
-	 * @var string the ID of the action that is used when the action ID is not specified
-	 *      in the request. Defaults to 'index'.
+	 * 默认的Action
+	 * @var string
 	 */
 	public $defaultAction = 'index';
+
 	/**
 	 * @var Action the action that is currently being executed. This property will be set
 	 * by [[run()]] when it is called by [[Application]] to run an action.
@@ -41,10 +41,10 @@ class Controller extends Injectable
 	public $action;
 
 	/**
-	 *
-	 * @param string $id the ID of this controller.
-	 * @param Module $module the module that this controller belongs to.
-	 * @param array $config name-value pairs that will be used to initialize the object properties.
+	 * 构造方法
+	 * @param string $id the Controller ID
+	 * @param Module $module 该控制器所属的模块
+	 * @param array $config 对象属性初始化配置
 	 */
 	public function __construct($id, $module)
 	{
@@ -57,7 +57,7 @@ class Controller extends Injectable
 	 */
 	public function getUniqueId()
 	{
-		return $this->module instanceof Application ? $this->id : $this->module->getUniqueId() . '/' . $this->id;
+		return $this->module instanceof \Leaps\Application ? $this->id : $this->module->getUniqueId() . '/' . $this->id;
 	}
 
 	public function runActionInstance($id, $params = [])
@@ -67,15 +67,19 @@ class Controller extends Injectable
 			throw new RouteException ( 'Unable to resolve the request: ' . $this->getUniqueId () . '/' . $id );
 		}
 		Kernel::trace("Route to run: " . $action->getUniqueId(), __METHOD__);
-
-        // run the action
-        $result = $action->runWithParams($params);
-
-        return $result;
+		if (Kernel::$app->requestedAction === null) {
+			Kernel::$app->requestedAction = $action;
+		}
+		$oldAction = $this->action;
+		$this->action = $action;
+		// run the action
+		$result = $action->runWithParams($params);
+		$this->action = $oldAction;
+		return $result;
 	}
 
 	/**
-	 * Binds the parameters to the action.
+	 * 绑定参数到action
 	 * This method is invoked by [[Action]] when it begins to run with the given parameters.
 	 * @param Action $action the action to be bound with parameters.
 	 * @param array $params the parameters to be bound to the action.
@@ -87,12 +91,7 @@ class Controller extends Injectable
 	}
 
 	/**
-	 * Creates an action based on the given action ID.
-	 * The method first checks if the action ID has been declared in [[actions()]]. If so,
-	 * it will use the configuration declared there to create the action object.
-	 * If not, it will look for a controller method whose name is in the format of `actionXyz`
-	 * where `Xyz` stands for the action ID. If found, an [[InlineAction]] representing that
-	 * method will be created and returned.
+	 * 创建Action实例
 	 * @param string $id the action ID.
 	 * @return Action the newly created action instance. Null if the ID doesn't resolve into any action.
 	 */
@@ -103,7 +102,7 @@ class Controller extends Injectable
 		}
 		$actionMap = $this->actions();
 		if (isset($actionMap[$id])) {
-			return Kernel::createObject($actionMap[$id], [$id, $this]);
+			return Kernel::createObject($actionMap[$id], $id, $this);
 		} elseif (preg_match('/^[a-z0-9\\-_]+$/', $id) && strpos($id, '--') === false && trim($id, '-') === $id) {
 			$methodName = 'Action'.str_replace(' ', '', ucwords(implode(' ', explode('-', $id))));
 			if (method_exists($this, $methodName)) {
@@ -134,7 +133,7 @@ class Controller extends Injectable
 	}
 
 	/**
-	 * Returns the route of the current request.
+	 * 返回当前请求的路由
 	 * @return string the route (module ID, controller ID and action ID) of the current request.
 	 */
 	public function getRoute()

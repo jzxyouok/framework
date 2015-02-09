@@ -103,7 +103,7 @@ abstract class errorHandler extends Injectable
 				if (PHP_SAPI === 'cli') {
 					echo $msg . "\n";
 				} else {
-					echo '<pre>' . htmlspecialchars($msg, ENT_QUOTES, Yii::$app->charset) . '</pre>';
+					echo '<pre>' . htmlspecialchars($msg, ENT_QUOTES, Kernel::$app->charset) . '</pre>';
 				}
 			}
 			$msg .= "\n\$_SERVER = " . VarDumper::export($_SERVER);

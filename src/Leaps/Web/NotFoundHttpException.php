@@ -8,18 +8,19 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Web\Router;
+namespace Leaps\Web;
 
-class Exception extends \Leaps\Exception
+class NotFoundHttpException extends HttpException
 {
-
 	/**
-	 * 返回用户友好的异常名称
+	 * Constructor.
 	 *
-	 * @return string
+	 * @param string $message error message
+	 * @param integer $code error code
+	 * @param \Exception $previous The previous exception used for the exception chaining.
 	 */
-	public function getName()
+	public function __construct($message = null, $code = 0, \Exception $previous = null)
 	{
-		return 'Router Exception';
+		parent::__construct ( 404, $message, $code, $previous );
 	}
 }

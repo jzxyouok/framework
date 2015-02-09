@@ -44,12 +44,39 @@ class Application extends \Leaps\Application
 				if ($result !== null) {
 					$response->data = $result;
 				}
-
 				return $response;
 			}
 		} catch ( RouteException $e ) {
+			echo 'Page not found.', $e->getCode ();
+			exit;
 			throw new NotFoundHttpException ( 'Page not found.', $e->getCode (), $e );
 		}
+	}
+
+	private $_homeUrl;
+
+	/**
+	 * @return string the homepage URL
+	 */
+	public function getHomeUrl()
+	{
+		if ($this->_homeUrl === null) {
+			if ($this->getRouter()->showScriptName) {
+				return $this->getRequest()->getScriptUrl();
+			} else {
+				return $this->getRequest()->getBaseUrl() . '/';
+			}
+		} else {
+			return $this->_homeUrl;
+		}
+	}
+
+	/**
+	 * @param string $value the homepage URL
+	 */
+	public function setHomeUrl($value)
+	{
+		$this->_homeUrl = $value;
 	}
 
 	/**
