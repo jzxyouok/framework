@@ -41,7 +41,7 @@ abstract class errorHandler extends Injectable
 	 * 监听异常
 	 * @return Leaps\Debug
 	 */
-	public function listen()
+	public function register()
 	{
 		//ini_set('display_errors', false);
         set_exception_handler([$this, 'handleException']);
@@ -55,7 +55,7 @@ abstract class errorHandler extends Injectable
 	/**
 	 * 恢复PHP异常监听
 	 */
-	public function unlisten()
+	public function unregister()
 	{
 		restore_error_handler();
 		restore_exception_handler();
@@ -156,7 +156,7 @@ abstract class errorHandler extends Injectable
 			}
 			$this->renderException($exception);
 			// need to explicitly flush logs because exit() next will terminate the app immediately
-			Yii::getLogger()->flush(true);
+			//Yii::getLogger()->flush(true);
 			exit(1);
 		}
 	}
@@ -182,6 +182,21 @@ abstract class errorHandler extends Injectable
 	{
 		$parts = explode(" ", \Leaps\Version::get());
 		return $parts[0];
+	}
+
+	/**
+	 * Logs the given exception
+	 * @param \Exception $exception the exception to be logged
+	 */
+	protected function logException($exception)
+	{
+		$category = get_class($exception);
+		if ($exception instanceof HttpException) {
+			$category = 'Leaps\\Web\\HttpException:' . $exception->statusCode;
+		} elseif ($exception instanceof \ErrorException) {
+			$category .= ':' . $exception->getSeverity();
+		}
+		Kernel::error((string) $exception, $category);
 	}
 
 	/**

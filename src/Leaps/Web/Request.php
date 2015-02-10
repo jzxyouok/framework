@@ -11,6 +11,7 @@
 namespace Leaps\Web;
 
 use Leaps\InvalidConfigException;
+use Leaps\Web\Response\HeaderCollection;
 
 class Request extends \Leaps\Request
 {
@@ -48,27 +49,6 @@ class Request extends \Leaps\Request
 		} else {
 			throw new \Exception ( 'Page not found.' );
 		}
-	}
-
-	/**
-	 * 获取请求的模块
-	 */
-	public function getModule()
-	{
-	}
-
-	/**
-	 * 获取请求的控制器
-	 */
-	public function getController()
-	{
-	}
-
-	/**
-	 * 获取请求的控制器
-	 */
-	public function getAction()
-	{
 	}
 
 	/**

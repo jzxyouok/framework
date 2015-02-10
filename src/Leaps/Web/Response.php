@@ -13,7 +13,8 @@ namespace Leaps\Web;
 use Leaps\Kernel;
 use Leaps\InvalidConfigException;
 use Leaps\InvalidParamException;
-use Guzzle\Plugin\Cookie\Cookie;
+use Leaps\Web\Response\CookieCollection;
+use Leaps\Web\Response\HeaderCollection;
 
 class Response extends \Leaps\Response
 {
@@ -22,6 +23,24 @@ class Response extends \Leaps\Response
 	const FORMAT_JSON = 'json';
 	const FORMAT_JSONP = 'jsonp';
 	const FORMAT_XML = 'xml';
+
+	/**
+	 * 响应类型
+	 * @var sring
+	 */
+	public $format = self::FORMAT_HTML;
+
+	/**
+	 * MIME类型
+	 * @var string
+	 */
+	public $acceptMimeType;
+
+	/**
+	 * 参数
+	 * @var array
+	 */
+	public $acceptParams = [];
 
 	/**
 	 *
@@ -37,6 +56,19 @@ class Response extends \Leaps\Response
 	 * @see content
 	 */
 	public $data;
+
+	/**
+	 * 格式化后的响应内容
+	 * @var string
+	 * @see data
+	 */
+	public $content;
+
+	/**
+	 * 响应流
+	 * @var resource|array
+	 */
+	public $stream;
 
 	/**
 	 * 响应文本的字符集
@@ -145,7 +177,7 @@ class Response extends \Leaps\Response
 	 *
 	 * @var int
 	 */
-	protected $_statusCode;
+	protected $_statusCode = 200;
 
 	/**
 	 * Header集合
@@ -207,9 +239,21 @@ class Response extends \Leaps\Response
 	}
 
 	/**
+	 * 设置Header集合
+	 *
+	 * @param Leaps\Web\Response\CookieCollection headers
+	 * @return Leaps\Web\Response\CookieCollection
+	 */
+	public function setHeaders(HeaderCollection $headers)
+	{
+		$this->_headers = $headers;
+		return $this;
+	}
+
+	/**
 	 * 返回Header集合
 	 *
-	 * @return HeaderCollection the header collection
+	 * @return Leaps\Web\Response\CookieCollection
 	 */
 	public function getHeaders()
 	{
@@ -251,23 +295,21 @@ class Response extends \Leaps\Response
 	private $_cookies;
 
 	/**
+	 * 设置Cookie集合
+	 *
+	 * @param Leaps\Web\Response\CookieCollection cookies
+	 * @return Leaps\Web\Response\CookieCollection
+	 */
+	public function setCookies(CookieCollection $cookies)
+	{
+		$this->_cookies = $cookies;
+		return $this;
+	}
+
+	/**
 	 * 返回Cookie集合
-	 * Through the returned cookie collection, you add or remove cookies as follows,
 	 *
-	 * ~~~
-	 * // add a cookie
-	 * $response->cookies->add(new Cookie([
-	 * 'name' => $name,
-	 * 'value' => $value,
-	 * ]);
-	 *
-	 * // remove a cookie
-	 * $response->cookies->remove('name');
-	 * // alternatively
-	 * unset($response->cookies['name']);
-	 * ~~~
-	 *
-	 * @return CookieCollection the cookie collection.
+	 * @return Leaps\Web\Response\CookieCollection
 	 */
 	public function getCookies()
 	{
@@ -276,6 +318,7 @@ class Response extends \Leaps\Response
 		}
 		return $this->_cookies;
 	}
+
 	/**
 	 * 设置Cookie
 	 *
@@ -283,7 +326,8 @@ class Response extends \Leaps\Response
 	 */
 	public function setCookie($config = [])
 	{
-		$this->getCookies ()->add ( new \Leaps\Web\Cookie ( $config ) );
+		$cookies = $this->getCookies ();
+		$cookies->add ( new \Leaps\Web\Cookie ( $config ) );
 		return $this;
 	}
 
@@ -297,9 +341,28 @@ class Response extends \Leaps\Response
 		if ($this->isSent) {
 			return;
 		}
-		$this->sendHeaders ();
-		echo '发送响应';
-		$this->isSent = true;
+		//$this->trigger(self::EVENT_BEFORE_SEND);
+        $this->prepare();
+        //$this->trigger(self::EVENT_AFTER_PREPARE);
+        $this->sendHeaders();
+        $this->sendContent();
+        //$this->trigger(self::EVENT_AFTER_SEND);
+        $this->isSent = true;
+	}
+
+	/**
+	 * 清理响应
+	 */
+	public function clear()
+	{
+		$this->_headers = null;
+		$this->_cookies = null;
+		$this->_statusCode = 200;
+		$this->statusText = 'OK';
+		$this->data = null;
+		$this->stream = null;
+		$this->content = null;
+		$this->isSent = false;
 	}
 
 	/**
@@ -319,7 +382,7 @@ class Response extends \Leaps\Response
 				// set replace for first occurrence of header but false afterwards to allow multiple
 				$replace = true;
 				foreach ( $values as $value ) {
-					//header ( "$name: $value", $replace );
+					header ( "$name: $value", $replace );
 					$replace = false;
 				}
 			}
@@ -332,51 +395,68 @@ class Response extends \Leaps\Response
 	 */
 	protected function sendCookies()
 	{
-		if ($this->_cookies === null) {
-			return;
-		}
-		$request = Kernel::$app->getRequest ();
-		if ($request->enableCookieValidation) {
-			if ($request->cookieValidationKey == '') {
-				throw new InvalidConfigException ( get_class ( $request ) . '::cookieValidationKey must be configured with a secret key.' );
-			}
-			$validationKey = $request->cookieValidationKey;
-		}
-		foreach ( $this->getCookies () as $cookie ) {
-			$value = $cookie->value;
-			if ($cookie->expire != 1 && isset ( $validationKey )) {
-				$value = Yii::$app->getSecurity ()->hashData ( serialize ( [
-						$cookie->name,
-						$value
-				] ), $validationKey );
-			}
-			setcookie ( $cookie->name, $value, $cookie->expire, $cookie->path, $cookie->domain, $cookie->secure, $cookie->httpOnly );
-		}
-		$this->getCookies ()->removeAll ();
+
 	}
 
 	/**
-	 * Sets an attached file to be sent at the end of the request
-	 *
-	 * @param string filePath
-	 * @param string attachmentName
-	 * @return Phalcon\Http\ResponseInterface
+	 * 发送响应内容到客户端
 	 */
-	public function setFileToSend($filePath, $attachmentName = null, $attachment = true)
+	protected function sendContent()
 	{
-		if (! is_string ( $attachmentName )) {
-			$basePath = basename ( $filePath );
+		if ($this->stream === null) {
+			echo $this->content;
+			return;
+		}
+		set_time_limit(0); // Reset time limit for big files
+		$chunkSize = 8 * 1024 * 1024; // 8MB per chunk
+
+		if (is_array($this->stream)) {
+			list ($handle, $begin, $end) = $this->stream;
+			fseek($handle, $begin);
+			while (!feof($handle) && ($pos = ftell($handle)) <= $end) {
+				if ($pos + $chunkSize > $end) {
+					$chunkSize = $end - $pos + 1;
+				}
+				echo fread($handle, $chunkSize);
+				flush(); // Free up memory. Otherwise large files will trigger PHP's memory limit.
+			}
+			fclose($handle);
 		} else {
-			$basePath = $attachmentName;
+			while (!feof($this->stream)) {
+				echo fread($this->stream, $chunkSize);
+				flush();
+			}
+			fclose($this->stream);
 		}
-		if ($attachment) {
-			$headers = $this->getHeaders ();
-			$headers->setRaw ( "Content-Description: File Transfer" );
-			$headers->setRaw ( "Content-Type: application/octet-stream" );
-			$headers->setRaw ( "Content-Disposition: attachment; filename=" . $basePath );
-			$headers->setRaw ( "Content-Transfer-Encoding: binary" );
+	}
+
+	/**
+	 * 发送文件到浏览器
+	 *
+	 * Note that this method only prepares the response for file sending. The file is not sent
+	 * until [[send()]] is called explicitly or implicitly. The latter is done after you return from a controller action.
+	 *
+	 * @param string $filePath the path of the file to be sent.
+	 * @param string $attachmentName the file name shown to the user. If null, it will be determined from `$filePath`.
+	 * @param array $options additional options for sending the file. The following options are supported:
+	 *
+	 *  - `mimeType`: the MIME type of the content. If not set, it will be guessed based on `$filePath`
+	 *  - `inline`: boolean, whether the browser should open the file within the browser window. Defaults to false,
+	 *     meaning a download dialog will pop up.
+	 *
+	 * @return static the response object itself
+	 */
+	public function sendFile($filePath, $attachmentName = null, $options = [])
+	{
+		if (!isset($options['mimeType'])) {
+			$options['mimeType'] = FileHelper::getMimeTypeByExtension($filePath);
 		}
-		$this->_file = $filePath;
+		if ($attachmentName === null) {
+			$attachmentName = basename($filePath);
+		}
+		$handle = fopen($filePath, 'rb');
+		$this->sendStreamAsFile($handle, $attachmentName, $options);
+
 		return $this;
 	}
 
@@ -402,9 +482,47 @@ class Response extends \Leaps\Response
 				self::FORMAT_XML => 'Leaps\Web\Response\XmlFormatter',
 				self::FORMAT_JSON => 'Leaps\Web\Response\JsonFormatter',
 				self::FORMAT_JSONP => [
-						'class' => 'Leaps\Web\Response\JsonFormatter',
+						'className' => 'Leaps\Web\Response\JsonFormatter',
 						'useJsonp' => true
 				]
 		];
+	}
+
+	/**
+	 * Prepares for sending the response.
+	 * The default implementation will convert [[data]] into [[content]] and set headers accordingly.
+	 * @throws InvalidConfigException if the formatter for the specified format is invalid or [[format]] is not supported
+	 */
+	protected function prepare()
+	{
+		if ($this->stream !== null || $this->data === null) {
+			return;
+		}
+
+		if (isset($this->formatters[$this->format])) {
+			$formatter = $this->formatters[$this->format];
+			if (!is_object($formatter)) {
+				$this->formatters[$this->format] = $formatter = Kernel::createObject($formatter);
+			}
+			if ($formatter instanceof ResponseFormatterInterface) {
+				$formatter->format($this);
+			} else {
+				throw new InvalidConfigException("The '{$this->format}' response formatter is invalid. It must implement the ResponseFormatterInterface.");
+			}
+		} elseif ($this->format === self::FORMAT_RAW) {
+			$this->content = $this->data;
+		} else {
+			throw new InvalidConfigException("Unsupported response format: {$this->format}");
+		}
+
+		if (is_array($this->content)) {
+			throw new InvalidParamException("Response content must not be an array.");
+		} elseif (is_object($this->content)) {
+			if (method_exists($this->content, '__toString')) {
+				$this->content = $this->content->__toString();
+			} else {
+				throw new InvalidParamException("Response content must be a string or an object implementing __toString().");
+			}
+		}
 	}
 }

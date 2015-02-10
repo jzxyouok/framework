@@ -24,6 +24,12 @@ class Application extends \Leaps\Application
 	public $defaultRoute = 'home';
 
 	/**
+	 * 控制器实例
+	 * @var Controller
+	 */
+	public $controller;
+
+	/**
 	 * (non-PHPdoc)
 	 *
 	 * @see \Leaps\Application::handleRequest()
@@ -47,8 +53,6 @@ class Application extends \Leaps\Application
 				return $response;
 			}
 		} catch ( RouteException $e ) {
-			echo 'Page not found.', $e->getCode ();
-			exit;
 			throw new NotFoundHttpException ( 'Page not found.', $e->getCode (), $e );
 		}
 	}
@@ -96,9 +100,15 @@ class Application extends \Leaps\Application
 				'response' => [
 						'className' => 'Leaps\Web\Response'
 				],
+				'cookie' => [
+						'className'=>'Leaps\Web\Response\CookieCollection'
+				],
 				'session' => [
 						'className' => 'Leaps\Web\Session'
-				]
+				],
+				'errorHandler' => [
+						'className'=>'Leaps\Web\ErrorHandler'
+				],
 		] );
 	}
 }

@@ -14,18 +14,11 @@ use DOMDocument;
 use DOMElement;
 use DOMText;
 use Leaps\Arrayable;
-use yii\base\Component;
+use Leaps\Di\Injectable;
+use Leaps\Web\ResponseFormatterInterface;
 use yii\helpers\StringHelper;
 
-/**
- * XmlResponseFormatter formats the given data into an XML response content.
- *
- * It is used by [[Response]] to format response data.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
- */
-class XmlResponseFormatter extends Component implements ResponseFormatterInterface
+class XmlResponseFormatter extends Injectable implements ResponseFormatterInterface
 {
 	/**
 	 * @var string the Content-Type header for the response

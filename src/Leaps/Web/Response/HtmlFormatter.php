@@ -10,9 +10,10 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Web\Response;
 
-use yii\base\Component;
+use Leaps\Di\Injectable;
+use Leaps\Web\ResponseFormatterInterface;
 
-class HtmlResponseFormatter extends Component implements ResponseFormatterInterface
+class HtmlFormatter extends Injectable implements ResponseFormatterInterface
 {
 	/**
 	 *
@@ -21,7 +22,7 @@ class HtmlResponseFormatter extends Component implements ResponseFormatterInterf
 	public $contentType = 'text/html';
 
 	/**
-	 * Formats the specified response.
+	 * 格式化指定的响应
 	 *
 	 * @param Response $response the response to be formatted.
 	 */
