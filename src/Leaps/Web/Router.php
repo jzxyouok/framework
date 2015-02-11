@@ -52,6 +52,8 @@ class Router extends Injectable
 	 */
 	public $suffix = '';
 
+	public $cache = 'cache';
+
 	/**
 	 * 是否显示脚本名称
 	 *
@@ -63,6 +65,7 @@ class Router extends Injectable
 	private $_baseUrl;
 	private $_hostInfo;
 	private $request;
+
 
 	/**
 	 * (non-PHPdoc)
@@ -76,10 +79,15 @@ class Router extends Injectable
 		if (! $this->enablePrettyUrl || empty ( $this->rules )) {
 			return;
 		}
+
+		if (is_string($this->cache)) {
+			$this->cache = $this->getDI()->get('cache');
+		}
+
 		if ($this->enableRuleCache) {
 			$cacheKey = __CLASS__;
 			$hash = md5 ( json_encode ( $this->rules ) );
-			if (($data = $this->cache->get ( $cacheKey, 'router' )) !== false && isset ( $data [1] ) && $data [1] === $hash) {
+			if (($data = $this->cache->get ( $cacheKey )) !== false && isset ( $data [1] ) && $data [1] === $hash) {
 				$this->rules = $data [0];
 			} else {
 				$this->rules = $this->buildRules ( $this->rules );

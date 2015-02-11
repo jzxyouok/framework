@@ -11,10 +11,10 @@
 namespace Leaps;
 
 use Leaps\Di\Injectable;
-use Leaps\ViewContextInterface;
+//use Leaps\ViewContextInterface;
 use Leaps\Web\Router\Exception as RouteException;
 
-abstract class Controller extends Injectable implements ViewContextInterface
+abstract class Controller extends Injectable// implements ViewContextInterface
 {
 
 	/**
@@ -51,7 +51,7 @@ abstract class Controller extends Injectable implements ViewContextInterface
 	 *
 	 * @var View
 	 */
-	// private $_view;
+	//public $_view;
 
 	/**
 	 * 构造方法
@@ -88,7 +88,7 @@ abstract class Controller extends Injectable implements ViewContextInterface
 		if ($action === null) {
 			throw new RouteException ( 'Unable to resolve the request: ' . $this->getUniqueId () . '/' . $id );
 		}
-		Kernel::trace ( "Route to run: " . $action->getUniqueId (), __METHOD__ );
+		//Kernel::trace ( "Route to run: " . $action->getUniqueId (), __METHOD__ );
 		if (Kernel::$app->requestedAction === null) {
 			Kernel::$app->requestedAction = $action;
 		}
@@ -124,7 +124,7 @@ abstract class Controller extends Injectable implements ViewContextInterface
 			$id = $this->defaultAction;
 		}
 		if (preg_match ( '/^[a-z0-9\\-_]+$/', $id ) && strpos ( $id, '--' ) === false && trim ( $id, '-' ) === $id) {
-			$methodName = 'Action' . str_replace ( ' ', '', ucwords ( implode ( ' ', explode ( '-', $id ) ) ) );
+			$methodName = str_replace ( ' ', '', strtolower ( implode ( ' ', explode ( '-', $id ) ) ) ).'Action';
 			if (method_exists ( $this, $methodName )) {
 				$method = new \ReflectionMethod ( $this, $methodName );
 				if ($method->isPublic () && $method->getName () === $methodName) {

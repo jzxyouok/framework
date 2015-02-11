@@ -40,18 +40,19 @@ class Application extends \Leaps\Application
 		Kernel::setAlias ( '@web', $request->getBaseUrl () );
 		list ( $route, $params ) = $request->resolve ();
 		try {
-			kernel::trace ( "Route requested: '$route'", __METHOD__ );
+			//kernel::trace ( "Route requested: '$route'", __METHOD__ );
 			$this->requestedRoute = $route;
 			$result = $this->runAction ( $route, $params );
-			if ($result instanceof Response) {
-				return $result;
-			} else {
-				$response = $this->getResponse ();
-				if ($result !== null) {
-					$response->data = $result;
-				}
-				return $response;
-			}
+			exit;
+			//if ($result instanceof Response) {
+			//	return $result;
+			//} else {
+			//	$response = $this->getResponse ();
+			//	if ($result !== null) {
+			//		$response->data = $result;
+			//	}
+			//	return $response;
+			//}
 		} catch ( RouteException $e ) {
 			throw new NotFoundHttpException ( 'Page not found.', $e->getCode (), $e );
 		}
@@ -97,18 +98,18 @@ class Application extends \Leaps\Application
 				'request' => [
 						'className' => 'Leaps\Web\Request'
 				],
-				'response' => [
-						'className' => 'Leaps\Web\Response'
-				],
+				//'response' => [
+				//		'className' => 'Leaps\Web\Response'
+				//],
 				'cookie' => [
 						'className'=>'Leaps\Web\Response\CookieCollection'
 				],
 				'session' => [
 						'className' => 'Leaps\Web\Session'
 				],
-				'errorHandler' => [
-						'className'=>'Leaps\Web\ErrorHandler'
-				],
+				//'errorHandler' => [
+				//		'className'=>'Leaps\Web\ErrorHandler'
+				//],
 		] );
 	}
 }

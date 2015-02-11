@@ -38,7 +38,8 @@ class Request extends \Leaps\Request
 	 */
 	public function resolve()
 	{
-		$result = $this->router->parseRequest ( $this );
+		$result = \Leaps\Kernel::$app->getRouter()->parseRequest($this);
+		//$result = $this->router->parseRequest ( $this );
 		if ($result !== false) {
 			list ( $route, $params ) = $result;
 			$_GET = array_merge ( $_GET, $params );

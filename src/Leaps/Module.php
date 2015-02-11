@@ -272,9 +272,9 @@ class Module extends Di
 			if ($this->_modules [$id] instanceof Module) {
 				return $this->_modules [$id];
 			} elseif ($load) {
-				Kernel::trace ( "Loading module: $id", __METHOD__ );
+				//Kernel::trace ( "Loading module: $id", __METHOD__ );
 				/* @var $module Module */
-				$module = Kernel::createObject ( $this->_modules [$id], $id, $this );
+				$module = Kernel::createObject ( $this->_modules [$id], [$id, $this] );
 				$module->setInstance ( $module );
 				return $this->_modules [$id] = $module;
 			}
@@ -469,7 +469,7 @@ class Module extends Di
 		}
 
 		if (is_subclass_of ( $className, 'Leaps\Controller' )) {
-			return Kernel::createObject ( $className, $id, $this );
+			return Kernel::createObject ( $className, [$id, $this] );
 		} elseif (Kernel::$env == Kernel::DEVELOPMENT) {
 			throw new InvalidConfigException ( "Controller class must extend from \\Leaps\\Controller." );
 		} else {

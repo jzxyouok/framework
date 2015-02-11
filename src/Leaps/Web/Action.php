@@ -63,7 +63,7 @@ class Action extends Injectable {
 	public function runWithParams($params)
 	{
 		$args = $this->controller->bindActionParams($this, $params);
-        Kernel::trace('Running action: ' . get_class($this->controller) . '::' . $this->actionMethod . '()', __METHOD__);
+        //Kernel::trace('Running action: ' . get_class($this->controller) . '::' . $this->actionMethod . '()', __METHOD__);
         return call_user_func_array([$this->controller, $this->actionMethod], $args);
 	}
 }

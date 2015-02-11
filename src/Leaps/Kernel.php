@@ -45,44 +45,19 @@ class Kernel
 	 */
 	public static $env = Kernel::PRODUCTION;
 
-	public static $aliases = [ ];
-
 	/**
 	 * 应用程序实例
 	 *
 	 * @var unknown
 	 */
 	public static $app;
-
-	/**
-	 * 初始属性值将被通过[[createObject]]应用到新创建的对象.
-	 * 数组类名健和相应的数组值木有反斜杠,
-	 * For example,
-	 *
-	 * ~~~
-	 * [
-	 * 'Bar' => [
-	 * 'prop1' => 'value1',
-	 * 'prop2' => 'value2',
-	 * ],
-	 * 'mycompany\foo\Car' => [
-	 * 'prop1' => 'value1',
-	 * 'prop2' => 'value2',
-	 * ],
-	 * ]
-	 * ~~~
-	 *
-	 * @var array
-	 * @see createObject()
-	 */
-	public static $objectConfig = [ ];
-
 	/**
 	 * classMap
 	 *
 	 * @var array
 	 */
-	public static $classMap = [ ];
+	private static $classMap = [ ];
+	private static $aliases = [ ];
 
 	/**
 	 * 自动装载器
@@ -251,7 +226,7 @@ class Kernel
 	 * @return mixed the created object
 	 * @throws InvalidConfigException if the configuration is invalid.
 	 */
-	public static function createObject($config)
+	public static function createObject($config,$params = [])
 	{
 		static $reflections = [ ];
 
@@ -266,9 +241,6 @@ class Kernel
 		}
 
 		$class = ltrim ( $class, '\\' );
-		if (isset ( static::$objectConfig [$class] )) {
-			$config = array_merge ( static::$objectConfig [$class], $config );
-		}
 		if (($n = func_num_args ()) > 1) {
 			/**
 			 * @var \ReflectionClass $reflection

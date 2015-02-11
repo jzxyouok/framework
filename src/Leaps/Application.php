@@ -86,7 +86,7 @@ abstract class Application extends Module
 		$this->setInstance($this);
 		$this->preInit ( $config );
 		$this->init ();
-		$this->registerErrorHandler($config);
+		//$this->registerErrorHandler($config);
 		Di::__construct();
 	}
 
@@ -337,7 +337,7 @@ abstract class Application extends Module
 				'event' => [
 						'className' => 'Leaps\Event\Dispatcher'
 				],
-				'view' => ['className' => 'Leaps\Web\View'],
+				//'view' => ['className' => 'Leaps\Web\View'],
 				'registry' => [
 						'className' => 'Leaps\Registry'
 				],

@@ -66,12 +66,15 @@ class FileCache extends Cache
 	 */
 	public $dirMode = 0775;
 
+	private $file;
+
 	/**
 	 * Initializes this component by ensuring the existence of the cache path.
 	 */
 	public function init()
 	{
 		parent::init ();
+		$this->file = $this->getDI()->get('file');
 		$this->cachePath = Kernel::getAlias ( $this->cachePath );
 		if (! is_dir ( $this->cachePath )) {
 			$this->file->createDirectory ( $this->cachePath, $this->dirMode, true );

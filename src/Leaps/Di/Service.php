@@ -142,7 +142,7 @@ class Service implements ServiceInterface
 		 */
 		if ($this->_shared) {
 			if ($this->_sharedInstance !== null) {
-				return $$this->_sharedInstance;
+				return $this->_sharedInstance;
 			}
 		}
 		$found = true;
