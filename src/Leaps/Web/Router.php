@@ -11,9 +11,9 @@
 namespace Leaps\Web;
 
 use Leaps\Kernel;
-use Leaps\Di\Injectable;
+use Leaps\Base;
 
-class Router extends Injectable
+class Router extends Base
 {
 
 	/**
@@ -75,15 +75,12 @@ class Router extends Injectable
 	public function init()
 	{
 		parent::init ();
-
 		if (! $this->enablePrettyUrl || empty ( $this->rules )) {
 			return;
 		}
-
 		if (is_string($this->cache)) {
-			$this->cache = $this->getDI()->get('cache');
+			$this->cache = Kernel::$app->get('cache');
 		}
-
 		if ($this->enableRuleCache) {
 			$cacheKey = __CLASS__;
 			$hash = md5 ( json_encode ( $this->rules ) );

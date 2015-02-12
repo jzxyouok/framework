@@ -363,12 +363,14 @@ class Module extends Di
 	public function runAction($route, $params = [])
 	{
 		$parts = $this->createController ( $route );
+
 		if (is_array ( $parts )) {
 			/* @var $controller Controller */
 			list ( $controller, $actionID ) = $parts;
 			$oldController = Kernel::$app->controller;
 			Kernel::$app->controller = $controller;
 			$result = $controller->runActionInstance ( $actionID, $params );
+			exit;
 			Kernel::$app->controller = $oldController;
 			return $result;
 		} else {

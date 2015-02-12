@@ -8,11 +8,9 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Log;
+namespace Leaps;
 
-use Leaps\Kernel;
 use Leaps\Di\Injectable;
-use Leaps\InvalidConfigException;
 
 class Logger extends Injectable
 {

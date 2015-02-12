@@ -39,9 +39,11 @@ class Application extends \Leaps\Application
 		Kernel::setAlias ( '@webroot', dirname ( $request->getScriptFile () ) );
 		Kernel::setAlias ( '@web', $request->getBaseUrl () );
 		list ( $route, $params ) = $request->resolve ();
+
 		try {
 			//kernel::trace ( "Route requested: '$route'", __METHOD__ );
 			$this->requestedRoute = $route;
+
 			$result = $this->runAction ( $route, $params );
 			exit;
 			//if ($result instanceof Response) {

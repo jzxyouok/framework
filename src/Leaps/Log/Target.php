@@ -10,6 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Log;
 
+use Leaps\Logger;
 use Leaps\Di\Injectable;
 use Leaps\InvalidConfigException;
 

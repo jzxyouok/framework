@@ -342,7 +342,7 @@ abstract class Application extends Module
 						'className' => 'Leaps\Registry'
 				],
 				'log' => [
-						'className' => 'Leaps\Log\Logger'
+						'className' => 'Leaps\Logger'
 				],
 				'cache' => [
 						'className' => 'Leaps\Cache\FileCache'

@@ -85,6 +85,7 @@ abstract class Controller extends Injectable// implements ViewContextInterface
 	public function runActionInstance($id, $params = [])
 	{
 		$action = $this->createActionInstance ( $id );
+
 		if ($action === null) {
 			throw new RouteException ( 'Unable to resolve the request: ' . $this->getUniqueId () . '/' . $id );
 		}
@@ -95,7 +96,9 @@ abstract class Controller extends Injectable// implements ViewContextInterface
 		$oldAction = $this->action;
 		$this->action = $action;
 		// run the action
+
 		$result = $action->runWithParams ( $params );
+		exit;
 		$this->action = $oldAction;
 		return $result;
 	}
