@@ -131,7 +131,7 @@ abstract class Controller extends Injectable// implements ViewContextInterface
 			if (method_exists ( $this, $methodName )) {
 				$method = new \ReflectionMethod ( $this, $methodName );
 				if ($method->isPublic () && $method->getName () === $methodName) {
-					return new \Leaps\Web\Action ( $id, $this, $methodName );
+					return new \Leaps\Action ( $id, $this, $methodName );
 				}
 			}
 		}
@@ -174,21 +174,5 @@ abstract class Controller extends Injectable// implements ViewContextInterface
 	public function getViewPath()
 	{
 		return $this->module->getViewPath () . DIRECTORY_SEPARATOR . ucwords ( $this->id );
-	}
-
-	/**
-	 * Returns the view object that can be used to render views or view files.
-	 * The [[render()]], [[renderPartial()]] and [[renderFile()]] methods will use
-	 * this view object to implement the actual view rendering.
-	 * If not set, it will default to the "view" application component.
-	 *
-	 * @return View|\yii\web\View the view object that can be used to render views or view files.
-	 */
-	public function getView()
-	{
-		if ($this->_view === null) {
-			$this->_view = Kernel::$app->getView ();
-		}
-		return $this->_view;
 	}
 }

@@ -60,10 +60,9 @@ class Action {
 	 */
 	public function runWithParams($params)
 	{
-		$args = $this->controller->bindActionParams($this, $params);
+		//$args = $this->controller->bindActionParams($this, $params);
         //Kernel::trace('Running action: ' . get_class($this->controller) . '::' . $this->actionMethod . '()', __METHOD__);
-        print_r($this->controller);
-        exit;
-        return call_user_func_array([$this->controller, $this->actionMethod], $args);
+		return call_user_func([$this->controller, $this->actionMethod]);
+        //return call_user_func_array([$this->controller, $this->actionMethod], $args);
 	}
 }

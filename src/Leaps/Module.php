@@ -272,7 +272,7 @@ class Module extends Di
 			if ($this->_modules [$id] instanceof Module) {
 				return $this->_modules [$id];
 			} elseif ($load) {
-				//Kernel::trace ( "Loading module: $id", __METHOD__ );
+				Kernel::trace ( "Loading module: $id", __METHOD__ );
 				/* @var $module Module */
 				$module = Kernel::createObject ( $this->_modules [$id], [$id, $this] );
 				$module->setInstance ( $module );

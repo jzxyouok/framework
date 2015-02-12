@@ -346,6 +346,9 @@ abstract class Application extends Module
 				],
 				'cache' => [
 						'className' => 'Leaps\Cache\FileCache'
+				],
+				'httpclient' => [
+						'className' => 'Leaps\HttpClient'
 				]
 		];
 	}

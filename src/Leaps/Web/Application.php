@@ -41,7 +41,7 @@ class Application extends \Leaps\Application
 		list ( $route, $params ) = $request->resolve ();
 
 		try {
-			//kernel::trace ( "Route requested: '$route'", __METHOD__ );
+			kernel::trace ( "Route requested: '$route'", __METHOD__ );
 			$this->requestedRoute = $route;
 
 			$result = $this->runAction ( $route, $params );
