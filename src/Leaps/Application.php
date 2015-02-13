@@ -70,12 +70,6 @@ abstract class Application extends Module
 	public $requestedParams;
 
 	/**
-	 *
-	 * @var array 已经加载的模块列表
-	 */
-	public $loadedModules = [ ];
-
-	/**
 	 * 构造方法
 	 *
 	 * @param array $config
