@@ -9,10 +9,8 @@
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
 namespace Leaps\Web;
-use Leaps\Kernel;
-use Leaps\Di\Injectable;
 use Leaps\InvalidConfigException;
-class Action extends Injectable {
+class Action {
 
 	/**
 	 * @var string ID of the action
@@ -28,8 +26,6 @@ class Action extends Injectable {
 	 * @var string the controller method that this inline action is associated with
 	 */
 	public $actionMethod;
-
-
 
 	/**
 	 * Constructor.
@@ -64,8 +60,9 @@ class Action extends Injectable {
 	 */
 	public function runWithParams($params)
 	{
-		$args = $this->controller->bindActionParams($this, $params);
-        Kernel::trace('Running action: ' . get_class($this->controller) . '::' . $this->actionMethod . '()', __METHOD__);
-        return call_user_func_array([$this->controller, $this->actionMethod], $args);
+		//$args = $this->controller->bindActionParams($this, $params);
+        //Kernel::trace('Running action: ' . get_class($this->controller) . '::' . $this->actionMethod . '()', __METHOD__);
+		return call_user_func([$this->controller, $this->actionMethod]);
+        //return call_user_func_array([$this->controller, $this->actionMethod], $args);
 	}
 }

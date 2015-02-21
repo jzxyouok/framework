@@ -70,12 +70,6 @@ abstract class Application extends Module
 	public $requestedParams;
 
 	/**
-	 *
-	 * @var array 已经加载的模块列表
-	 */
-	public $loadedModules = [ ];
-
-	/**
 	 * 构造方法
 	 *
 	 * @param array $config
@@ -86,6 +80,7 @@ abstract class Application extends Module
 		$this->setInstance($this);
 		$this->preInit ( $config );
 		$this->init ();
+		//$this->registerErrorHandler($config);
 		Di::__construct();
 	}
 
@@ -102,7 +97,7 @@ abstract class Application extends Module
 		}
 
 		if (isset ( $config ['charset'] )) {
-			$this->id = $config ['charset'];
+			$this->charset = $config ['charset'];
 			unset ( $config ['charset'] );
 		}
 
@@ -167,6 +162,23 @@ abstract class Application extends Module
 	}
 
 	/**
+	 * Registers the errorHandler component as a PHP error handler.
+	 * @param array $config application config
+	 */
+	protected function registerErrorHandler(&$config)
+	{
+		if (Kernel::$env == Kernel::DEVELOPMENT) {
+			if (!isset($config['services']['errorHandler']['className'])) {
+				echo "Error: no errorHandler service is configured.\n";
+				exit(1);
+			}
+			$this->set('errorHandler', $config['services']['errorHandler']);
+			unset($config['services']['errorHandler']);
+			$this->getErrorHandler()->register();
+		}
+	}
+
+	/**
 	 * 处理指定的请求
 	 *
 	 * 此方法返回 [[Response]] 实例或其子类来表示处理请求的结果。
@@ -187,7 +199,7 @@ abstract class Application extends Module
 		try {
 			$this->get ( 'event' )->trigger ( self::EVENT_BEFORE_REQUEST );
 			$response = $this->handleRequest ( $this->getRequest () );
-			$this->event->trigger ( self::EVENT_AFTER_REQUEST );
+			$this->get ( 'event' )->trigger ( self::EVENT_AFTER_REQUEST );
 			$response->send ();
 			return $response->exitStatus;
 		} catch ( ExitException $e ) {
@@ -319,14 +331,18 @@ abstract class Application extends Module
 				'event' => [
 						'className' => 'Leaps\Event\Dispatcher'
 				],
+				//'view' => ['className' => 'Leaps\Web\View'],
 				'registry' => [
 						'className' => 'Leaps\Registry'
 				],
 				'log' => [
-						'className' => 'Leaps\Log\Logger'
+						'className' => 'Leaps\Logger'
 				],
 				'cache' => [
 						'className' => 'Leaps\Cache\FileCache'
+				],
+				'httpclient' => [
+						'className' => 'Leaps\HttpClient'
 				]
 		];
 	}

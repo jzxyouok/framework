@@ -8,18 +8,13 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Web\Router;
+namespace Leaps;
 
-class Exception extends \Leaps\Exception
-{
+interface ViewContextInterface{
 
 	/**
-	 * 返回用户友好的异常名称
-	 *
+	 * 获取模板视图路径
 	 * @return string
 	 */
-	public function getName()
-	{
-		return 'Router Exception';
-	}
+	public function getViewPath();
 }

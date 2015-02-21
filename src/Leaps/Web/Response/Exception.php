@@ -8,7 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Web\Router;
+namespace Leaps\Web\Response;
 
 class Exception extends \Leaps\Exception
 {
@@ -20,6 +20,6 @@ class Exception extends \Leaps\Exception
 	 */
 	public function getName()
 	{
-		return 'Router Exception';
+		return 'Response Exception';
 	}
 }

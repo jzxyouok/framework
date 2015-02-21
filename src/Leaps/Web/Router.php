@@ -11,9 +11,9 @@
 namespace Leaps\Web;
 
 use Leaps\Kernel;
-use Leaps\Di\Injectable;
+use Leaps\Base;
 
-class Router extends Injectable
+class Router extends Base
 {
 
 	/**
@@ -52,6 +52,8 @@ class Router extends Injectable
 	 */
 	public $suffix = '';
 
+	public $cache = 'cache';
+
 	/**
 	 * 是否显示脚本名称
 	 *
@@ -64,6 +66,7 @@ class Router extends Injectable
 	private $_hostInfo;
 	private $request;
 
+
 	/**
 	 * (non-PHPdoc)
 	 *
@@ -72,14 +75,16 @@ class Router extends Injectable
 	public function init()
 	{
 		parent::init ();
-
 		if (! $this->enablePrettyUrl || empty ( $this->rules )) {
 			return;
+		}
+		if (is_string($this->cache)) {
+			$this->cache = Kernel::$app->get('cache');
 		}
 		if ($this->enableRuleCache) {
 			$cacheKey = __CLASS__;
 			$hash = md5 ( json_encode ( $this->rules ) );
-			if (($data = $this->cache->get ( $cacheKey, 'router' )) !== false && isset ( $data [1] ) && $data [1] === $hash) {
+			if (($data = $this->cache->get ( $cacheKey )) !== false && isset ( $data [1] ) && $data [1] === $hash) {
 				$this->rules = $data [0];
 			} else {
 				$this->rules = $this->buildRules ( $this->rules );
