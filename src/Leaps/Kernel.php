@@ -58,6 +58,7 @@ class Kernel
 	 */
 	private static $classMap = [ ];
 	private static $aliases = [ ];
+	public static $loadedModules = [];
 
 	/**
 	 * 自动装载器

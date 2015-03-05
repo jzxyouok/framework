@@ -74,6 +74,8 @@ class FileCache extends Cache
 	public function init()
 	{
 		parent::init ();
+		print_r($this->getDI());
+		exit;
 		$this->file = $this->getDI()->get('file');
 		$this->cachePath = Kernel::getAlias ( $this->cachePath );
 		if (! is_dir ( $this->cachePath )) {

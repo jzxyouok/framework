@@ -77,7 +77,7 @@ class Module extends Di
 	public static function getInstance()
 	{
 		$class = get_called_class ();
-		return isset ( Kernel::$app->loadedModules [$class] ) ? Kernel::$app->loadedModules [$class] : null;
+		return isset ( Kernel::$loadedModules [$class] ) ? Kernel::$loadedModules [$class] : null;
 	}
 
 	/**
@@ -89,9 +89,9 @@ class Module extends Di
 	public static function setInstance($instance)
 	{
 		if ($instance === null) {
-			unset ( Kernel::$app->loadedModules [get_called_class ()] );
+			unset ( Kernel::$loadedModules [get_called_class ()] );
 		} else {
-			Kernel::$app->loadedModules [get_class ( $instance )] = $instance;
+			Kernel::$loadedModules [get_class ( $instance )] = $instance;
 		}
 	}
 
