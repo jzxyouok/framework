@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps;
 
-use Leaps\Log\Logger;
+use Leaps\Logger;
 
 class Kernel
 {
