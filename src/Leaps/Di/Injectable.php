@@ -50,7 +50,7 @@ abstract class Injectable extends Base implements \Leaps\Di\InjectionAwareInterf
 	public function getDI()
 	{
 		$dependencyInjector = $this->_dependencyInjector;
-		if (is_object ( $dependencyInjector )) {
+		if (! is_object ( $dependencyInjector )) {
 			$dependencyInjector = \Leaps\Di::getDefault ();
 		}
 		return $dependencyInjector;
@@ -91,6 +91,7 @@ abstract class Injectable extends Base implements \Leaps\Di\InjectionAwareInterf
 
 	/**
 	 * 魔术方法__set
+	 *
 	 * @param string $name
 	 * @param unknown $value
 	 * @throws InvalidCallException
