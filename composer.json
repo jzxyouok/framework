@@ -6,9 +6,6 @@
     "php" : ">=5.4.0",
     "ext-mbstring" : "*",
     "lib-pcre" : "*",
-    "leaps/filesystem" : "1.0.0",
-    "leaps/httpclient" : "1.2.2",
-    "tintsoft/aliyun" : "1.0",
     "ezyang/htmlpurifier" : "4.6.*",
     "cebe/markdown" : "0.9.*",
     "firephp/firephp-core" : "0.4.0"
