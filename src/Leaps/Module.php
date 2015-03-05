@@ -68,34 +68,6 @@ class Module extends Di
 	}
 
 	/**
-	 * Returns the currently requested instance of this module class.
-	 * If the module class is not currently requested, null will be returned.
-	 * This method is provided so that you access the module instance from anywhere within the module.
-	 *
-	 * @return static|null the currently requested instance of this module class, or null if the module class is not requested.
-	 */
-	public static function getInstance()
-	{
-		$class = get_called_class ();
-		return isset ( Kernel::$loadedModules [$class] ) ? Kernel::$loadedModules [$class] : null;
-	}
-
-	/**
-	 * Sets the currently requested instance of this module class.
-	 *
-	 * @param Module|null $instance the currently requested instance of this module class.
-	 *        If it is null, the instance of the calling class will be removed, if any.
-	 */
-	public static function setInstance($instance)
-	{
-		if ($instance === null) {
-			unset ( Kernel::$loadedModules [get_called_class ()] );
-		} else {
-			Kernel::$loadedModules [get_class ( $instance )] = $instance;
-		}
-	}
-
-	/**
 	 * 初始化模块
 	 */
 	public function init()

@@ -77,7 +77,7 @@ abstract class Application extends Module
 	public function __construct($config = [])
 	{
 		Kernel::$app = $this;
-		Module::setInstance($this);
+		//Module::setInstance($this);
 		$this->preInit ( $config );
 		$this->init ();
 		//$this->registerErrorHandler($config);
