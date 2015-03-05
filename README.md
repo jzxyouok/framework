@@ -43,7 +43,6 @@ The preferred way to install the Leaps framework is through [composer](http://ge
 Either run
 
 ```
-composer global require "fxp/composer-asset-plugin:1.0.0-beta2"
 composer require --prefer-dist "tintsoft/framework *"
 ```
 
