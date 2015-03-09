@@ -170,8 +170,6 @@ class UrlRule extends Base  implements UrlRuleInterface
 
 		$tr = [ '.' => '\\.','*' => '\\*','$' => '\\$','[' => '\\[',']' => '\\]','(' => '\\(',')' => '\\)' ];
 		$tr2 = [];
-		print_r($tr);
-		exit;
 		if (preg_match_all ( "/<(\\w+):?([^>]+)?>/", $this->pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER )) {
 			foreach ( $matches as $match ) {
 				$name = $match [1] [0];
