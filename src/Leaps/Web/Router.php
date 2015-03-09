@@ -132,7 +132,7 @@ class Router extends Base
 		foreach ( $rules as $key => $rule ) {
 			if (is_string ( $rule )) {
 				$rule = [ 'route' => $rule ];
-				if (preg_match ( "/^((?:($verbs),)*($verbs))\\s+(.*)$/", $key, $matches )) {
+				if (preg_match ( "/^((?:(".$verbs."),)*(".$verbs."))\\s+(.*)$/", $key, $matches )) {
 					$rule ['verb'] = explode ( ',', $matches [1] );
 					$rule ['mode'] = UrlRule::PARSING_ONLY;
 					$key = $matches [4];
