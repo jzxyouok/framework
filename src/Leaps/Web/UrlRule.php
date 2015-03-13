@@ -8,12 +8,11 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-
 namespace Leaps\Web;
 
 use Leaps\Base;
 
-class UrlRule extends Base  implements UrlRuleInterface
+class UrlRule extends Base implements UrlRuleInterface
 {
 
 	/**
@@ -63,7 +62,7 @@ class UrlRule extends Base  implements UrlRuleInterface
 	 *      property will be
 	 *      injected into $_GET.
 	 */
-	public $defaults = [];
+	public $defaults = [ ];
 
 	/**
 	 *
@@ -71,7 +70,7 @@ class UrlRule extends Base  implements UrlRuleInterface
 	 *      be used so that the
 	 *      URL looks like pointing to a static HTML page. If not, the value of
 	 *      [[UrlManager::suffix]] will be used.
-	*/
+	 */
 	public $suffix;
 
 	/**
@@ -117,13 +116,12 @@ class UrlRule extends Base  implements UrlRuleInterface
 	 * @var array list of regex for matching parameters. This is used in
 	 *      generating URL.
 	 */
-	private $_paramRules = [];
+	private $_paramRules = [ ];
 	/**
 	 *
 	 * @var array list of parameters used in the route.
-	*/
-	private $_routeParams = [];
-
+	 */
+	private $_routeParams = [ ];
 
 	/**
 	 * 初始化这个规则
@@ -142,7 +140,9 @@ class UrlRule extends Base  implements UrlRuleInterface
 					$this->verb [$i] = strtoupper ( $verb );
 				}
 			} else {
-				$this->verb = [strtoupper ( $this->verb ) ];
+				$this->verb = [
+						strtoupper ( $this->verb )
+				];
 			}
 		}
 		if ($this->name === null) {
@@ -168,10 +168,16 @@ class UrlRule extends Base  implements UrlRuleInterface
 			}
 		}
 
-		$tr = [ '.' => '\\.','*' => '\\*','$' => '\\$','[' => '\\[',']' => '\\]','(' => '\\(',')' => '\\)' ];
-		$tr2 = [];
-		print_r($tr);
-		exit;
+		$tr = [
+				'.' => '\\.',
+				'*' => '\\*',
+				'$' => '\\$',
+				'[' => '\\[',
+				']' => '\\]',
+				'(' => '\\(',
+				')' => '\\)'
+		];
+		$tr2 = [ ];
 		if (preg_match_all ( "/<(\\w+):?([^>]+)?>/", $this->pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER )) {
 			foreach ( $matches as $match ) {
 				$name = $match [1] [0];
@@ -251,7 +257,7 @@ class UrlRule extends Base  implements UrlRuleInterface
 			}
 		}
 		$params = $this->defaults;
-		$tr = [];
+		$tr = [ ];
 		foreach ( $matches as $name => $value ) {
 			if (isset ( $this->_routeParams [$name] )) {
 				$tr [$this->_routeParams [$name]] = $value;
@@ -265,7 +271,10 @@ class UrlRule extends Base  implements UrlRuleInterface
 		} else {
 			$route = $this->route;
 		}
-		return [ $route,$params ];
+		return [
+				$route,
+				$params
+		];
 	}
 
 	/**
@@ -285,7 +294,7 @@ class UrlRule extends Base  implements UrlRuleInterface
 			return false;
 		}
 
-		$tr = [];
+		$tr = [ ];
 
 		// match the route part first
 		if ($route !== $this->route) {
@@ -312,8 +321,8 @@ class UrlRule extends Base  implements UrlRuleInterface
 			if (! isset ( $params [$name] )) {
 				return false;
 			} elseif (strcmp ( $params [$name], $value ) === 0) { // strcmp will do
-				// string conversion
-				// automatically
+			                                                      // string conversion
+			                                                      // automatically
 				unset ( $params [$name] );
 				if (isset ( $this->_paramRules [$name] )) {
 					$tr ["<$name>"] = '';

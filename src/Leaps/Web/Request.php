@@ -408,7 +408,7 @@ class Request extends \Leaps\Request
 			} elseif (($pos = strpos ( $_SERVER ['PHP_SELF'], '/' . $scriptName )) !== false) {
 				$this->_scriptUrl = substr ( $_SERVER ['SCRIPT_NAME'], 0, $pos ) . '/' . $scriptName;
 			} elseif (! empty ( $_SERVER ['DOCUMENT_ROOT'] ) && strpos ( $scriptFile, $_SERVER ['DOCUMENT_ROOT'] ) === 0) {
-				$this->_scriptUrl = str_replace ( '\\', '/', str_replace ( $_SERVER ['DOCUMENT_ROOT'], '', $scriptFile ) );
+				$this->_scriptUrl = str_replace ( "\\", "/", str_replace ( $_SERVER ['DOCUMENT_ROOT'], '', $scriptFile ) );
 			} else {
 				throw new InvalidConfigException ( 'Unable to determine the entry script URL.' );
 			}
@@ -426,17 +426,7 @@ class Request extends \Leaps\Request
 	{
 		$this->_scriptUrl = '/' . trim ( $value, '/' );
 	}
-	private $_scriptFile;
 
-	/**
-	 * 返回输入脚本的物理路径
-	 *
-	 * @return string the entry script file path
-	 */
-	public function getScriptFile()
-	{
-		return isset ( $this->_scriptFile ) ? $this->_scriptFile : $_SERVER ['SCRIPT_FILENAME'];
-	}
 
 	/**
 	 * 设置输入脚本的物理路径
@@ -576,7 +566,7 @@ class Request extends \Leaps\Request
 		} elseif (isset ( $_SERVER ['REQUEST_URI'] )) {
 			$requestUri = $_SERVER ['REQUEST_URI'];
 			if ($requestUri !== '' && $requestUri [0] !== '/') {
-				$requestUri = preg_replace ( '/^(http|https):\/\/[^\/]+/i', '', $requestUri );
+				$requestUri = preg_replace ( "/^(http|https):\/\/[^\/]+/i", '', $requestUri );
 			}
 		} elseif (isset ( $_SERVER ['ORIG_PATH_INFO'] )) { // IIS 5.0 CGI
 			$requestUri = $_SERVER ['ORIG_PATH_INFO'];

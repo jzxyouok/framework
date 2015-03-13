@@ -261,7 +261,7 @@ class Router extends Base
 		$params = ( array ) $params;
 		$url = $this->createUrl ( $params );
 		if (strpos ( $url, '://' ) === false) {
-			$url = $this->getHostInfo ( $schema ) . $url;
+			$url = $this->getHostInfo ( ) . $url;
 		}
 		if ($schema !== null && ($pos = strpos ( $url, '://' )) !== false) {
 			$url = $schema . substr ( $url, $pos );

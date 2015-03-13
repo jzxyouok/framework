@@ -98,7 +98,7 @@ class Application extends \Leaps\Application
 						'className' => 'Leaps\Web\Router'
 				],
 				'request' => [
-						'className' => 'Leaps\Web\Request'
+						'className' => 'Leaps\Http\Request'
 				],
 				//'response' => [
 				//		'className' => 'Leaps\Web\Response'
