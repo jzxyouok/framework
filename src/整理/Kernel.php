@@ -58,7 +58,7 @@ class Kernel
 	 */
 	private static $classMap = [ ];
 	private static $aliases = [ ];
-	public static $loadedModules = [ ];
+	public static $loadedModules = [];
 
 	/**
 	 * 自动装载器
@@ -136,18 +136,13 @@ class Kernel
 				if ($pos === false) {
 					static::$aliases [$root] = $path;
 				} else {
-					static::$aliases [$root] = [
-							$alias => $path
-					];
+					static::$aliases [$root] = [ $alias => $path ];
 				}
 			} elseif (is_string ( static::$aliases [$root] )) {
 				if ($pos === false) {
 					static::$aliases [$root] = $path;
 				} else {
-					static::$aliases [$root] = [
-							$alias => $path,
-							$root => static::$aliases [$root]
-					];
+					static::$aliases [$root] = [ $alias => $path,$root => static::$aliases [$root] ];
 				}
 			} else {
 				static::$aliases [$root] [$alias] = $path;
@@ -232,7 +227,7 @@ class Kernel
 	 * @return mixed the created object
 	 * @throws InvalidConfigException if the configuration is invalid.
 	 */
-	public static function createObject($config, $params = [])
+	public static function createObject($config,$params = [])
 	{
 		static $reflections = [ ];
 
@@ -249,7 +244,6 @@ class Kernel
 		$class = ltrim ( $class, '\\' );
 		if (($n = func_num_args ()) > 1) {
 			/**
-			 *
 			 * @var \ReflectionClass $reflection
 			 */
 			if (isset ( $reflections [$class] )) {
@@ -334,14 +328,13 @@ class Kernel
 	 * Logs a trace message.
 	 * Trace messages are logged mainly for development purpose to see
 	 * the execution work flow of some code.
-	 *
 	 * @param string $message the message to be logged.
 	 * @param string $category the category of the message.
 	 */
 	public static function trace($message, $category = 'application')
 	{
 		if (static::$env == static::DEVELOPMENT) {
-			static::$app->get ( 'log' )->log ( $message, Logger::LEVEL_TRACE, $category );
+			static::$app->get('log')->log($message, Logger::LEVEL_TRACE, $category);
 		}
 	}
 
@@ -349,39 +342,36 @@ class Kernel
 	 * Logs an error message.
 	 * An error message is typically logged when an unrecoverable error occurs
 	 * during the execution of an application.
-	 *
 	 * @param string $message the message to be logged.
 	 * @param string $category the category of the message.
 	 */
 	public static function error($message, $category = 'application')
 	{
-		static::$app->get ( 'log' )->log ( $message, Logger::LEVEL_ERROR, $category );
+		static::$app->get('log')->log($message, Logger::LEVEL_ERROR, $category);
 	}
 
 	/**
 	 * Logs a warning message.
 	 * A warning message is typically logged when an error occurs while the execution
 	 * can still continue.
-	 *
 	 * @param string $message the message to be logged.
 	 * @param string $category the category of the message.
 	 */
 	public static function warning($message, $category = 'application')
 	{
-		static::$app->get ( 'log' )->log ( $message, Logger::LEVEL_WARNING, $category );
+		static::$app->get('log')->log($message, Logger::LEVEL_WARNING, $category);
 	}
 
 	/**
 	 * Logs an informative message.
 	 * An informative message is typically logged by an application to keep record of
 	 * something important (e.g. an administrator logs in).
-	 *
 	 * @param string $message the message to be logged.
 	 * @param string $category the category of the message.
 	 */
 	public static function info($message, $category = 'application')
 	{
-		static::$app->get ( 'log' )->log ( $message, Logger::LEVEL_INFO, $category );
+		static::$app->get('log')->log($message, Logger::LEVEL_INFO, $category);
 	}
 
 	/**
@@ -392,32 +382,30 @@ class Kernel
 	 * ~~~
 	 * \Leaps::beginProfile('block1');
 	 * // some code to be profiled
-	 * \Leaps::beginProfile('block2');
-	 * // some other code to be profiled
-	 * \Leaps::endProfile('block2');
+	 *     \Leaps::beginProfile('block2');
+	 *     // some other code to be profiled
+	 *     \Leaps::endProfile('block2');
 	 * \Leaps::endProfile('block1');
 	 * ~~~
-	 *
 	 * @param string $token token for the code block
 	 * @param string $category the category of this log message
 	 * @see endProfile()
 	 */
 	public static function beginProfile($token, $category = 'application')
 	{
-		static::$app->get ( 'log' )->log ( $token, Logger::LEVEL_PROFILE_BEGIN, $category );
+		static::$app->get('log')->log($token, Logger::LEVEL_PROFILE_BEGIN, $category);
 	}
 
 	/**
 	 * 为分析标志着一个代码块的结束。
 	 * This has to be matched with a previous call to [[beginProfile]] with the same category name.
-	 *
 	 * @param string $token token for the code block
 	 * @param string $category the category of this log message
 	 * @see beginProfile()
 	 */
 	public static function endProfile($token, $category = 'application')
 	{
-		static::$app->get ( 'log' )->log ( $token, Logger::LEVEL_PROFILE_END, $category );
+		static::$app->get('log')->log($token, Logger::LEVEL_PROFILE_END, $category);
 	}
 
 	/**
