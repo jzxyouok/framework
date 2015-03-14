@@ -16,6 +16,8 @@ class Application extends \Leaps\Application
 {
 	public function handleRequest($request)
 	{
+		print_r($request);
+		exit;
 		echo 999;
 		exit ();
 	}
