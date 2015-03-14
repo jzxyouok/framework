@@ -19,6 +19,7 @@ class Application extends \Leaps\Application
 		echo 999;
 		exit ();
 	}
+
 	public function coreServices()
 	{
 		return Arr::mergeArray ( parent::coreServices (), [

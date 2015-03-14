@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Console;
 
-class Request extends \Leaps\Http\RequestInterface
+class Request implements \Leaps\Http\RequestInterface
 {
 	public function resolve()
 	{
