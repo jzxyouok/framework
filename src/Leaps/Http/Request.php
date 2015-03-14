@@ -8,8 +8,15 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Console;
+namespace Leaps\Http;
 
-class Application {
+use Leaps\Base;
+use Leaps\DiInterface;
+use Leaps\Http\Request\Exception;
+use Leaps\InvalidConfigException;
+use Leaps\Di\InjectionAwareInterface;
+
+class Request  extends Base implements RequestInterface, InjectionAwareInterface
+{
 
 }

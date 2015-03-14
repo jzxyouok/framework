@@ -30,7 +30,7 @@ interface CryptInterface
 	 * Returns the current cipher
 	 *
 	 * @return string
-	 */
+	*/
 	public function getCipher();
 
 	/**
@@ -38,14 +38,14 @@ interface CryptInterface
 	 *
 	 * @param string cipher
 	 * @return Leaps\EncryptInterface
-	 */
+	*/
 	public function setMode($mode);
 
 	/**
 	 * Returns the current encryption mode
 	 *
 	 * @return string
-	 */
+	*/
 	public function getMode();
 
 	/**
@@ -53,14 +53,14 @@ interface CryptInterface
 	 *
 	 * @param string key
 	 * @return Leaps\EncryptInterface
-	 */
+	*/
 	public function setKey($key);
 
 	/**
 	 * Returns the encryption key
 	 *
 	 * @return string
-	 */
+	*/
 	public function getKey();
 
 	/**
@@ -69,7 +69,7 @@ interface CryptInterface
 	 * @param string text
 	 * @param string key
 	 * @return string
-	 */
+	*/
 	public function encrypt($text, $key = null);
 
 	/**
@@ -78,7 +78,7 @@ interface CryptInterface
 	 * @param string text
 	 * @param string key
 	 * @return string
-	 */
+	*/
 	public function decrypt($text, $key = null);
 
 	/**
@@ -87,7 +87,7 @@ interface CryptInterface
 	 * @param string text
 	 * @param string key
 	 * @return string
-	 */
+	*/
 	public function encryptBase64($text, $key = null);
 
 	/**
@@ -96,20 +96,20 @@ interface CryptInterface
 	 * @param string text
 	 * @param string key
 	 * @return string
-	 */
+	*/
 	public function decryptBase64($text, $key = null);
 
 	/**
 	 * Returns a list of available cyphers
 	 *
 	 * @return array
-	 */
+	*/
 	public function getAvailableCiphers();
 
 	/**
 	 * Returns a list of available modes
 	 *
 	 * @return array
-	 */
+	*/
 	public function getAvailableModes();
 }

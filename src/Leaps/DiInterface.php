@@ -34,14 +34,14 @@ interface DiInterface extends \ArrayAccess
 	 * @param string name
 	 * @param mixed definition
 	 * @return Leaps\Di\ServiceInterface
-	 */
+	*/
 	public function setShared($name, $definition);
 
 	/**
 	 * 从容器删除一个服务
 	 *
 	 * @param string name
-	 */
+	*/
 	public function remove($name);
 
 	/**
@@ -53,7 +53,7 @@ interface DiInterface extends \ArrayAccess
 	 * @param mixed definition
 	 * @param boolean shared
 	 * @return Leaps\Di\ServiceInterface
-	 */
+	*/
 	public function attempt($name, $definition, $shared = false);
 
 	/**
@@ -62,7 +62,7 @@ interface DiInterface extends \ArrayAccess
 	 * @param string name
 	 * @param array parameters
 	 * @return mixed
-	 */
+	*/
 	public function get($name, $parameters = null);
 
 	/**
@@ -71,7 +71,7 @@ interface DiInterface extends \ArrayAccess
 	 * @param string name
 	 * @param array parameters
 	 * @return mixed
-	 */
+	*/
 	public function getShared($name, $parameters = null);
 
 	/**
@@ -80,7 +80,7 @@ interface DiInterface extends \ArrayAccess
 	 * @param string name
 	 * @param Leaps\Di\ServiceInterface rawDefinition
 	 * @return Leaps\Di\ServiceInterface
-	 */
+	*/
 	public function setRaw($name, \Leaps\Di\ServiceInterface $rawDefinition);
 
 	/**
@@ -88,7 +88,7 @@ interface DiInterface extends \ArrayAccess
 	 *
 	 * @param string name
 	 * @return mixed
-	 */
+	*/
 	public function getRaw($name);
 
 	/**
@@ -96,7 +96,7 @@ interface DiInterface extends \ArrayAccess
 	 *
 	 * @param string name
 	 * @return Leaps\Di\ServiceInterface
-	 */
+	*/
 	public function getService($name);
 
 	/**
@@ -104,39 +104,39 @@ interface DiInterface extends \ArrayAccess
 	 *
 	 * @param string name
 	 * @return boolean
-	 */
+	*/
 	public function has($name);
 
 	/**
 	 * Check whether the last service obtained via getShared produced a fresh instance or an existing one
 	 *
 	 * @return boolean
-	 */
+	*/
 	public function wasFreshInstance();
 
 	/**
 	 * 返回容器中所有的服务
 	 *
 	 * @return array
-	 */
+	*/
 	public function getServices();
 
 	/**
 	 * 通过静态方法设置一个默认的DI容器
 	 *
 	 * @param Leaps\DiInterface dependencyInjector
-	 */
+	*/
 	public static function setDefault(\Leaps\DiInterface $dependencyInjector);
 
 	/**
 	 * 返回最后一个DI实例
 	 *
 	 * @return Leaps\DiInterface
-	 */
+	*/
 	public static function getDefault();
 
 	/**
 	 * 重置DI容器
-	 */
+	*/
 	public static function reset();
 }

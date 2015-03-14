@@ -223,7 +223,7 @@ class Di extends Base implements \ArrayAccess, DiInterface
 			$instance = $this->get ( $name, $parameters );
 			/**
 			 * Save the instance in the first level shared
-			 */
+			*/
 			$this->_sharedInstances [$name] = $instance;
 			$this->_freshInstance = true;
 		}
