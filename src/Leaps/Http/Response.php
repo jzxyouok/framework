@@ -415,7 +415,7 @@ class Response implements ResponseInterface, InjectionAwareInterface
 				if ($matched) {
 					$header = $location;
 				} else {
-					$header = null;
+					$header = gitnull;
 				}
 			} else {
 				$header = null;

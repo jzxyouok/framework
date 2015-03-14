@@ -14,14 +14,44 @@ use Leaps\Arr;
 
 class Application extends \Leaps\Application
 {
+	/**
+	 * The option name for specifying the application configuration file path.
+	 */
+	const OPTION_APPCONFIG = 'appconfig';
+
+	/**
+	 *
+	 * @var string the default route of this application. Defaults to 'help',
+	 *      meaning the `help` command.
+	 */
+	public $defaultRoute = 'help';
+
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * @see \Leaps\Application::handleRequest()
+	 */
 	public function handleRequest($request)
 	{
-		print_r($request);
-		exit;
-		echo 999;
-		exit ();
+		list ( $route, $params ) = $request->resolve ();
+		$this->requestedRoute = $route;
+		$result = $this->runAction ( $route, $params );
+	/**
+	 * if ($result instanceof Response) {
+	 * return $result;
+	 * } else {
+	 * $response = $this->getResponse();
+	 * $response->exitStatus = $result;
+	 * return $response;
+	 * }
+	 */
 	}
 
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * @see \Leaps\Application::coreServices()
+	 */
 	public function coreServices()
 	{
 		return Arr::mergeArray ( parent::coreServices (), [
