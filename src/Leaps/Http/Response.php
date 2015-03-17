@@ -14,13 +14,7 @@ use Leaps\Base;
 use Leaps\Kernel;
 use Leaps\Http\ResponseInterface;
 use Leaps\Http\Response\Exception;
-use Leaps\Http\Response\HeadersInterface;
-use Leaps\Http\Response\CookiesInterface;
-// use Leaps\Mvc\UrlInterface;
-// use Leaps\Mvc\ViewInterface;
-use Leaps\Http\Response\Headers;
 use Leaps\Di\InjectionAwareInterface;
-
 
 /**
  * Leaps\Http\Response
@@ -232,6 +226,32 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	}
 
 	/**
+	 * Sets the dependency injector
+	 *
+	 * @param Leaps\DiInterface dependencyInjector
+	 */
+	public function setDI(\Leaps\DiInterface $dependencyInjector)
+	{
+		$this->_dependencyInjector = $dependencyInjector;
+	}
+
+	/**
+	 * Returns the internal dependency injector
+	 *
+	 * @return Leaps\DiInterface
+	 */
+	public function getDI()
+	{
+		if (! is_object ( $this->_dependencyInjector )) {
+			$this->_dependencyInjector = \Leaps\Di::getDefault ();
+			if (! is_object ( $this->_dependencyInjector )) {
+				throw new Exception ( "A dependency injection object is required to access the 'url' service" );
+			}
+		}
+		return $this->_dependencyInjector;
+	}
+
+	/**
 	 * 发送响应的HTTP状态代码
 	 *
 	 * @return integer
@@ -239,6 +259,20 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	public function getStatusCode()
 	{
 		return $this->_statusCode;
+	}
+
+	/**
+	 * Returns the header collection.
+	 * The header collection contains the currently registered HTTP headers.
+	 *
+	 * @return HeaderCollection the header collection
+	 */
+	public function getHeaders()
+	{
+		if ($this->_headers === null) {
+			$this->_headers = new HeaderCollection ();
+		}
+		return $this->_headers;
 	}
 
 	/**
@@ -276,13 +310,90 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	}
 
 	/**
-	 * 是否是有效的HTTP状态码 [[statusCode]].
 	 *
-	 * @return boolean
+	 * @return boolean whether this response has a valid [[statusCode]].
 	 */
 	public function getIsInvalid()
 	{
 		return $this->getStatusCode () < 100 || $this->getStatusCode () >= 600;
+	}
+
+	/**
+	 *
+	 * @return boolean whether this response is informational
+	 */
+	public function getIsInformational()
+	{
+		return $this->getStatusCode () >= 100 && $this->getStatusCode () < 200;
+	}
+
+	/**
+	 *
+	 * @return boolean whether this response is successful
+	 */
+	public function getIsSuccessful()
+	{
+		return $this->getStatusCode () >= 200 && $this->getStatusCode () < 300;
+	}
+	/**
+	 *
+	 * @return boolean whether this response is a redirection
+	 */
+	public function getIsRedirection()
+	{
+		return $this->getStatusCode () >= 300 && $this->getStatusCode () < 400;
+	}
+	/**
+	 *
+	 * @return boolean whether this response indicates a client error
+	 */
+	public function getIsClientError()
+	{
+		return $this->getStatusCode () >= 400 && $this->getStatusCode () < 500;
+	}
+	/**
+	 *
+	 * @return boolean whether this response indicates a server error
+	 */
+	public function getIsServerError()
+	{
+		return $this->getStatusCode () >= 500 && $this->getStatusCode () < 600;
+	}
+	/**
+	 *
+	 * @return boolean whether this response is OK
+	 */
+	public function getIsOk()
+	{
+		return $this->getStatusCode () == 200;
+	}
+	/**
+	 *
+	 * @return boolean whether this response indicates the current request is forbidden
+	 */
+	public function getIsForbidden()
+	{
+		return $this->getStatusCode () == 403;
+	}
+	/**
+	 *
+	 * @return boolean whether this response indicates the currently requested resource is not found
+	 */
+	public function getIsNotFound()
+	{
+		return $this->getStatusCode () == 404;
+	}
+	/**
+	 *
+	 * @return boolean whether this response is empty
+	 */
+	public function getIsEmpty()
+	{
+		return in_array ( $this->getStatusCode (), [
+				201,
+				204,
+				304
+		] );
 	}
 
 	/**
@@ -322,6 +433,139 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	}
 
 	/**
+	 * 发送文件到浏览器
+	 *
+	 * @param string $filePath the path of the file to be sent.
+	 * @param string $attachmentName the file name shown to the user. If null, it will be determined from `$filePath`.
+	 * @param array $options additional options for sending the file. The following options are supported:
+	 *
+	 *        - `mimeType`: the MIME type of the content. If not set, it will be guessed based on `$filePath`
+	 *        - `inline`: boolean, whether the browser should open the file within the browser window. Defaults to false,
+	 *        meaning a download dialog will pop up.
+	 *
+	 * @return static the response object itself
+	 */
+	public function sendFile($filePath, $attachmentName = null, $options = [])
+	{
+		if (! isset ( $options ['mimeType'] )) {
+			$options ['mimeType'] = \Leaps\Filesystem\MimeType::getMimeType ( $filePath );
+		}
+		if ($attachmentName === null) {
+			$attachmentName = basename ( $filePath );
+		}
+		$handle = fopen ( $filePath, 'rb' );
+		$this->sendStreamAsFile ( $handle, $attachmentName, $options );
+		return $this;
+	}
+
+	/**
+	 * 将指定的内容作为一个文件发送到浏览器。
+	 *
+	 * @param string $content the content to be sent. The existing [[content]] will be discarded.
+	 * @param string $attachmentName the file name shown to the user.
+	 * @param array $options additional options for sending the file. The following options are supported:
+	 *
+	 *        - `mimeType`: the MIME type of the content. Defaults to 'application/octet-stream'.
+	 *        - `inline`: boolean, whether the browser should open the file within the browser window. Defaults to false,
+	 *        meaning a download dialog will pop up.
+	 *
+	 * @return static the response object itself
+	 * @throws HttpException if the requested range is not satisfiable
+	 */
+	public function sendContentAsFile($content, $attachmentName, $options = [])
+	{
+		$headers = $this->getHeaders ();
+		$contentLength = \Leaps\Str::byteLength ( $content );
+		$range = $this->getHttpRange ( $contentLength );
+		if ($range === false) {
+			$headers->set ( 'Content-Range', "bytes */$contentLength" );
+			throw new \Leaps\Web\HttpException ( 416, 'Requested range not satisfiable' );
+		}
+		list ( $begin, $end ) = $range;
+		if ($begin != 0 || $end != $contentLength - 1) {
+			$this->setStatusCode ( 206 );
+			$headers->set ( 'Content-Range', "bytes $begin-$end/$contentLength" );
+			$this->content = \Leaps\Str::byteSubstr ( $content, $begin, $end - $begin + 1 );
+		} else {
+			$this->setStatusCode ( 200 );
+			$this->content = $content;
+		}
+		$mimeType = isset ( $options ['mimeType'] ) ? $options ['mimeType'] : 'application/octet-stream';
+		$this->setDownloadHeaders ( $attachmentName, $mimeType, ! empty ( $options ['inline'] ), $end - $begin + 1 );
+		$this->format = self::FORMAT_RAW;
+		return $this;
+	}
+
+	/**
+	 * Sets a default set of HTTP headers for file downloading purpose.
+	 *
+	 * @param string $attachmentName the attachment file name
+	 * @param string $mimeType the MIME type for the response. If null, `Content-Type` header will NOT be set.
+	 * @param boolean $inline whether the browser should open the file within the browser window. Defaults to false,
+	 *        meaning a download dialog will pop up.
+	 * @param integer $contentLength the byte length of the file being downloaded. If null, `Content-Length` header will NOT be set.
+	 * @return static the response object itself
+	 */
+	public function setDownloadHeaders($attachmentName, $mimeType = null, $inline = false, $contentLength = null)
+	{
+		$headers = $this->getHeaders ();
+		$disposition = $inline ? 'inline' : 'attachment';
+		$headers->setDefault ( 'Pragma', 'public' )->setDefault ( 'Accept-Ranges', 'bytes' )->setDefault ( 'Expires', '0' )->setDefault ( 'Cache-Control', 'must-revalidate, post-check=0, pre-check=0' )->setDefault ( 'Content-Disposition', "$disposition; filename=\"$attachmentName\"" );
+		if ($mimeType !== null) {
+			$headers->setDefault ( 'Content-Type', $mimeType );
+		}
+		if ($contentLength !== null) {
+			$headers->setDefault ( 'Content-Length', $contentLength );
+		}
+		return $this;
+	}
+
+	/**
+	 * Sends the specified stream as a file to the browser.
+	 *
+	 * Note that this method only prepares the response for file sending. The file is not sent
+	 * until [[send()]] is called explicitly or implicitly. The latter is done after you return from a controller action.
+	 *
+	 * @param resource $handle the handle of the stream to be sent.
+	 * @param string $attachmentName the file name shown to the user.
+	 * @param array $options additional options for sending the file. The following options are supported:
+	 *
+	 *        - `mimeType`: the MIME type of the content. Defaults to 'application/octet-stream'.
+	 *        - `inline`: boolean, whether the browser should open the file within the browser window. Defaults to false,
+	 *        meaning a download dialog will pop up.
+	 *
+	 * @return static the response object itself
+	 * @throws HttpException if the requested range cannot be satisfied.
+	 */
+	public function sendStreamAsFile($handle, $attachmentName, $options = [])
+	{
+		$headers = $this->getHeaders ();
+		fseek ( $handle, 0, SEEK_END );
+		$fileSize = ftell ( $handle );
+		$range = $this->getHttpRange ( $fileSize );
+		if ($range === false) {
+			$headers->set ( 'Content-Range', "bytes */$fileSize" );
+			throw new \Leaps\Web\HttpException ( 416, 'Requested range not satisfiable' );
+		}
+		list ( $begin, $end ) = $range;
+		if ($begin != 0 || $end != $fileSize - 1) {
+			$this->setStatusCode ( 206 );
+			$headers->set ( 'Content-Range', "bytes $begin-$end/$fileSize" );
+		} else {
+			$this->setStatusCode ( 200 );
+		}
+		$mimeType = isset ( $options ['mimeType'] ) ? $options ['mimeType'] : 'application/octet-stream';
+		$this->setDownloadHeaders ( $attachmentName, $mimeType, ! empty ( $options ['inline'] ), $end - $begin + 1 );
+		$this->format = self::FORMAT_RAW;
+		$this->stream = [
+				$handle,
+				$begin,
+				$end
+		];
+		return $this;
+	}
+
+	/**
 	 * 发送响应到客户端
 	 *
 	 * @return Phalcon\Http\ResponseInterface
@@ -334,8 +578,8 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 		// $this->trigger(self::EVENT_BEFORE_SEND);
 		$this->prepare ();
 		// $this->trigger(self::EVENT_AFTER_PREPARE);
-		$this->sendHeaders();
-		$this->sendContent();
+		$this->sendHeaders ();
+		$this->sendContent ();
 		// $this->trigger(self::EVENT_AFTER_SEND);
 		$this->isSent = true;
 	}
@@ -469,29 +713,42 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	}
 
 	/**
-	 * Sets the dependency injector
+	 * Determines the HTTP range given in the request.
 	 *
-	 * @param Leaps\DiInterface dependencyInjector
+	 * @param integer $fileSize the size of the file that will be used to validate the requested HTTP range.
+	 * @return array|boolean the range (begin, end), or false if the range request is invalid.
 	 */
-	public function setDI(\Leaps\DiInterface $dependencyInjector)
+	protected function getHttpRange($fileSize)
 	{
-		$this->_dependencyInjector = $dependencyInjector;
-	}
-
-	/**
-	 * Returns the internal dependency injector
-	 *
-	 * @return Leaps\DiInterface
-	 */
-	public function getDI()
-	{
-		if (! is_object ( $this->_dependencyInjector )) {
-			$this->_dependencyInjector = \Leaps\Di::getDefault ();
-			if (! is_object ( $this->_dependencyInjector )) {
-				throw new Exception ( "A dependency injection object is required to access the 'url' service" );
-			}
+		if (! isset ( $_SERVER ['HTTP_RANGE'] ) || $_SERVER ['HTTP_RANGE'] === '-') {
+			return [
+					0,
+					$fileSize - 1
+			];
 		}
-		return $this->_dependencyInjector;
+		if (! preg_match ( '/^bytes=(\d*)-(\d*)$/', $_SERVER ['HTTP_RANGE'], $matches )) {
+			return false;
+		}
+		if ($matches [1] === '') {
+			$start = $fileSize - $matches [2];
+			$end = $fileSize - 1;
+		} elseif ($matches [2] !== '') {
+			$start = $matches [1];
+			$end = $matches [2];
+			if ($end >= $fileSize) {
+				$end = $fileSize - 1;
+			}
+		} else {
+			$start = $matches [1];
+			$end = $fileSize - 1;
+		}
+		if ($start < 0 || $start > $end) {
+			return false;
+		} else {
+			return [
+					$start,
+					$end
+			];
+		}
 	}
-
 }

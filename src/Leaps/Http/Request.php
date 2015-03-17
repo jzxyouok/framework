@@ -19,6 +19,7 @@ use Leaps\Di\InjectionAwareInterface;
 class Request extends Base implements RequestInterface, InjectionAwareInterface
 {
 	public $methodParam = "_method";
+	protected $_headers;
 	protected $_dependencyInjector;
 	protected $_rawBody;
 	protected $_url;
@@ -26,7 +27,6 @@ class Request extends Base implements RequestInterface, InjectionAwareInterface
 	protected $_scriptUrl;
 	protected $_baseUrl;
 	protected $_pathInfo;
-
 	private $_router;
 
 	/**
@@ -215,23 +215,28 @@ class Request extends Base implements RequestInterface, InjectionAwareInterface
 	 */
 	public function getHeaders()
 	{
-		$headers = [ ];
-		$contentHeaders = [
-				"CONTENT_TYPE" => true,
-				"CONTENT_LENGTH" => true
-		];
-		foreach ( $_SERVER as $name => $value ) {
-			if (strncmp ( $name, "HTTP_", 5 ) === 0) {
-				$name = ucwords ( strtolower ( str_replace ( "_", " ", substr ( $name, 5 ) ) ) );
-				$name = str_replace ( " ", "-", $name );
-				$headers [$name] = $value;
-			} elseif (isset ( $contentHeaders [$name] )) {
-				$name = ucwords ( strtolower ( str_replace ( "_", " ", $name ) ) );
-				$name = str_replace ( " ", "-", $name );
-				$headers [$name] = $value;
+		if ($this->_headers === null) {
+			$this->_headers = new HeaderCollection ();
+			if (function_exists ( 'getallheaders' )) {
+				$headers = getallheaders ();
+			} elseif (function_exists ( 'http_get_request_headers' )) {
+				$headers = http_get_request_headers ();
+			} else {
+				foreach ( $_SERVER as $name => $value ) {
+					if (strncmp ( $name, 'HTTP_', 5 ) === 0) {
+						$name = str_replace ( ' ', '-', ucwords ( strtolower ( str_replace ( '_', ' ', substr ( $name, 5 ) ) ) ) );
+						$this->_headers->add ( $name, $value );
+					}
+				}
+				return $this->_headers;
+			}
+			if (isset ( $headers )) {
+				foreach ( $headers as $name => $value ) {
+					$this->_headers->add ( $name, $value );
+				}
 			}
 		}
-		return $headers;
+		return $this->_headers;
 	}
 
 	/**
