@@ -10,8 +10,8 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Web;
 
-use Leaps\Kernel;
 use Leaps\Base;
+use Leaps\Kernel;
 
 class Router extends Base
 {
