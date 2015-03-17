@@ -349,4 +349,15 @@ class Filesystem extends Injectable
 	{
 		return $this->deleteDirectory ( $directory, true );
 	}
+
+	/**
+	 * Determines the MIME type based on the extension name of the specified file.
+	 * This method will use a local map between extension names and MIME types.
+	 * @param string $fileName the file name.
+	 * @return string the MIME type. Null is returned if the MIME type cannot be determined.
+	 */
+	public function getMimeType($fileName)
+	{
+		return MimeType::getMimeType($fileName);
+	}
 }
