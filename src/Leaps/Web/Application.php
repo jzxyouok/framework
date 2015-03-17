@@ -104,7 +104,7 @@ class Application extends \Leaps\Application
 						'className' => 'Leaps\Web\Router'
 				],
 				'cookie' => [
-						'className' => 'Leaps\Web\Response\CookieCollection'
+						'className' => 'Leaps\Http\CookieCollection'
 				],
 				'session' => [
 						'className' => 'Leaps\Web\Session'
