@@ -8,15 +8,17 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Http;
+namespace Leaps\Http\Response;
 
-/**
- * Leaps\Http\Response
- *
- * Interface for Leaps\Http\Response
- */
-interface ResponseInterface
+class Exception extends \Leaps\Exception
 {
-
-
+	/**
+	 * 返回用户友好的异常名称
+	 *
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'Response Exception';
+	}
 }

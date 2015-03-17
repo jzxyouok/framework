@@ -10,13 +10,12 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Http;
 
-/**
- * Leaps\Http\Response
- *
- * Interface for Leaps\Http\Response
- */
-interface ResponseInterface
+interface ResponseFormatterInterface
 {
-
-
+	/**
+	 * Formats the specified response.
+	 *
+	 * @param Response $response the response to be formatted.
+	 */
+	public function format($response);
 }

@@ -8,15 +8,9 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Http;
+namespace Leaps;
 
-/**
- * Leaps\Http\Response
- *
- * Interface for Leaps\Http\Response
- */
-interface ResponseInterface
+
+class UserException extends Exception
 {
-
-
 }

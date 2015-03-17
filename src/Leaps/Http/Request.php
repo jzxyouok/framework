@@ -27,6 +27,8 @@ class Request extends Base implements RequestInterface, InjectionAwareInterface
 	protected $_baseUrl;
 	protected $_pathInfo;
 
+	private $_router;
+
 	/**
 	 * 初始化
 	 */

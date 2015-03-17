@@ -14,51 +14,21 @@ use Leaps\Web\Router\Exception as RouteException;
 
 class Module extends Di
 {
-	/**
-	 *
-	 * @var string an ID that uniquely identifies this module among other modules which have the same [[module|parent]].
-	 */
 	public $id;
-
-	/**
-	 *
-	 * @var Module the parent module of this module. Null if this module does not have a parent.
-	 */
 	public $module;
 	public $controllerNamespace;
-
-	/**
-	 *
-	 * @var string the default route of this module. Defaults to 'default'.
-	 *      The route may consist of child module ID, controller ID, and/or action ID.
-	 *      For example, `help`, `post/create`, `admin/post/create`.
-	 *      If action ID is not given, it will take the default value as specified in
-	 *      [[Controller::defaultAction]].
-	 */
 	public $defaultRoute = 'home';
 	protected $_modules = [ ];
-
-	/**
-	 * 模块跟目录
-	 *
-	 * @var string
-	 */
 	private $_basePath;
-
-	/**
-	 * 模块布局跟目录
-	 *
-	 * @var string
-	 */
 	private $_layoutPath;
 	public $_viewPath;
 
 	/**
 	 * 构造方法
 	 *
-	 * @param string $id the ID of this module
-	 * @param Module $parent the parent module (if any)
-	 * @param array $config name-value pairs that will be used to initialize the object properties
+	 * @param string $id 模块ID
+	 * @param Module $parent 父模块实例
+	 * @param array $config 模块配置
 	 */
 	public function __construct($id, $parent = null, $config = [])
 	{
@@ -246,7 +216,10 @@ class Module extends Di
 			} elseif ($load) {
 				Kernel::trace ( "Loading module: $id", __METHOD__ );
 				/* @var $module Module */
-				$module = Kernel::createObject ( $this->_modules [$id], [$id, $this] );
+				$module = Kernel::createObject ( $this->_modules [$id], [
+						$id,
+						$this
+				] );
 				$module->setInstance ( $module );
 				return $this->_modules [$id] = $module;
 			}
@@ -342,7 +315,7 @@ class Module extends Di
 			$oldController = Kernel::$app->controller;
 			Kernel::$app->controller = $controller;
 			$result = $controller->runActionInstance ( $actionID, $params );
-			exit;
+			exit ();
 			Kernel::$app->controller = $oldController;
 			return $result;
 		} else {
@@ -443,7 +416,10 @@ class Module extends Di
 		}
 
 		if (is_subclass_of ( $className, 'Leaps\Controller' )) {
-			return Kernel::createObject ( $className, [$id, $this] );
+			return Kernel::createObject ( $className, [
+					$id,
+					$this
+			] );
 		} elseif (Kernel::$env == Kernel::DEVELOPMENT) {
 			throw new InvalidConfigException ( "Controller class must extend from \\Leaps\\Controller." );
 		} else {

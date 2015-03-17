@@ -59,6 +59,8 @@ class ErrorHandler extends \Leaps\ErrorHandler
 	 */
 	protected function renderException($exception)
 	{
+		print_r ( $exception );
+		exit ();
 		if (Kernel::$app->has ( 'response' )) {
 			$response = Kernel::$app->getResponse ();
 			$response->isSent = false;

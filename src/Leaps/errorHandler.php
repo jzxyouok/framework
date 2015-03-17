@@ -10,10 +10,15 @@
 // +----------------------------------------------------------------------
 namespace Leaps;
 
-use Leaps\Di\Injectable;
-
-abstract class errorHandler extends Injectable
+abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInterface
 {
+
+	/**
+	 * 依赖注入器
+	 *
+	 * @var Leaps\Di\DiInteface
+	 */
+	protected $_dependencyInjector;
 
 	/**
 	 *
@@ -43,13 +48,41 @@ abstract class errorHandler extends Injectable
 	private $_memoryReserve;
 
 	/**
+	 * 设置依赖注入器
+	 *
+	 * @param Leaps\DiInterface dependencyInjector
+	 */
+	public function setDI(\Leaps\DiInterface $dependencyInjector)
+	{
+		if (! is_object ( $dependencyInjector )) {
+			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
+		}
+		$this->_dependencyInjector = $dependencyInjector;
+	}
+
+	/**
+	 * 返回依赖注入器实例
+	 *
+	 * @return Leaps\Di\DiInterface
+	 */
+	public function getDI()
+	{
+		$dependencyInjector = $this->_dependencyInjector;
+		if (! is_object ( $dependencyInjector )) {
+			$dependencyInjector = \Leaps\Di::getDefault ();
+		}
+		return $dependencyInjector;
+	}
+
+
+	/**
 	 * 监听异常
 	 *
 	 * @return Leaps\Debug
 	 */
 	public function register()
 	{
-		// ini_set('display_errors', false);
+		ini_set ( 'display_errors', false );
 		set_exception_handler ( [
 				$this,
 				'handleException'
