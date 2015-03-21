@@ -45,13 +45,18 @@ class CookieCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 	public $secure = false;
 
 	/**
-	 * 只读
+	 * Cookie是否只能通过HTTP协议读取
 	 *
 	 * @var boolean whether the cookie should be accessible only through the HTTP protocol.
 	 *      By setting this property to true, the cookie will not be accessible by scripting languages,
 	 *      such as JavaScript, which can effectively help to reduce identity theft through XSS attacks.
 	 */
 	public $httpOnly = true;
+
+	/**
+	 * 是否只读
+	 * @var unknown
+	 */
 	public $readOnly = false;
 
 	/**
@@ -80,7 +85,15 @@ class CookieCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 		$time = ($minutes == 0) ? 0 : time () + ($minutes * 60);
 		$secure = $secure ? $secure : $this->secure;
 		$httpOnly = $httpOnly ? $httpOnly : $this->httpOnly;
-		$cookie = new Cookie ( $name, $value, $time, $path, $domain, $secure, $httpOnly );
+		$cookie = new Cookie ( [
+				'name' => $name,
+				'value' => $value,
+				'expire' => $time,
+				'path' => $path,
+				'domain' => $domain,
+				'secure' => $secure,
+				'httpOnly' => $httpOnly
+		] );
 		return $this->add ( $cookie );
 	}
 
@@ -151,6 +164,7 @@ class CookieCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 	{
 		return $this->getCount ();
 	}
+
 	/**
 	 * 返回Coookie总数
 	 *
@@ -238,6 +252,7 @@ class CookieCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 		}
 		$this->_cookies = [ ];
 	}
+
 	/**
 	 * 返回集合数组
 	 *
@@ -248,6 +263,7 @@ class CookieCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 	{
 		return $this->_cookies;
 	}
+
 	/**
 	 * 从一个数组填充Cookie集合。
 	 *

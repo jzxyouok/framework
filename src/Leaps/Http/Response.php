@@ -681,7 +681,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	}
 
 	/**
-	 * Sends the cookies to the client.
+	 * 发送Cookie到客户端
 	 */
 	protected function sendCookies()
 	{

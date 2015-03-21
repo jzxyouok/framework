@@ -1,0 +1,349 @@
+<?php
+// +----------------------------------------------------------------------
+// | Leaps Framework [ WE CAN DO IT JUST THINK IT ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2011-2014 Leaps Team (http://www.tintsoft.com)
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author XuTongle <xutongle@gmail.com>
+// +----------------------------------------------------------------------
+namespace Leaps\HttpClient;
+
+abstract class Adapter
+{
+	/**
+	 * 响应数据寄存器
+	 *
+	 * @var array
+	 */
+	protected $httpData = [ ];
+
+	/**
+	 * User Agent 浏览器的身份标识
+	 *
+	 * @var string
+	 */
+	protected $userAgent;
+
+	/**
+	 * 页面来源
+	 *
+	 * @var string
+	 */
+	protected $referer;
+
+	/**
+	 * 携带的Cookie
+	 *
+	 * @var string
+	 */
+	protected $cookie;
+	protected $files = [ ];
+	protected $hostIp;
+	protected $header = [ ];
+	protected $option = [ ];
+	protected $timeout = 30;
+
+	/**
+	 * 待Post提交的数据
+	 *
+	 * @var array
+	 */
+	protected $postData = [ ];
+
+	/**
+	 * 多列队任务进程数，0表示不限制
+	 *
+	 * @var int
+	 */
+	protected $multiExecNum = 20;
+
+	/**
+	 * 默认请求方法
+	 *
+	 * @var string
+	 */
+	protected $method = 'GET';
+
+	/**
+	 * 默认连接超时时间，毫秒
+	 *
+	 * @var int
+	 */
+	protected $connectTimeout = 3000;
+	protected $proxyHost;
+	protected $proxyPort;
+	protected $authorizationToken;
+
+	/**
+	 * HTTP GET方式请求
+	 *
+	 * @param string $url
+	 * @return \Leaps\HttpClient\Result
+	 */
+	public function get($url)
+	{
+		$this->getRequest ( $url );
+		$data = $this->getResutData ();
+		if (is_array ( $url )) {
+			// 如果是多个URL
+			$result = [ ];
+			foreach ( $data as $key => $item ) {
+				$reflection = new \ReflectionClass ( "\\Leaps\\HttpClient\\Result" );
+				$result [$key] = $reflection->newInstanceArgs ( [
+						$item
+				] );
+			}
+		} else {
+			$reflection = new \ReflectionClass ( "\\Leaps\\HttpClient\\Result" );
+			$result = $reflection->newInstanceArgs ( [
+					$data
+			] );
+		}
+		return $result;
+	}
+
+	/**
+	 * Http POST方式请求
+	 *
+	 * @param string $url
+	 * @param string $data
+	 * @return \Leaps\HttpClient\Result
+	 */
+	public function post($url, $datas)
+	{
+		$this->postRequest ( $url, $datas );
+		$data = $this->getResutData ();
+		if (is_array ( $url )) {
+			// 如果是多个URL
+			$result = [ ];
+			foreach ( $data as $key => $item ) {
+				$reflection = new \ReflectionClass ( "\\Leaps\\HttpClient\\Result" );
+				$result [$key] = $reflection->newInstanceArgs ( [
+						$item
+				] );
+			}
+		} else {
+			$reflection = new \ReflectionClass ( "\\Leaps\\HttpClient\\Result" );
+			$result = $reflection->newInstanceArgs ( [
+					$data
+			] );
+		}
+		return $result;
+	}
+
+	/**
+	 * PUT方式请求
+	 *
+	 * @param string $url
+	 * @param string、array $data
+	 * @return \Leaps\HttpClient\Result
+	 */
+	public function put($url, $datas)
+	{
+		$this->putRequest ( $url, $datas );
+		$data = $this->getResutData ();
+		if (is_array ( $url )) {
+			// 如果是多个URL
+			$result = [ ];
+			foreach ( $data as $key => $item ) {
+				$reflection = new \ReflectionClass ( "\\Leaps\\HttpClient\\Result" );
+				$result [key] = $reflection->newInstanceArgs ( [
+						$item
+				] );
+			}
+		} else {
+			$reflection = new \ReflectionClass ( "\\Leaps\\HttpClient\\Result" );
+			$result = $reflection->newInstanceArgs ( [
+					$data
+			] );
+		}
+		return result;
+	}
+
+	/**
+	 * DELETE方式请求
+	 *
+	 * @param $url
+	 * @param $data
+	 * @param $timeout
+	 * @return \Leaps\HttpClient\Result
+	 */
+	public function delete($url)
+	{
+		$this->deleteRequest ( $url );
+		$data = $this->getResutData ();
+		if (is_array ( $url )) {
+			// 如果是多个URL
+			$result = [ ];
+			foreach ( $data as $key => $item ) {
+				$reflection = new \ReflectionClass ( "\\Leaps\\HttpClient\\Result" );
+				$result [$key] = $reflection->newInstanceArgs ( [
+						$item
+				] );
+			}
+		} else {
+
+			$reflection = new \ReflectionClass ( "\\Leaps\\HttpClient\\Result" );
+			$result = $reflection->newInstanceArgs ( [
+					$data
+			] );
+		}
+		return $result;
+	}
+
+	/**
+	 * 上传文件
+	 *
+	 * 注意，使用 `addFile()` 上传文件时，必须使用post方式提交
+	 *
+	 * upload('http://localhost/upload', '/tmp/test.jpg');
+	 *
+	 * @param $url
+	 * @param $name string 上传的文件的key，默认为 `file`
+	 * @param $file_name string
+	 * @param null $post
+	 * @param int $timeout
+	 * @return Result
+	 */
+	public function upload($url, $fileName, $name = "upload", $post = null, $timeout = 30)
+	{
+		return $this->addFile ( $fileName, $name )->post ( $url, $post, $timeout );
+	}
+
+	/**
+	 * 添加上传文件
+	 *
+	 * HttpClient::factory()->add_file('/tmp/test.jpg', 'img');
+	 *
+	 * @param $file_name string 文件路径
+	 * @param $name string 名称
+	 * @return $this
+	 */
+	public function addFile($fileName, $name = "upload")
+	{
+		$this->_addFile ( $fileName, $name ? $name : "upload" );
+	}
+
+	abstract public function setAuthorization($username, $password);
+	abstract public function getRequest($url);
+	abstract public function postRequest($url, $vars);
+	abstract public function putRequest($url, $vars);
+	abstract public function deleteRequest($url);
+	abstract public function _addFile($fileName, $name);
+
+	/**
+	 * 设置User Agent
+	 *
+	 * @param string $userAgent
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setUserAgent($userAgent)
+	{
+		$this->userAgent = $userAgent;
+	}
+
+	/**
+	 * 设置Http Referer
+	 *
+	 * @param string $referer
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setReferer($referer)
+	{
+		$this->referer = $referer;
+	}
+
+	/**
+	 * 设置Cookie
+	 *
+	 * @param string $cookie
+	 * @return \Leaps\HttpClient\Adapter
+	 */
+	public function setCookie($cookie)
+	{
+		$this->cookie = $cookie;
+	}
+
+	/**
+	 * 设置Header
+	 *
+	 * @param array $header
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setHeader($header)
+	{
+		$this->header = array_merge ( $this->header, ( array ) $header );
+	}
+
+	/**
+	 * 设置多个列队默认排队数上限
+	 *
+	 * @param int $num
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setMultiMaxNum($num = 0)
+	{
+		$this->multiExecNum = ( int ) $num;
+	}
+
+	/**
+	 * 设置IP
+	 *
+	 * @param string $ip
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setHostIp($ip)
+	{
+		$this->hostIp = $ip;
+	}
+
+	/**
+	 * 设置超时时间
+	 *
+	 * @param int $timeoutp
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setTimeout($timeout)
+	{
+		$this->timeout = $timeout;
+	}
+
+	/**
+	 * 设置，获取REST的类型
+	 *
+	 * @param string $method GET|POST|DELETE|PUT 等，不传则返回当前method
+	 * @return string
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function method($method = null)
+	{
+		if (null === $method)
+			return $this->method;
+		$this->method = strtoupper ( $method );
+	}
+
+	/**
+	 * 获取结果数据
+	 */
+	public function getResutData()
+	{
+		return $this->httpData;
+	}
+
+	/**
+	 * 清理设置
+	 */
+	protected function clearSet()
+	{
+		$this->option = [ ];
+		$this->header = [ ];
+		$this->hostIp = null;
+		$this->files = [ ];
+		$this->cookie = null;
+		$this->referer = null;
+		$this->method = 'GET';
+		$this->postData = [ ];
+	}
+}
