@@ -76,7 +76,7 @@ class Curl extends \Leaps\HttpClient\Adapter implements \Leaps\HttpClient\Adapte
 					$url
 			] );
 		}
-		$this->clearSet ();
+		$this->reset ();
 		if (! is_array ( $url )) {
 			$this->httpData = $this->httpData [$url];
 			return $data [$url];
@@ -99,7 +99,7 @@ class Curl extends \Leaps\HttpClient\Adapter implements \Leaps\HttpClient\Adapte
 	public function postRequest($url, $vars)
 	{
 		// POST模式
-		$this->method ( 'POST' );
+		$this->setMethod ( 'POST' );
 		$this->setOption ( CURLOPT_HTTPHEADER, array (
 				'Expect:'
 		) );
@@ -142,7 +142,7 @@ class Curl extends \Leaps\HttpClient\Adapter implements \Leaps\HttpClient\Adapte
 	 */
 	public function putRequest($url, $vars)
 	{
-		$this->method ( 'PUT' );
+		$this->setMethod ( 'PUT' );
 		$this->setOption ( CURLOPT_HTTPHEADER, [
 				'Expect:'
 		] );
@@ -163,7 +163,7 @@ class Curl extends \Leaps\HttpClient\Adapter implements \Leaps\HttpClient\Adapte
 			];
 		}
 		$this->postData = $myvars;
-		return $this->get ( $url );
+		return $this->getRequest ( $url );
 	}
 
 	/**
@@ -174,8 +174,8 @@ class Curl extends \Leaps\HttpClient\Adapter implements \Leaps\HttpClient\Adapte
 	 */
 	public function deleteRequest($url)
 	{
-		$this->method ( 'DELETE' );
-		$this->get ( $url );
+		$this->setMethod ( 'DELETE' );
+		$this->getRequest ( $url );
 	}
 
 	/**

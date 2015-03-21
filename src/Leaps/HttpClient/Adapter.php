@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\HttpClient;
 
-abstract class Adapter
+abstract class Adapter extends \Leaps\Base
 {
 	/**
 	 * 响应数据寄存器
@@ -75,6 +75,146 @@ abstract class Adapter
 	protected $proxyHost;
 	protected $proxyPort;
 	protected $authorizationToken;
+
+	/**
+	 * 设置，获取REST的类型
+	 *
+	 * @param string $method GET|POST|DELETE|PUT 等，不传则返回当前method
+	 * @return string
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setMethod($method = null)
+	{
+		if (null === $method)
+			return $this->method;
+		$this->method = strtoupper ( $method );
+	}
+
+	/**
+	 * 设置Header
+	 *
+	 * @param array $header
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setHeader($item, $value)
+	{
+		$this->header = array_merge ( $this->header, [
+				$item . ": " . $value
+		] );
+	}
+
+	/**
+	 * 设置Header
+	 *
+	 * @param array $header
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setHeaders($headers)
+	{
+		$this->header = array_merge ( $this->header, ( array ) $headers );
+	}
+
+	/**
+	 * 设置代理服务器访问
+	 *
+	 * @param string $host
+	 * @param string $port
+	 * @return \Leaps\HttpClient\HttpClient
+	 */
+	public function setHttpProxy($host, $port)
+	{
+		$this->proxyHost = $host;
+		$this->proxyPort = $port;
+	}
+
+	/**
+	 * 设置IP
+	 *
+	 * @param string $ip
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setHostIp($ip)
+	{
+		$this->hostIp = $ip;
+	}
+
+	/**
+	 * 设置User Agent
+	 *
+	 * @param string $userAgent
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setUserAgent($userAgent)
+	{
+		$this->userAgent = $userAgent;
+	}
+
+	/**
+	 * 设置Http Referer
+	 *
+	 * @param string $referer
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setReferer($referer)
+	{
+		$this->referer = $referer;
+	}
+
+	/**
+	 * 设置Cookie
+	 *
+	 * @param string $cookie
+	 * @return \Leaps\HttpClient\Adapter
+	 */
+	public function setCookie($cookie)
+	{
+		$this->cookie = $cookie;
+	}
+
+	/**
+	 * 设置多个列队默认排队数上限
+	 *
+	 * @param int $num
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setMultiMaxNum($num = 0)
+	{
+		$this->multiExecNum = ( int ) $num;
+	}
+
+	/**
+	 * 设置超时时间
+	 *
+	 * @param int $timeoutp
+	 * @return \Leaps\HttpClient\Adapter\Curl
+	 */
+	public function setTimeout($timeout)
+	{
+		$this->timeout = $timeout;
+	}
+
+	/**
+	 * 重置设置
+	 */
+	public function reset()
+	{
+		$this->option = [ ];
+		$this->header = [ ];
+		$this->hostIp = null;
+		$this->files = [ ];
+		$this->cookie = null;
+		$this->referer = null;
+		$this->method = 'GET';
+		$this->postData = [ ];
+	}
+
+	/**
+	 * 获取结果数据
+	 */
+	public function getResutData()
+	{
+		return $this->httpData;
+	}
 
 	/**
 	 * HTTP GET方式请求
@@ -149,7 +289,7 @@ abstract class Adapter
 			$result = [ ];
 			foreach ( $data as $key => $item ) {
 				$reflection = new \ReflectionClass ( "\\Leaps\\HttpClient\\Result" );
-				$result [key] = $reflection->newInstanceArgs ( [
+				$result [$key] = $reflection->newInstanceArgs ( [
 						$item
 				] );
 			}
@@ -159,7 +299,7 @@ abstract class Adapter
 					$data
 			] );
 		}
-		return result;
+		return $result;
 	}
 
 	/**
@@ -225,125 +365,10 @@ abstract class Adapter
 	{
 		$this->_addFile ( $fileName, $name ? $name : "upload" );
 	}
-
 	abstract public function setAuthorization($username, $password);
 	abstract public function getRequest($url);
 	abstract public function postRequest($url, $vars);
 	abstract public function putRequest($url, $vars);
 	abstract public function deleteRequest($url);
 	abstract public function _addFile($fileName, $name);
-
-	/**
-	 * 设置User Agent
-	 *
-	 * @param string $userAgent
-	 * @return \Leaps\HttpClient\Adapter\Curl
-	 */
-	public function setUserAgent($userAgent)
-	{
-		$this->userAgent = $userAgent;
-	}
-
-	/**
-	 * 设置Http Referer
-	 *
-	 * @param string $referer
-	 * @return \Leaps\HttpClient\Adapter\Curl
-	 */
-	public function setReferer($referer)
-	{
-		$this->referer = $referer;
-	}
-
-	/**
-	 * 设置Cookie
-	 *
-	 * @param string $cookie
-	 * @return \Leaps\HttpClient\Adapter
-	 */
-	public function setCookie($cookie)
-	{
-		$this->cookie = $cookie;
-	}
-
-	/**
-	 * 设置Header
-	 *
-	 * @param array $header
-	 * @return \Leaps\HttpClient\Adapter\Curl
-	 */
-	public function setHeader($header)
-	{
-		$this->header = array_merge ( $this->header, ( array ) $header );
-	}
-
-	/**
-	 * 设置多个列队默认排队数上限
-	 *
-	 * @param int $num
-	 * @return \Leaps\HttpClient\Adapter\Curl
-	 */
-	public function setMultiMaxNum($num = 0)
-	{
-		$this->multiExecNum = ( int ) $num;
-	}
-
-	/**
-	 * 设置IP
-	 *
-	 * @param string $ip
-	 * @return \Leaps\HttpClient\Adapter\Curl
-	 */
-	public function setHostIp($ip)
-	{
-		$this->hostIp = $ip;
-	}
-
-	/**
-	 * 设置超时时间
-	 *
-	 * @param int $timeoutp
-	 * @return \Leaps\HttpClient\Adapter\Curl
-	 */
-	public function setTimeout($timeout)
-	{
-		$this->timeout = $timeout;
-	}
-
-	/**
-	 * 设置，获取REST的类型
-	 *
-	 * @param string $method GET|POST|DELETE|PUT 等，不传则返回当前method
-	 * @return string
-	 * @return \Leaps\HttpClient\Adapter\Curl
-	 */
-	public function method($method = null)
-	{
-		if (null === $method)
-			return $this->method;
-		$this->method = strtoupper ( $method );
-	}
-
-	/**
-	 * 获取结果数据
-	 */
-	public function getResutData()
-	{
-		return $this->httpData;
-	}
-
-	/**
-	 * 清理设置
-	 */
-	protected function clearSet()
-	{
-		$this->option = [ ];
-		$this->header = [ ];
-		$this->hostIp = null;
-		$this->files = [ ];
-		$this->cookie = null;
-		$this->referer = null;
-		$this->method = 'GET';
-		$this->postData = [ ];
-	}
 }

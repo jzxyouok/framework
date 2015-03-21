@@ -65,7 +65,7 @@ class Fsock extends \Leaps\HttpClient\Adapter implements \Leaps\HttpClient\Adapt
 					$url
 			] );
 		}
-		$this->clearSet ();
+		$this->reset ();
 		if (! is_array ( $url )) {
 			$this->httpData = $this->httpData [$url];
 			return $data [$url];
@@ -90,7 +90,7 @@ class Fsock extends \Leaps\HttpClient\Adapter implements \Leaps\HttpClient\Adapt
 	public function postRequest($url, $vars)
 	{
 		// POST模式
-		$this->method ( 'POST' );
+		$this->setMethod ( 'POST' );
 		if (is_array ( $url )) {
 			$myvars = [ ];
 			foreach ( $url as $k => $u ) {
@@ -126,7 +126,7 @@ class Fsock extends \Leaps\HttpClient\Adapter implements \Leaps\HttpClient\Adapt
 	 */
 	public function putRequest($url, $vars)
 	{
-		$this->method ( 'PUT' );
+		$this->setMethod ( 'PUT' );
 		$this->contentType = "application/x-www-form-urlencoded";
 		if (is_array ( $url )) {
 			$myvars = [ ];
@@ -158,7 +158,7 @@ class Fsock extends \Leaps\HttpClient\Adapter implements \Leaps\HttpClient\Adapt
 	 */
 	public function deleteRequest($url)
 	{
-		$this->method ( 'DELETE' );
+		$this->setMethod ( 'DELETE' );
 		return $this->getRequest ( $url );
 	}
 
@@ -200,7 +200,6 @@ class Fsock extends \Leaps\HttpClient\Adapter implements \Leaps\HttpClient\Adapt
 			$header ['Cookie'] = is_array ( $this->cookie ) ? http_build_query ( $this->cookie, '', ';' ) : $this->cookie;
 		}
 		if ($this->header) {
-			$header = array ();
 			foreach ( $this->header as $item ) {
 				// 防止有重复的header
 				if (preg_match ( '#(^[^:]*):(.*)$#', $item, $m )) {
