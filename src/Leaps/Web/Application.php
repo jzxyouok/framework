@@ -108,11 +108,12 @@ class Application extends \Leaps\Application
 				],
 				'session' => [
 						'className' => 'Leaps\Web\Session'
+				],
+				'errorHandler' => [
+						'className' => 'Leaps\Web\ErrorHandler'
 				]
-		] )
-		// 'errorHandler' => [
-		// 'className'=>'Leaps\Web\ErrorHandler'
-		// ],
-		;
+		] );
+
+
 	}
 }

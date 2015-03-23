@@ -74,7 +74,6 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 		return $dependencyInjector;
 	}
 
-
 	/**
 	 * 监听异常
 	 *
@@ -110,7 +109,7 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 	}
 
 	/**
-	 * Renders the exception.
+	 * 渲染异常
 	 *
 	 * @param \Exception $exception the exception to be rendered.
 	 */
@@ -135,7 +134,7 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 		$this->unregister ();
 
 		try {
-			// $this->logException($exception);
+			$this->logException($exception);
 			if ($this->discardExistingOutput) {
 				$this->clearOutput ();
 			}
@@ -161,6 +160,16 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 		}
 		$this->exception = null;
 	}
+
+	/**
+	 * 处理错误
+	 * @param unknown $code
+	 * @param unknown $message
+	 * @param unknown $file
+	 * @param unknown $line
+	 * @throws \Leaps\ErrorException
+	 * @return boolean
+	 */
 	public function handleError($code, $message, $file, $line)
 	{
 		if (error_reporting () & $code) {
@@ -232,7 +241,7 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 	}
 
 	/**
-	 * Logs the given exception
+	 * 记录异常到日志
 	 *
 	 * @param \Exception $exception the exception to be logged
 	 */
