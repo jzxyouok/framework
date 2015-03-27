@@ -12,8 +12,10 @@ namespace Leaps\Web;
 
 use Leaps\Base;
 use Leaps\Kernel;
+use Leaps\DiInterface;
+use Leaps\Web\Router\Exception;
 
-class Router extends Base
+class Router extends Base implements \Leaps\Di\InjectionAwareInterface
 {
 
 	/**
@@ -51,7 +53,6 @@ class Router extends Base
 	 * @var string
 	 */
 	public $suffix = '';
-
 	public $cache = 'cache';
 
 	/**
@@ -60,12 +61,47 @@ class Router extends Base
 	 * @var boolean
 	 */
 	public $showScriptName = false;
-	public $ruleConfig = [ 'className' => 'Leaps\Web\UrlRule' ];
+	public $ruleConfig = [
+			'className' => 'Leaps\Web\UrlRule'
+	];
 	public $routeParam = 'r';
+
+	/**
+	 * 依赖注入器
+	 *
+	 * @var Leaps\Di\DiInteface
+	 */
+	protected $_dependencyInjector;
 	private $_baseUrl;
 	private $_hostInfo;
 	private $request;
 
+	/**
+	 * 设置依赖注入器
+	 *
+	 * @param Leaps\DiInterface dependencyInjector
+	 */
+	public function setDI(DiInterface $dependencyInjector)
+	{
+		if (! is_object ( $dependencyInjector )) {
+			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
+		}
+		$this->_dependencyInjector = $dependencyInjector;
+	}
+
+	/**
+	 * 返回依赖注入器实例
+	 *
+	 * @return Leaps\Di\DiInterface
+	 */
+	public function getDI()
+	{
+		$dependencyInjector = $this->_dependencyInjector;
+		if (! is_object ( $dependencyInjector )) {
+			$dependencyInjector = \Leaps\Di::getDefault ();
+		}
+		return $dependencyInjector;
+	}
 
 	/**
 	 * (non-PHPdoc)
@@ -78,8 +114,12 @@ class Router extends Base
 		if (! $this->enablePrettyUrl || empty ( $this->rules )) {
 			return;
 		}
-		if (is_string($this->cache)) {
-			$this->cache = Kernel::$app->get('cache');
+		if (is_string ( $this->cache )) {
+			$dependencyInjector = $this->_dependencyInjector;
+			if (! is_object ( $dependencyInjector )) {
+				throw new Exception ( "A dependency injection object is required to access the '" . $this->cache . "' service" );
+			}
+			$this->cache = $dependencyInjector->get ( 'cache' );
 		}
 		if ($this->enableRuleCache) {
 			$cacheKey = __CLASS__;
@@ -88,7 +128,10 @@ class Router extends Base
 				$this->rules = $data [0];
 			} else {
 				$this->rules = $this->buildRules ( $this->rules );
-				$this->cache->set ( $cacheKey, [ $this->rules,$hash ], 'router' );
+				$this->cache->set ( $cacheKey, [
+						$this->rules,
+						$hash
+				], 'router' );
 			}
 		} else {
 			$this->rules = $this->buildRules ( $this->rules );
@@ -131,8 +174,10 @@ class Router extends Base
 		$verbs = 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS';
 		foreach ( $rules as $key => $rule ) {
 			if (is_string ( $rule )) {
-				$rule = [ 'route' => $rule ];
-				if (preg_match ( "/^((?:(".$verbs."),)*(".$verbs."))\\s+(.*)$/", $key, $matches )) {
+				$rule = [
+						'route' => $rule
+				];
+				if (preg_match ( "/^((?:(" . $verbs . "),)*(" . $verbs . "))\\s+(.*)$/", $key, $matches )) {
 					$rule ['verb'] = explode ( ',', $matches [1] );
 					$rule ['mode'] = UrlRule::PARSING_ONLY;
 					$key = $matches [4];
@@ -186,13 +231,19 @@ class Router extends Base
 				}
 			}
 
-			return [ $pathInfo,[ ] ];
+			return [
+					$pathInfo,
+					[ ]
+			];
 		} else {
 			$route = $request->getQueryParam ( $this->routeParam, '' );
 			if (is_array ( $route )) {
 				$route = '';
 			}
-			return [ ( string ) $route,[ ] ];
+			return [
+					( string ) $route,
+					[ ]
+			];
 		}
 	}
 
@@ -261,7 +312,7 @@ class Router extends Base
 		$params = ( array ) $params;
 		$url = $this->createUrl ( $params );
 		if (strpos ( $url, '://' ) === false) {
-			$url = $this->getHostInfo ( ) . $url;
+			$url = $this->getHostInfo () . $url;
 		}
 		if ($schema !== null && ($pos = strpos ( $url, '://' )) !== false) {
 			$url = $schema . substr ( $url, $pos );

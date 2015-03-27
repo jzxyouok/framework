@@ -691,7 +691,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 		$request = Yii::$app->getRequest();
 		if ($request->enableCookieValidation) {
 			if ($request->cookieValidationKey == '') {
-				throw new InvalidConfigException(get_class($request) . '::cookieValidationKey must be configured with a secret key.');
+				throw new \Leaps\InvalidConfigException(get_class($request) . '::cookieValidationKey must be configured with a secret key.');
 			}
 			$validationKey = $request->cookieValidationKey;
 		}

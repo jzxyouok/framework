@@ -217,21 +217,9 @@ class Request extends Base implements RequestInterface, InjectionAwareInterface
 	{
 		if ($this->_headers === null) {
 			$this->_headers = new HeaderCollection ();
-			if (function_exists ( 'getallheaders' )) {
-				$headers = getallheaders ();
-			} elseif (function_exists ( 'http_get_request_headers' )) {
-				$headers = http_get_request_headers ();
-			} else {
-				foreach ( $_SERVER as $name => $value ) {
-					if (strncmp ( $name, 'HTTP_', 5 ) === 0) {
-						$name = str_replace ( ' ', '-', ucwords ( strtolower ( str_replace ( '_', ' ', substr ( $name, 5 ) ) ) ) );
-						$this->_headers->add ( $name, $value );
-					}
-				}
-				return $this->_headers;
-			}
-			if (isset ( $headers )) {
-				foreach ( $headers as $name => $value ) {
+			foreach ( $_SERVER as $name => $value ) {
+				if (strncmp ( $name, 'HTTP_', 5 ) === 0) {
+					$name = str_replace ( ' ', '-', ucwords ( strtolower ( str_replace ( '_', ' ', substr ( $name, 5 ) ) ) ) );
 					$this->_headers->add ( $name, $value );
 				}
 			}
