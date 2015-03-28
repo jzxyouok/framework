@@ -134,7 +134,7 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 		$this->unregister ();
 
 		try {
-			$this->logException($exception);
+			$this->logException ( $exception );
 			if ($this->discardExistingOutput) {
 				$this->clearOutput ();
 			}
@@ -163,6 +163,7 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 
 	/**
 	 * 处理错误
+	 *
 	 * @param unknown $code
 	 * @param unknown $message
 	 * @param unknown $file
