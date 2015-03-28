@@ -62,7 +62,7 @@ class ErrorHandler extends \Leaps\ErrorHandler
 				// if there is an error during error rendering it's useful to
 				// display PHP error in debug mode instead of a blank screen
 				if (Kernel::$env == Kernel::DEVELOPMENT) {
-					// ini_set ( 'display_errors', 1 );
+					ini_set ( 'display_errors', 1 );
 				}
 				if ($useErrorView) {
 					$this->response->data = $this->renderErrorView ( $exception );
@@ -96,7 +96,7 @@ class ErrorHandler extends \Leaps\ErrorHandler
 	 * @param array $args array of method arguments.
 	 * @return string HTML content of the rendered call stack element.
 	 */
-	public function renderCallStackItem($file, $line, $class, $method, $args, $index)
+	public function renderCallStackItem($file, $line, $class, $method, $args, $index = 0)
 	{
 		$lines = [ ];
 		$begin = $end = 0;
