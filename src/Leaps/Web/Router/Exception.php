@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Web\Router;
 
-class Exception extends \Leaps\Exception
+class Exception extends \Leaps\Core\Exception
 {
 
 	/**

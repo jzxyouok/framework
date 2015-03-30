@@ -10,8 +10,8 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Web;
 
-use Leaps\Base;
 use Leaps\Kernel;
+use Leaps\Core\Base;
 use Leaps\DiInterface;
 use Leaps\Web\Router\Exception;
 

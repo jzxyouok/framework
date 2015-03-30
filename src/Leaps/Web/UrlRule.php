@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Web;
 
-use Leaps\Base;
+use Leaps\Core\Base;
 
 class UrlRule extends Base implements UrlRuleInterface
 {

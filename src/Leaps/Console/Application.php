@@ -12,7 +12,7 @@ namespace Leaps\Console;
 
 use Leaps\Arr;
 
-class Application extends \Leaps\Application
+class Application extends \Leaps\Core\Application
 {
 	/**
 	 * The option name for specifying the application configuration file path.

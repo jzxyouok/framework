@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Storage;
 
-abstract class Adapter extends \Leaps\Base
+abstract class Adapter extends \Leaps\Core\Base
 {
 
 }

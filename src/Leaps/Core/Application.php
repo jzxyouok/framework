@@ -8,7 +8,11 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
+
+use Leaps\Di;
+use Leaps\Arr;
+use Leaps\Kernel;
 
 abstract class Application extends Module
 {

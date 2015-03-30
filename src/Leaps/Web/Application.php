@@ -14,7 +14,7 @@ use Leaps\Arr;
 use Leaps\Kernel;
 use Leaps\Web\Router\Exception as RouteException;
 
-class Application extends \Leaps\Application
+class Application extends \Leaps\Core\Application
 {
 	/**
 	 * 默认路由

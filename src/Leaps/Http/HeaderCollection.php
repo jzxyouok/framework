@@ -10,8 +10,8 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Http;
 
-use Leaps\Base;
 use ArrayIterator;
+use Leaps\Core\Base;
 
 class HeaderCollection extends Base implements \IteratorAggregate, \ArrayAccess, \Countable
 {

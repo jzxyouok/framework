@@ -10,8 +10,8 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Http;
 
-use Leaps\Base;
 use \ArrayIterator;
+use Leaps\Core\Base;
 
 class CookieCollection extends Base implements \IteratorAggregate, \ArrayAccess, \Countable
 {
@@ -55,6 +55,7 @@ class CookieCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 
 	/**
 	 * 是否只读
+	 *
 	 * @var unknown
 	 */
 	public $readOnly = false;

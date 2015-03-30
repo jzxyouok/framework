@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Http;
 
-use Leaps\Base;
+use Leaps\Core\Base;
 use Leaps\DiInterface;
 use Leaps\Http\Request\Exception;
 use Leaps\InvalidConfigException;

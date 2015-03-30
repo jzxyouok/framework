@@ -8,9 +8,10 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
 
-use Leaps\Web\Router\Exception as RouteException;
+use Leaps\Di;
+use Leaps\Kernel;
 
 class Module extends Di
 {
@@ -315,11 +316,10 @@ class Module extends Di
 			$oldController = Kernel::$app->controller;
 			Kernel::$app->controller = $controller;
 			$result = $controller->runActionInstance ( $actionID, $params );
-			exit ();
 			Kernel::$app->controller = $oldController;
 			return $result;
 		} else {
-			throw new RouteException ( 'Unable to resolve the request "' . $route . '".' );
+			throw new \Leaps\Web\Router\Exception ( 'Unable to resolve the request "' . $route . '".' );
 		}
 	}
 

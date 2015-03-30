@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Http;
 
-class Cookie extends \Leaps\Base
+class Cookie extends \Leaps\Core\Base
 {
 	/**
 	 * Cookie名称
