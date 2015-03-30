@@ -230,7 +230,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	 *
 	 * @param Leaps\DiInterface dependencyInjector
 	 */
-	public function setDI(\Leaps\DiInterface $dependencyInjector)
+	public function setDI(\Leaps\Di\ContainerInterface $dependencyInjector)
 	{
 		$this->_dependencyInjector = $dependencyInjector;
 	}
@@ -243,7 +243,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	public function getDI()
 	{
 		if (! is_object ( $this->_dependencyInjector )) {
-			$this->_dependencyInjector = \Leaps\Di::getDefault ();
+			$this->_dependencyInjector =  \Leaps\Kernel::$app;
 			if (! is_object ( $this->_dependencyInjector )) {
 				throw new Exception ( "A dependency injection object is required to access the 'url' service" );
 			}

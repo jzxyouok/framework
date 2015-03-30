@@ -51,7 +51,7 @@ abstract class Injectable extends Base implements \Leaps\Di\InjectionAwareInterf
 	{
 		$dependencyInjector = $this->_dependencyInjector;
 		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Di::getDefault ();
+			$dependencyInjector = \Leaps\Kernel::$app;
 		}
 		return $dependencyInjector;
 	}
@@ -65,7 +65,7 @@ abstract class Injectable extends Base implements \Leaps\Di\InjectionAwareInterf
 	{
 		$dependencyInjector = $this->_dependencyInjector;
 		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Di::getDefault ();
+			$dependencyInjector = \Leaps\Kernel::$app;
 			if (! is_object ( $dependencyInjector )) {
 				throw new \Leaps\Di\Exception ( "A dependency injection object is required to access the application services" );
 			}

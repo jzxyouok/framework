@@ -10,9 +10,9 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Http;
 
-use Leaps\DiInterface;
+use Leaps\Di\ContainerInterface;
 use Leaps\Http\Request\Exception;
-use Leaps\InvalidConfigException;
+use Leaps\Core\InvalidConfigException;
 
 class Request extends \Leaps\Core\Request
 {
@@ -26,6 +26,33 @@ class Request extends \Leaps\Core\Request
 	protected $_baseUrl;
 	protected $_pathInfo;
 	private $_router;
+
+	/**
+	 * 设置依赖注入器
+	 *
+	 * @param Leaps\DiInterface dependencyInjector
+	 */
+	public function setDI(ContainerInterface $dependencyInjector)
+	{
+		if (! is_object ( $dependencyInjector )) {
+			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
+		}
+		$this->_dependencyInjector = $dependencyInjector;
+	}
+
+	/**
+	 * 返回依赖注入器实例
+	 *
+	 * @return Leaps\Di\ContainerInterface
+	 */
+	public function getDI()
+	{
+		$dependencyInjector = $this->_dependencyInjector;
+		if (! is_object ( $dependencyInjector )) {
+			$dependencyInjector = \Leaps\Di::getDefault ();
+		}
+		return $dependencyInjector;
+	}
 
 	/**
 	 * 初始化
@@ -869,32 +896,5 @@ class Request extends \Leaps\Core\Request
 		}
 
 		return ( string ) $pathInfo;
-	}
-
-	/**
-	 * 设置依赖注入器
-	 *
-	 * @param Leaps\DiInterface dependencyInjector
-	 */
-	public function setDI(DiInterface $dependencyInjector)
-	{
-		if (! is_object ( $dependencyInjector )) {
-			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
-		}
-		$this->_dependencyInjector = $dependencyInjector;
-	}
-
-	/**
-	 * 返回依赖注入器实例
-	 *
-	 * @return Leaps\Di\DiInterface
-	 */
-	public function getDI()
-	{
-		$dependencyInjector = $this->_dependencyInjector;
-		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Di::getDefault ();
-		}
-		return $dependencyInjector;
 	}
 }

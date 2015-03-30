@@ -19,14 +19,14 @@ interface InjectionAwareInterface
 	/**
 	 * 设置依赖注入器
 	 *
-	 * @param \Leaps\DiInterface dependencyInjector
+	 * @param \Leaps\Di\ContainerInterface 依赖注入器
 	 */
 	public function setDI(\Leaps\Di\ContainerInterface $dependencyInjector);
 
 	/**
 	 * 获取依赖注入器
 	 *
-	 * @return Leaps\DiInterface
+	 * @return Leaps\Di\ContainerInterface
 	 */
 	public function getDI();
 }
