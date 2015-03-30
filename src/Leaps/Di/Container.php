@@ -21,6 +21,14 @@ class Container extends Base implements \ArrayAccess, ContainerInterface
 	protected $_services;
 	protected $_sharedInstances;
 	protected $_freshInstance = false;
+	protected static $_default;
+
+	public function init()
+	{
+		if (! self::$_default) {
+			self::$_default = $this;
+		}
+	}
 
 	/**
 	 * 注册一个服务到服务容器
@@ -386,5 +394,23 @@ class Container extends Base implements \ArrayAccess, ContainerInterface
 	{
 		$provider->register ( $this );
 		return $this;
+	}
+
+	/**
+	 * Return the lastest DI created
+	 *
+	 * @return Phalcon\DiInterface
+	 */
+	public static function getDefault()
+	{
+		return self::$_default;
+	}
+
+	/**
+	 * 重置DI
+	 */
+	public static function reset()
+	{
+		self::$_default = null;
 	}
 }

@@ -43,6 +43,7 @@ class Module extends Container
 	 */
 	public function init()
 	{
+		parent::init();
 		if ($this->controllerNamespace === null) {
 			$class = get_class ( $this );
 			if (($pos = strrpos ( $class, '\\' )) !== false) {

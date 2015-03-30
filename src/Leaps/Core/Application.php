@@ -10,9 +10,10 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Core;
 
-use Leaps\Di;
+
 use Leaps\Arr;
 use Leaps\Kernel;
+use Leaps\Di\Container;
 
 abstract class Application extends Module
 {
@@ -172,6 +173,7 @@ abstract class Application extends Module
 	 */
 	public function init()
 	{
+		parent::init();
 	}
 
 	/**
