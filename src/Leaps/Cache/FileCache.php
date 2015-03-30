@@ -11,9 +11,8 @@
 namespace Leaps\Cache;
 
 use Leaps\Kernel;
-use Leaps\Cache;
 
-class FileCache extends Cache
+class FileCache extends Adapter
 {
 	/**
 	 *
@@ -65,7 +64,6 @@ class FileCache extends Cache
 	 *      but read-only for other users.
 	 */
 	public $dirMode = 0775;
-
 	private $file;
 
 	/**
@@ -74,7 +72,7 @@ class FileCache extends Cache
 	public function init()
 	{
 		parent::init ();
-		$this->file = $this->getDI()->get('file');
+		$this->file = $this->getDI ()->get ( 'file' );
 		$this->cachePath = Kernel::getAlias ( $this->cachePath );
 		if (! is_dir ( $this->cachePath )) {
 			$this->file->createDirectory ( $this->cachePath, $this->dirMode, true );

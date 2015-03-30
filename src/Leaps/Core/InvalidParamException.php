@@ -8,15 +8,15 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
 
 /**
- * 使用错误的方式调用方法引起的异常。
+ * 一个无效的参数传递给方法造成的异常。
  *
  * @author Tongle Xu <xutongle@gmail.com>
  * @since 4.0
  */
-class InvalidCallException extends Exception
+class InvalidParamException extends Exception
 {
 	/**
 	 * 返回用户友好的异常名称
@@ -25,6 +25,6 @@ class InvalidCallException extends Exception
 	 */
 	public function getName()
 	{
-		return 'Invalid Call';
+		return 'Invalid Parameter';
 	}
 }

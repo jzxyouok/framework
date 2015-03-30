@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Di;
 
-use Leaps\Base;
+use Leaps\Core\Base;
 use Leaps\InvalidCallException;
 
 /**

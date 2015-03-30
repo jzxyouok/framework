@@ -8,11 +8,13 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Cache;
 
+use Leaps\Str;
+use Leaps\Core\Base;
 use Leaps\Di\InjectionAwareInterface;
 
-abstract class Cache extends Base implements InjectionAwareInterface
+abstract class Adapter extends Base implements InjectionAwareInterface
 {
 	/**
 	 *
@@ -184,7 +186,7 @@ abstract class Cache extends Base implements InjectionAwareInterface
 	 * @param string $value the value to be cached
 	 * @param integer $duration the number of seconds in which the cached value will expire. 0 means never expire.
 	 * @return boolean true if the value is successfully stored into cache, false otherwise
-	 */
+	*/
 	abstract protected function setValue($key, $value, $duration);
 
 	/**
@@ -196,7 +198,7 @@ abstract class Cache extends Base implements InjectionAwareInterface
 	 * @param string $value the value to be cached
 	 * @param integer $duration the number of seconds in which the cached value will expire. 0 means never expire.
 	 * @return boolean true if the value is successfully stored into cache, false otherwise
-	 */
+	*/
 	abstract protected function addValue($key, $value, $duration);
 
 	/**
@@ -205,7 +207,7 @@ abstract class Cache extends Base implements InjectionAwareInterface
 	 *
 	 * @param string $key the key of the value to be deleted
 	 * @return boolean if no error happens during deletion
-	 */
+	*/
 	abstract protected function deleteValue($key);
 
 	/**
@@ -213,7 +215,7 @@ abstract class Cache extends Base implements InjectionAwareInterface
 	 * Child classes may implement this method to realize the flush operation.
 	 *
 	 * @return boolean whether the flush operation was successful.
-	 */
+	*/
 	abstract protected function flushValues();
 
 	/**
@@ -224,7 +226,7 @@ abstract class Cache extends Base implements InjectionAwareInterface
 	 *
 	 * @param array $keys a list of keys identifying the cached values
 	 * @return array a list of cached values indexed by the keys
-	 */
+	*/
 	protected function getValues($keys)
 	{
 		$results = [ ];

@@ -8,8 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
-
+namespace Leaps\Core;
 
 class UserException extends Exception
 {

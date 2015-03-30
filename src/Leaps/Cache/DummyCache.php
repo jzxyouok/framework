@@ -10,9 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Cache;
 
-use Leaps\Cache;
-
-class DummyCache extends Cache
+class DummyCache extends Adapter
 {
 	/**
 	 * Retrieves a value from cache with a specified key.

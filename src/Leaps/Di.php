@@ -10,6 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps;
 
+use Leaps\Core\Base;
 use Leaps\Di\Service;
 use Leaps\Di\ServiceInterface;
 use Leaps\Di\ServiceProviderInterface;

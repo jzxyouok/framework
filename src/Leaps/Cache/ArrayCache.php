@@ -10,9 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Cache;
 
-use Leaps\Cache;
-
-class ArrayCache extends Cache
+class ArrayCache extends Adapter
 {
 	private $_cache;
 
@@ -42,7 +40,10 @@ class ArrayCache extends Cache
 	 */
 	protected function setValue($key, $value, $duration)
 	{
-		$this->_cache [$key] = [ $value,$duration === 0 ? 0 : microtime ( true ) + $duration ];
+		$this->_cache [$key] = [
+				$value,
+				$duration === 0 ? 0 : microtime ( true ) + $duration
+		];
 		return true;
 	}
 
@@ -54,7 +55,10 @@ class ArrayCache extends Cache
 		if (isset ( $this->_cache [$key] ) && ($this->_cache [$key] [1] === 0 || $this->_cache [$key] [1] > microtime ( true ))) {
 			return false;
 		} else {
-			$this->_cache [$key] = [ $value,$duration === 0 ? 0 : microtime ( true ) + $duration ];
+			$this->_cache [$key] = [
+					$value,
+					$duration === 0 ? 0 : microtime ( true ) + $duration
+			];
 			return true;
 		}
 	}

@@ -8,7 +8,9 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
+
+use Leaps\Kernel;
 
 class Base implements Arrayable
 {

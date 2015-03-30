@@ -10,9 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Cache;
 
-use Leaps\Cache;
-
-class XCache extends Cache
+class XCache extends Adapter
 {
 	/**
 	 * Checks whether a specified key exists in the cache.

@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Crypt;
 
-class Exception extends \Leaps\Exception
+class Exception extends \Leaps\Core\Exception
 {
 	/**
 	 * 返回用户友好的异常名称

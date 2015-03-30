@@ -8,23 +8,28 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
 
-/**
- * 一个无效的参数传递给方法造成的异常。
- *
- * @author Tongle Xu <xutongle@gmail.com>
- * @since 4.0
- */
-class InvalidParamException extends Exception
+class ExitException extends Exception
 {
 	/**
-	 * 返回用户友好的异常名称
+	 * 退出状态代码
 	 *
-	 * @return string
+	 * @var integer
 	 */
-	public function getName()
+	public $statusCode;
+
+	/**
+	 * 构造方法
+	 *
+	 * @param integer $status 退出状态代码
+	 * @param string $message 错误消息
+	 * @param integer $code 错误代码
+	 * @param \Exception $previous
+	 */
+	public function __construct($status = 0, $message = null, $code = 0, \Exception $previous = null)
 	{
-		return 'Invalid Parameter';
+		$this->statusCode = $status;
+		parent::__construct ( $message, $code, $previous );
 	}
 }

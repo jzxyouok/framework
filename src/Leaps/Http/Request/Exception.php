@@ -15,6 +15,15 @@ namespace Leaps\Http\Request;
  *
  * Exceptions thrown in Leaps\Http\Request will use this class
  */
-class Exception extends \Leaps\Exception
+class Exception extends \Leaps\Core\Exception
 {
+	/**
+	 * 返回用户友好的异常名称
+	 *
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'Request Exception';
+	}
 }

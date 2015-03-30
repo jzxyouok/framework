@@ -10,12 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Di;
 
-/**
- * Leaps\Di\Exception
- *
- * Exceptions thrown in Leaps\Di will use this class
- */
-class Exception extends \Leaps\Exception
+class Exception extends \Leaps\Core\Exception
 {
 
 	/**

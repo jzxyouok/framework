@@ -8,23 +8,14 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
 
-/**
- * 对象配置不正确造成的异常
- *
- * @author Tongle Xu <xutongle@gmail.com>
- * @since 4.0
- */
-class InvalidConfigException extends Exception
+interface Arrayable
 {
 	/**
-	 * 返回用户友好的异常名称
+	 * 用数组表示对象
 	 *
-	 * @return string
+	 * @return array
 	 */
-	public function getName()
-	{
-		return 'Invalid Configuration';
-	}
+	public function toArray();
 }

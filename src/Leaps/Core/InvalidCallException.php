@@ -8,15 +8,15 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
 
 /**
- * 使用一个未知类引起的异常。
+ * 使用错误的方式调用方法引起的异常。
  *
  * @author Tongle Xu <xutongle@gmail.com>
  * @since 4.0
  */
-class UnknownClassException extends Exception
+class InvalidCallException extends Exception
 {
 	/**
 	 * 返回用户友好的异常名称
@@ -25,6 +25,6 @@ class UnknownClassException extends Exception
 	 */
 	public function getName()
 	{
-		return 'Unknown Class';
+		return 'Invalid Call';
 	}
 }

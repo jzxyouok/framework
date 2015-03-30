@@ -8,7 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
 
 class Exception extends \Exception
 {
@@ -41,7 +41,12 @@ class Exception extends \Exception
 	 */
 	protected function toArrayRecursive($exception)
 	{
-		$array = [ 'type' => get_class ( $exception ),'name' => $exception instanceof self ? $exception->getName () : 'Exception','message' => $exception->getMessage (),'code' => $exception->getCode () ];
+		$array = [
+				'type' => get_class ( $exception ),
+				'name' => $exception instanceof self ? $exception->getName () : 'Exception',
+				'message' => $exception->getMessage (),
+				'code' => $exception->getCode ()
+		];
 		if (($prev = $exception->getPrevious ()) !== null) {
 			$array ['previous'] = $this->toArrayRecursive ( $prev );
 		}

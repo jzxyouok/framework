@@ -10,8 +10,8 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Http;
 
-use Leaps\Base;
 use Leaps\Kernel;
+use Leaps\Core\Base;
 use Leaps\Http\ResponseInterface;
 use Leaps\Http\Response\Exception;
 use Leaps\Di\InjectionAwareInterface;

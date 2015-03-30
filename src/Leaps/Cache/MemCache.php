@@ -10,8 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Cache;
 
-use Leaps\Cache;
-use Leaps\InvalidConfigException;
+use Leaps\Core\InvalidConfigException;
 
 /**
  * MemCache implements a cache application component based on [memcache](http://pecl.php.net/package/memcache)
@@ -64,7 +63,7 @@ use Leaps\InvalidConfigException;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class MemCache extends Cache
+class MemCache extends Adapter
 {
 	/**
 	 *
@@ -132,7 +131,12 @@ class MemCache extends Cache
 	protected function addServers($cache, $servers)
 	{
 		if (empty ( $servers )) {
-			$servers = [ new MemCacheServer ( [ 'host' => '127.0.0.1','port' => 11211 ] ) ];
+			$servers = [
+					new MemCacheServer ( [
+							'host' => '127.0.0.1',
+							'port' => 11211
+					] )
+			];
 		} else {
 			foreach ( $servers as $server ) {
 				if ($server->host === null) {

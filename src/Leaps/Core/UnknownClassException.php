@@ -8,27 +8,23 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
 
-class ExitException extends Exception
+/**
+ * 使用一个未知类引起的异常。
+ *
+ * @author Tongle Xu <xutongle@gmail.com>
+ * @since 4.0
+ */
+class UnknownClassException extends Exception
 {
 	/**
+	 * 返回用户友好的异常名称
 	 *
-	 * @var integer the exit status code
+	 * @return string
 	 */
-	public $statusCode;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param integer $status the exit status code
-	 * @param string $message error message
-	 * @param integer $code error code
-	 * @param \Exception $previous The previous exception used for the exception chaining.
-	 */
-	public function __construct($status = 0, $message = null, $code = 0, \Exception $previous = null)
+	public function getName()
 	{
-		$this->statusCode = $status;
-		parent::__construct ( $message, $code, $previous );
+		return 'Unknown Class';
 	}
 }

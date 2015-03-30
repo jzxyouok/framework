@@ -8,7 +8,10 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
+
+use Leaps\Kernel;
+use Leaps\Debug\Dump;
 
 abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInterface
 {
@@ -81,7 +84,7 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 	 */
 	public function register()
 	{
-		ini_set ( 'display_errors', false );
+		//ini_set ( 'display_errors', false );
 		set_exception_handler ( [
 				$this,
 				'handleException'
@@ -154,7 +157,7 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 					echo '<pre>' . htmlspecialchars ( $msg, ENT_QUOTES, Kernel::$app->charset ) . '</pre>';
 				}
 			}
-			$msg .= "\n\$_SERVER = " . VarDumper::export ( $_SERVER );
+			$msg .= "\n\$_SERVER = " . Dump::export ( $_SERVER );
 			error_log ( $msg );
 			exit ( 1 );
 		}
