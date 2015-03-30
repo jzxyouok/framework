@@ -10,13 +10,11 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Http;
 
-use Leaps\Core\Base;
 use Leaps\DiInterface;
 use Leaps\Http\Request\Exception;
 use Leaps\InvalidConfigException;
-use Leaps\Di\InjectionAwareInterface;
 
-class Request extends Base implements RequestInterface, InjectionAwareInterface
+class Request extends \Leaps\Core\Request
 {
 	public $methodParam = "_method";
 	protected $_headers;

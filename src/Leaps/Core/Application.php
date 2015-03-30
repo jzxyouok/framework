@@ -37,6 +37,7 @@ abstract class Application extends Module
 
 	/**
 	 * 最终用户语言
+	 *
 	 * @var string
 	 * @see sourceLanguage
 	 */
@@ -44,18 +45,21 @@ abstract class Application extends Module
 
 	/**
 	 * 当前活跃的控制器实例
+	 *
 	 * @var Controller
 	 */
 	public $controller;
 
 	/**
 	 * 应用程序布局，false为禁用
+	 *
 	 * @var string|boolean
 	 */
 	public $layout = 'main';
 
 	/**
 	 * 请求的操作
+	 *
 	 * @var Action
 	 */
 	public $requestedAction;
@@ -69,6 +73,7 @@ abstract class Application extends Module
 
 	/**
 	 * 请求操作参数
+	 *
 	 * @var array
 	 */
 	public $requestedParams;
@@ -83,8 +88,8 @@ abstract class Application extends Module
 		Kernel::$app = $this;
 		$this->preInit ( $config );
 		$this->init ();
-		$this->registerErrorHandler($config);
-		Di::__construct();
+		$this->registerErrorHandler ( $config );
+		Di::__construct ();
 	}
 
 	/**
@@ -166,18 +171,19 @@ abstract class Application extends Module
 
 	/**
 	 * Registers the errorHandler component as a PHP error handler.
+	 *
 	 * @param array $config application config
 	 */
 	protected function registerErrorHandler(&$config)
 	{
 		if (Kernel::$env == Kernel::DEVELOPMENT) {
-			if (!isset($config['services']['errorHandler']['className'])) {
+			if (! isset ( $config ['services'] ['errorHandler'] ['className'] )) {
 				echo "Error: no errorHandler service is configured.\n";
-				exit(1);
+				exit ( 1 );
 			}
-			$this->set('errorHandler', $config['services']['errorHandler']);
-			unset($config['services']['errorHandler']);
-			$this->getErrorHandler()->register();
+			$this->set ( 'errorHandler', $config ['services'] ['errorHandler'] );
+			unset ( $config ['services'] ['errorHandler'] );
+			$this->getErrorHandler ()->register ();
 		}
 	}
 
@@ -196,7 +202,7 @@ abstract class Application extends Module
 	 * 这是应用程序入口
 	 *
 	 * @return integer 退出状态 (0 means normal, non-zero values mean abnormal)
-	*/
+	 */
 	public function run()
 	{
 		try {
@@ -231,7 +237,7 @@ abstract class Application extends Module
 	{
 		parent::setBasePath ( $path );
 		Kernel::setAlias ( '@app', $this->getBasePath () );
-		Kernel::setAlias ( '@Module', $this->getBasePath ().'/Module' );
+		Kernel::setAlias ( '@Module', $this->getBasePath () . '/Module' );
 	}
 
 	/**
@@ -329,12 +335,11 @@ abstract class Application extends Module
 						'className' => 'Leaps\Filesystem\Filesystem'
 				],
 				'crypt' => [
-						'className' => 'Leaps\Crypt\Crypt'
+						'className' => 'Leaps\Crypt'
 				],
 				'event' => [
 						'className' => 'Leaps\Event\Dispatcher'
 				],
-				//'view' => ['className' => 'Leaps\Web\View'],
 				'registry' => [
 						'className' => 'Leaps\Registry'
 				],
@@ -343,9 +348,6 @@ abstract class Application extends Module
 				],
 				'cache' => [
 						'className' => 'Leaps\Cache\FileCache'
-				],
-				'httpclient' => [
-						'className' => 'Leaps\HttpClient'
 				]
 		];
 	}

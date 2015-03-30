@@ -11,7 +11,7 @@
 namespace Leaps\Di;
 
 use Leaps\Core\Base;
-use Leaps\InvalidCallException;
+use Leaps\Core\InvalidCallException;
 
 /**
  * Leaps\Di\Injectable
