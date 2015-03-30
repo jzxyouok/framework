@@ -88,7 +88,6 @@ abstract class Application extends Module
 		Kernel::$app = $this;
 		$this->preInit ( $config );
 		$this->init ();
-		Di::__construct ();
 	}
 
 	/**

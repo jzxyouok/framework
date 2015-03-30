@@ -55,7 +55,7 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 	 *
 	 * @param Leaps\DiInterface dependencyInjector
 	 */
-	public function setDI(\Leaps\DiInterface $dependencyInjector)
+	public function setDI(\Leaps\Di\ContainerInterface $dependencyInjector)
 	{
 		if (! is_object ( $dependencyInjector )) {
 			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
@@ -72,7 +72,7 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 	{
 		$dependencyInjector = $this->_dependencyInjector;
 		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Di::getDefault ();
+			//$dependencyInjector = \Leaps\Di::getDefault ();
 		}
 		return $dependencyInjector;
 	}

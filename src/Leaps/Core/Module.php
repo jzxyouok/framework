@@ -10,10 +10,10 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Core;
 
-use Leaps\Di;
+use Leaps\Di\Container;
 use Leaps\Kernel;
 
-class Module extends Di
+class Module extends Container
 {
 	public $id;
 	public $module;

@@ -34,7 +34,7 @@ abstract class Injectable extends Base implements \Leaps\Di\InjectionAwareInterf
 	 *
 	 * @param Leaps\DiInterface dependencyInjector
 	 */
-	public function setDI(\Leaps\DiInterface $dependencyInjector)
+	public function setDI(\Leaps\Di\ContainerInterface $dependencyInjector)
 	{
 		if (! is_object ( $dependencyInjector )) {
 			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );

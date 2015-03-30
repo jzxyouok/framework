@@ -21,7 +21,7 @@ interface InjectionAwareInterface
 	 *
 	 * @param \Leaps\DiInterface dependencyInjector
 	 */
-	public function setDI(\Leaps\DiInterface $dependencyInjector);
+	public function setDI(\Leaps\Di\ContainerInterface $dependencyInjector);
 
 	/**
 	 * 获取依赖注入器

@@ -135,7 +135,7 @@ class Service implements ServiceInterface
 	 * @param Leaps\Di\DiInterface dependencyInjector
 	 * @return mixed
 	 */
-	public function resolve($parameters = null, \Leaps\DiInterface $dependencyInjector = null)
+	public function resolve($parameters = null, \Leaps\Di\ContainerInterface $dependencyInjector = null)
 	{
 		/**
 		 * 判断服务是否是共享的
@@ -149,12 +149,12 @@ class Service implements ServiceInterface
 		$instance = null;
 
 		$definition = $this->_definition;
-		if (is_string($definition)) {
+		if (is_string ( $definition )) {
 			/**
 			 * 定义是字符串
 			 */
 			if (class_exists ( $definition )) {
-				if (is_array($parameters)) {
+				if (is_array ( $parameters )) {
 					if (count ( $parameters )) {
 						if (version_compare ( PHP_VERSION, '5.6.0', '>=' )) {
 							$reflection = new \ReflectionClass ( $definition );
@@ -188,7 +188,7 @@ class Service implements ServiceInterface
 			 */
 			if (gettype ( $definition ) == "object") {
 				if ($definition instanceof \Closure) {
-					if (is_array($definition)) {
+					if (is_array ( $definition )) {
 						$instance = call_user_func_array ( $definition, $parameters );
 					} else {
 						$instance = call_user_func ( $definition );
@@ -200,7 +200,7 @@ class Service implements ServiceInterface
 				/**
 				 * 数组定义需要'className'参数
 				 */
-				if (is_array($definition)) {
+				if (is_array ( $definition )) {
 					$instance = Kernel::createObject ( $definition );
 				} else {
 					$found = false;
@@ -248,7 +248,9 @@ class Service implements ServiceInterface
 			$arguments = $definition ["arguments"];
 			$arguments [$position] = $parameter;
 		} else {
-			$arguments = [ $position => $parameter ];
+			$arguments = [
+					$position => $parameter
+			];
 		}
 
 		/**

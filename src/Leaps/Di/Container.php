@@ -8,7 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Di;
 
 use Leaps\Core\Base;
 use Leaps\Di\Service;
@@ -16,24 +16,11 @@ use Leaps\Di\Exception;
 use Leaps\Di\ServiceInterface;
 use Leaps\Di\ServiceProviderInterface;
 
-class Di extends Base implements \ArrayAccess, DiInterface
+class Container extends Base implements \ArrayAccess, ContainerInterface
 {
 	protected $_services;
 	protected $_sharedInstances;
 	protected $_freshInstance = false;
-	protected static $_default;
-
-	/**
-	 * 构造方法
-	 */
-	public function __construct($config = [])
-	{
-		$defaultDi = self::$_default;
-		if (! $defaultDi) {
-			self::$_default = $this;
-		}
-		parent::__construct ( $config );
-	}
 
 	/**
 	 * 注册一个服务到服务容器
@@ -79,7 +66,7 @@ class Di extends Base implements \ArrayAccess, DiInterface
 	 *
 	 * @param Leaps\Di\DiInterface dependencyInjector
 	 */
-	public static function setDefault(\Leaps\DiInterface $dependencyInjector)
+	public static function setDefault(\Leaps\Di\ContainerInterface $dependencyInjector)
 	{
 		self::$_default = $dependencyInjector;
 	}
@@ -399,23 +386,5 @@ class Di extends Base implements \ArrayAccess, DiInterface
 	{
 		$provider->register ( $this );
 		return $this;
-	}
-
-	/**
-	 * Return the lastest DI created
-	 *
-	 * @return Leaps\DiInterface
-	 */
-	public static function getDefault()
-	{
-		return self::$_default;
-	}
-
-	/**
-	 * Resets the internal default DI
-	 */
-	public static function reset()
-	{
-		self::$_default = null;
 	}
 }
