@@ -12,6 +12,7 @@ namespace Leaps;
 
 use Leaps\Core\Base;
 use Leaps\Di\Service;
+use Leaps\Di\Exception;
 use Leaps\Di\ServiceInterface;
 use Leaps\Di\ServiceProviderInterface;
 
@@ -23,7 +24,7 @@ class Di extends Base implements \ArrayAccess, DiInterface
 	protected static $_default;
 
 	/**
-	 * Leaps\Di constructor
+	 * 构造方法
 	 */
 	public function __construct($config = [])
 	{
@@ -31,7 +32,7 @@ class Di extends Base implements \ArrayAccess, DiInterface
 		if (! $defaultDi) {
 			self::$_default = $this;
 		}
-		parent::__construct($config);
+		parent::__construct ( $config );
 	}
 
 	/**
@@ -154,10 +155,11 @@ class Di extends Base implements \ArrayAccess, DiInterface
 	public function get($name, $parameters = null)
 	{
 		if (isset ( $this->_services [$name] )) {
+
 			/**
 			 * 服务已经注册
 			 */
-			$instance = $this->_services [$name]->resolve ( $parameters,$this );
+			$instance = $this->_services [$name]->resolve ( $parameters, $this );
 		} else {
 			/**
 			 * The DI also acts as builder for any class even if it isn't defined in the DI
@@ -224,7 +226,7 @@ class Di extends Base implements \ArrayAccess, DiInterface
 			$instance = $this->get ( $name, $parameters );
 			/**
 			 * Save the instance in the first level shared
-			*/
+			 */
 			$this->_sharedInstances [$name] = $instance;
 			$this->_freshInstance = true;
 		}
@@ -364,14 +366,14 @@ class Di extends Base implements \ArrayAccess, DiInterface
 	 *
 	 * ```php
 	 * [
-	 *     'db' => [
-	 *         'className' => 'Leaps\Db\Connection',
-	 *         'dsn' => 'sqlite:path/to/file.db',
-	 *     ],
-	 *     'cache' => [
-	 *         'className' => 'Leaps\Cache\DbCache',
-	 *         'db' => 'db',
-	 *     ],
+	 * 'db' => [
+	 * 'className' => 'Leaps\Db\Connection',
+	 * 'dsn' => 'sqlite:path/to/file.db',
+	 * ],
+	 * 'cache' => [
+	 * 'className' => 'Leaps\Cache\DbCache',
+	 * 'db' => 'db',
+	 * ],
 	 * ]
 	 * ```
 	 *
@@ -379,8 +381,8 @@ class Di extends Base implements \ArrayAccess, DiInterface
 	 */
 	public function setServices($services)
 	{
-		foreach ($services as $id => $service) {
-			$this->set($id, $service);
+		foreach ( $services as $id => $service ) {
+			$this->set ( $id, $service );
 		}
 	}
 

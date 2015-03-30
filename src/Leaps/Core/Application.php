@@ -88,7 +88,6 @@ abstract class Application extends Module
 		Kernel::$app = $this;
 		$this->preInit ( $config );
 		$this->init ();
-		$this->registerErrorHandler ( $config );
 		Di::__construct ();
 	}
 
@@ -159,6 +158,13 @@ abstract class Application extends Module
 		foreach ( $config ['services'] as $id => $service ) {
 			$this->set ( $id, $service );
 		}
+		if (Kernel::$env == Kernel::DEVELOPMENT) {
+			if (! $this->has ( 'errorHandler' )) {
+				echo "Error: no errorHandler service is configured.\n";
+				exit ( 1 );
+			}
+			$this->get ( 'errorHandler' )->register ();
+		}
 		unset ( $config ['services'] );
 	}
 
@@ -167,24 +173,6 @@ abstract class Application extends Module
 	 */
 	public function init()
 	{
-	}
-
-	/**
-	 * Registers the errorHandler component as a PHP error handler.
-	 *
-	 * @param array $config application config
-	 */
-	protected function registerErrorHandler(&$config)
-	{
-		if (Kernel::$env == Kernel::DEVELOPMENT) {
-			if (! isset ( $config ['services'] ['errorHandler'] ['className'] )) {
-				echo "Error: no errorHandler service is configured.\n";
-				exit ( 1 );
-			}
-			$this->set ( 'errorHandler', $config ['services'] ['errorHandler'] );
-			unset ( $config ['services'] ['errorHandler'] );
-			$this->getErrorHandler ()->register ();
-		}
 	}
 
 	/**
@@ -296,7 +284,7 @@ abstract class Application extends Module
 	public function setVendorPath($path)
 	{
 		$this->_vendorPath = Kernel::getAlias ( $path );
-		Kernel::setAlias ( '@vendor', $this->_vendorPath );
+		Kernel::setAlias ( '@Vendor', $this->_vendorPath );
 		Kernel::setAlias ( '@bower', $this->_vendorPath . DIRECTORY_SEPARATOR . 'bower' );
 		Kernel::setAlias ( '@npm', $this->_vendorPath . DIRECTORY_SEPARATOR . 'npm' );
 	}

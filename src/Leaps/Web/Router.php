@@ -96,11 +96,10 @@ class Router extends Base implements \Leaps\Di\InjectionAwareInterface
 	 */
 	public function getDI()
 	{
-		$dependencyInjector = $this->_dependencyInjector;
-		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Di::getDefault ();
+		if (! is_object ( $this->_dependencyInjector )) {
+			$this->_dependencyInjector = \Leaps\Di::getDefault ();
 		}
-		return $dependencyInjector;
+		return $this->_dependencyInjector;
 	}
 
 	/**
@@ -115,6 +114,8 @@ class Router extends Base implements \Leaps\Di\InjectionAwareInterface
 			return;
 		}
 		if (is_string ( $this->cache )) {
+			print_r($this->_dependencyInjector);
+			exit;
 			$dependencyInjector = $this->_dependencyInjector;
 			if (! is_object ( $dependencyInjector )) {
 				throw new Exception ( "A dependency injection object is required to access the '" . $this->cache . "' service" );
