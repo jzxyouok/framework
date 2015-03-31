@@ -14,13 +14,9 @@ use Leaps\Http\Cookie\Exception;
 
 class CookieCollection
 {
-
 	protected $_dependencyInjector;
-
 	protected $_registered = false;
-
 	protected $_useEncryption = true;
-
 	protected $_cookies;
 
 	/**
@@ -38,9 +34,10 @@ class CookieCollection
 	 *
 	 * @return Phalcon\DiInterface
 	 */
-	public function getDI(){
-		return $this->	_dependencyInjector;
-}
+	public function getDI()
+	{
+		return $this->_dependencyInjector;
+	}
 
 	/**
 	 * Set if cookies in the bag must be automatically encrypted/decrypted
@@ -77,37 +74,36 @@ class CookieCollection
 	 * @param boolean httpOnly
 	 * @return Phalcon\Http\Response\Cookies
 	 */
-	public function set($name, $value=null, $expire=0, $path="/", $secure=null, $domain=null, $httpOnly=null)
+	public function set($name, $value = null, $expire = 0, $path = "/", $secure = null, $domain = null, $httpOnly = null)
 	{
 		$encryption = $this->_useEncryption;
 
 		/**
 		 * Check if the cookie needs to be updated or
 		 */
-		if (!isset($this->_cookies[$name])){
-			$cookie = new \Leaps\Http\Cookie($name, $value, $expire, $path, $secure, $domain, $httpOnly);
+		if (! isset ( $this->_cookies [$name] )) {
+			$cookie = new \Leaps\Http\Cookie ( $name, $value, $expire, $path, $secure, $domain, $httpOnly );
 			/**
 			 * Pass the DI to created cookies
-			*/
-			$cookie->setDi($this->_dependencyInjector);
+			 */
+			$cookie->setDi ( $this->_dependencyInjector );
 			/**
 			 * Enable encryption in the cookie
-			*/
+			 */
 			if ($encryption) {
-				$cookie->useEncryption($encryption);
+				$cookie->useEncryption ( $encryption );
 			}
-			$this->_cookies[$name] = $cookie;
-
+			$this->_cookies [$name] = $cookie;
 		} else {
 			/**
 			 * Override any settings in the cookie
 			 */
-			$this->_cookies[$name]->setValue($value);
-			$this->_cookies[$name]->setExpiration($expire);
-			$this->_cookies[$name]->setPath($path);
-			$this->_cookies[$name]->setSecure($secure);
-			$this->_cookies[$name]->setDomain($domain);
-			$this->_cookies[$name]->setHttpOnly($httpOnly);
+			$this->_cookies [$name]->setValue ( $value );
+			$this->_cookies [$name]->setExpiration ( $expire );
+			$this->_cookies [$name]->setPath ( $path );
+			$this->_cookies [$name]->setSecure ( $secure );
+			$this->_cookies [$name]->setDomain ( $domain );
+			$this->_cookies [$name]->setHttpOnly ( $httpOnly );
 		}
 
 		/**
@@ -115,14 +111,14 @@ class CookieCollection
 		 */
 		if ($this->_registered === false) {
 			$dependencyInjector = $this->_dependencyInjector;
-			if (!is_object($dependencyInjector)) {
-				throw new Exception("A dependency injection object is required to access the 'response' service");
+			if (! is_object ( $dependencyInjector )) {
+				throw new Exception ( "A dependency injection object is required to access the 'response' service" );
 			}
-			$response = $dependencyInjector->getShared("response");
+			$response = $dependencyInjector->getShared ( "response" );
 			/**
 			 * Pass the cookies bag to the response so it can send the headers at the of the request
-			*/
-			$response->setCookies($this);
+			 */
+			$response->setCookies ( $this );
 		}
 		return $this;
 	}
@@ -135,29 +131,29 @@ class CookieCollection
 	 */
 	public function get($name)
 	{
-		if (isset($this->_cookies[$name]))  {
-			return $this->_cookies[$name];
+		if (isset ( $this->_cookies [$name] )) {
+			return $this->_cookies [$name];
 		}
 
 		/**
 		 * Create the cookie if the it does not exist
 		 */
-		$cookie = new \Leaps\Http\Cookie($name);
+		$cookie = new \Leaps\Http\Cookie ( $name );
 		$dependencyInjector = $this->_dependencyInjector;
-		if (is_object($dependencyInjector)){
+		if (is_object ( $dependencyInjector )) {
 			/**
 			 * Pass the DI to created cookies
 			 */
-			$cookie->setDi($dependencyInjector);
+			$cookie->setDi ( $dependencyInjector );
 			$encryption = $this->_useEncryption;
 			/**
 			 * Enable encryption in the cookie
 			 */
 			if ($encryption) {
-				$cookie->useEncryption($encryption);
+				$cookie->useEncryption ( $encryption );
 			}
 		}
-		$this->_cookies[$name] = $cookie;
+		$this->_cookies [$name] = $cookie;
 		return $cookie;
 	}
 
@@ -173,14 +169,14 @@ class CookieCollection
 		/**
 		 * Check the internal bag
 		 */
-		if (isset ($this->_cookies[$name])) {
+		if (isset ( $this->_cookies [$name] )) {
 			return true;
 		}
 
 		/**
 		 * Check the superglobal
 		 */
-		if (isset ($_COOKIE[$name])) {
+		if (isset ( $_COOKIE [$name] )) {
 			return true;
 		}
 
@@ -196,8 +192,8 @@ class CookieCollection
 	 */
 	public function delete($name)
 	{
-		if(isset($this->_cookies[$name])) {
-			$this->_cookies[$name]->delete();
+		if (isset ( $this->_cookies [$name] )) {
+			$this->_cookies [$name]->delete ();
 			return true;
 		}
 		return false;
@@ -211,9 +207,9 @@ class CookieCollection
 	 */
 	public function send()
 	{
-		if (!headers_sent()) {
-			foreach ($this->_cookies as $cookie) {
-				$cookie->send();
+		if (! headers_sent ()) {
+			foreach ( $this->_cookies as $cookie ) {
+				$cookie->send ();
 			}
 			return true;
 		}
@@ -227,8 +223,7 @@ class CookieCollection
 	 */
 	public function reset()
 	{
-		$this->_cookies = [];
+		$this->_cookies = [ ];
 		return $this;
 	}
-
 }
