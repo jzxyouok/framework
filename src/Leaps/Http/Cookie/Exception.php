@@ -8,24 +8,17 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Di;
+namespace Leaps\Http\Cookie;
 
-use Leaps\Di\ContainerInterface;
-
-interface InjectionAwareInterface
+class Exception extends \Leaps\Core\Exception
 {
-
 	/**
-	 * 设置依赖注入器
+	 * 返回用户友好的异常名称
 	 *
-	 * @param \Leaps\Di\ContainerInterface 依赖注入器
+	 * @return string
 	 */
-	public function setDI(ContainerInterface $dependencyInjector);
-
-	/**
-	 * 获取依赖注入器
-	 *
-	 * @return Leaps\Di\ContainerInterface
-	 */
-	public function getDI();
+	public function getName()
+	{
+		return 'Response Exception';
+	}
 }

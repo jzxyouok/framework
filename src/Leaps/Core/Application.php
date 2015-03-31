@@ -13,7 +13,6 @@ namespace Leaps\Core;
 
 use Leaps\Arr;
 use Leaps\Kernel;
-use Leaps\Di\Container;
 
 abstract class Application extends Module
 {
@@ -195,9 +194,12 @@ abstract class Application extends Module
 	public function run()
 	{
 		try {
-			$this->get ( 'event' )->trigger ( self::EVENT_BEFORE_REQUEST );
+			$this->registerServiceProvider(new \Leaps\Events\EventServiceProvider());
+			print_r(\Leaps\Di\Container::getDefault ());
+			exit;
+			//$this->getEvent()->trigger ( self::EVENT_BEFORE_REQUEST );
 			$response = $this->handleRequest ( $this->getRequest () );
-			$this->get ( 'event' )->trigger ( self::EVENT_AFTER_REQUEST );
+			//$this->getEvent()->trigger ( self::EVENT_AFTER_REQUEST );
 			$response->send ();
 			return $response->exitStatus;
 		} catch ( ExitException $e ) {
@@ -313,6 +315,20 @@ abstract class Application extends Module
 	}
 
 	/**
+	 * Returns the request component.
+	 * @return \Leaps\Http\Request|\Leaps\console\Request the request component.
+	 */
+	public function getRequest()
+	{
+		return $this->get('request');
+	}
+
+	public function getEvent()
+	{
+		return $this->get('event');
+	}
+
+	/**
 	 * 核心服务
 	 *
 	 * @return multitype:multitype:string
@@ -326,9 +342,9 @@ abstract class Application extends Module
 				'crypt' => [
 						'className' => 'Leaps\Crypt'
 				],
-				'event' => [
-						'className' => 'Leaps\Event\Dispatcher'
-				],
+				//'event' => [
+				//		'className' => 'Leaps\Event\Dispatcher'
+				//],
 				'registry' => [
 						'className' => 'Leaps\Registry'
 				],

@@ -10,79 +10,441 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Http;
 
-class Cookie extends \Leaps\Core\Base
+use Leaps\Di\ContainerInterface;
+use Leaps\Di\InjectionAwareInterface;
+use Leaps\Http\Response\Exception;
+
+/**
+ * Leaps\Http\Cookie
+ *
+ * Provide OO wrappers to manage a HTTP cookie
+ */
+class Cookie implements InjectionAwareInterface
 {
-	/**
-	 * Cookie名称
-	 *
-	 * @var string
-	 */
-	public $name;
+	protected $_readed = false;
+	protected $_restored = false;
+	protected $_useEncryption = false;
+	protected $_dependencyInjector;
+	protected $_filter;
+	protected $_name;
+	protected $_value;
+	protected $_expire;
+	protected $_path = "/";
+	protected $_domain;
+	protected $_secure;
+	protected $_httpOnly = true;
 
 	/**
-	 * Cookie值
+	 * Leaps\Http\Cookie constructor
 	 *
-	 * @var string
+	 * @param string name
+	 * @param mixed value
+	 * @param int expire
+	 * @param string path
+	 * @param boolean secure
+	 * @param string domain
+	 * @param boolean httpOnly
 	 */
-	public $value = '';
+	public function __construct($name, $value = null, $expire = 0, $path = "/", $secure = null, $domain = null, $httpOnly = null)
+	{
+		$this->_name = $name;
+		if (! is_null ( $value )) {
+			$this->_value = $value;
+		}
+		$this->_expire = $expire;
+		if (! is_null ( $path )) {
+			$this->_path = $path;
+		}
+		if (is_null ( $secure )) {
+			$this->_secure = $secure;
+		}
+		if (! is_null ( $domain )) {
+			$this->_domain = $domain;
+		}
+		if (! is_null ( $httpOnly )) {
+			$this->_httpOnly = $httpOnly;
+		}
+	}
 
 	/**
-	 * Cookie 作用域
+	 * Sets the dependency injector
 	 *
-	 * @var string
+	 * @param Leaps\Di\ContainerInterface dependencyInjector
 	 */
-	public $domain = '';
+	public function setDI(ContainerInterface $dependencyInjector)
+	{
+		$this->_dependencyInjector = $dependencyInjector;
+	}
 
 	/**
-	 * Cookie过期时间戳 0为浏览器进程
+	 * Returns the internal dependency injector
 	 *
-	 * @var integer
+	 * @return Leaps\DiInterface
 	 */
-	public $expire = 0;
+	public function getDI()
+	{
+		return $this->_dependencyInjector;
+	}
 
 	/**
-	 * Cookie 作用路径
+	 * Sets the cookie's value
 	 *
-	 * @var string
+	 * @param string value
+	 * @return Leaps\Http\Cookie
 	 */
-	public $path = '/';
+	public function setValue($value)
+	{
+		$this->_value = $value;
+		$this->_readed = true;
+		return $this;
+	}
 
 	/**
-	 * 是否应通过安全连接发送cookie
+	 * Returns the cookie's value
 	 *
-	 * @var boolean
+	 * @param string|array filters
+	 * @param string defaultValue
+	 * @return mixed
 	 */
-	public $secure = false;
+	public function getValue($filters = null, $defaultValue = null)
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		$dependencyInjector = null;
+		if ($this->_readed === false) {
+			if (isset ( $_COOKIE [$this->_name] )) {
+				if ($this->_useEncryption) {
+					$dependencyInjector = $this->_dependencyInjector;
+					if (! is_object ( $dependencyInjector )) {
+						throw new Exception ( "A dependency injection object is required to access the 'crypt' service" );
+					}
+					$crypt = $dependencyInjector->getShared ( "crypt" );
+					/**
+					 * Decrypt the value also decoding it with base64
+					 */
+					$decryptedValue = $crypt->decryptBase64 ( $_COOKIE [$this->_name] );
+				} else {
+					$decryptedValue = $_COOKIE [$this->_name];
+				}
+				/**
+				 * Update the decrypted value
+				 */
+				$this->_value = $decryptedValue;
+				if ($filters !== null) {
+					$filter = $this->_filter;
+					if (! is_object ( $this->_filter )) {
+						if ($dependencyInjector === null) {
+							$dependencyInjector = $this->_dependencyInjector;
+							if (! is_object ( $dependencyInjector )) {
+								throw new Exception ( "A dependency injection object is required to access the 'filter' service" );
+							}
+						}
+						$filter = $dependencyInjector->getShared ( "filter" );
+						$this->_filter = $filter;
+					}
+
+					return $filter->sanitize ( $decryptedValue, $filters );
+				}
+
+				/**
+				 * Return the value without filtering
+				 */
+				return $decryptedValue;
+			}
+			return $defaultValue;
+		}
+
+		return $this->_value;
+	}
 
 	/**
-	 * Cookie是否只能通过HTTP协议读取
+	 * Sends the cookie to the HTTP client
+	 * Stores the cookie definition in session
 	 *
-	 * @var boolean
-	 */
-	public $httpOnly = true;
-
-	/**
-	 * 发送Cookie到客户端
+	 * @return Leaps\Http\Cookie
 	 */
 	public function send()
 	{
-		setcookie ( $this->name, $this->value, $this->expire, $this->path, $this->domain, $this->secure, $this->httpOnly );
+		$dependencyInjector = $this->_dependencyInjector;
+		if (! is_object ( $dependencyInjector )) {
+			throw new Exception ( "A dependency injection object is required to access the 'session' service" );
+		}
+		$definition = [ ];
+		if ($this->_expire != 0) {
+			$definition ["expire"] = $this->_expire;
+		}
+		if (! empty ( $this->_path )) {
+			$definition ["path"] = $this->_path;
+		}
+		if (! empty ( $this->_domain )) {
+			$definition ["domain"] = $this->_domain;
+		}
+		if (! empty ( $this->_secure )) {
+			$definition ["secure"] = $this->_secure;
+		}
+		if (! empty ( $this->_httpOnly )) {
+			$definition ["httpOnly"] = $this->_httpOnly;
+		}
+		/**
+		 * The definition is stored in session
+		 */
+		if (count ( $definition )) {
+			$session = $dependencyInjector->getShared ( "session" );
+			$session->set ( "_LEAPSCOOKIE_" . $this->_name, $definition );
+		}
+		if ($this->_useEncryption) {
+			if (! empty ( $this->_value )) {
+				if (! is_object ( $dependencyInjector )) {
+					throw new Exception ( "A dependency injection object is required to access the 'crypt' service" );
+				}
+				$crypt = $dependencyInjector->getShared ( "crypt" );
+				$encryptValue = $crypt->encryptBase64 ( $this->_value );
+			} else {
+				$encryptValue = $this->_value;
+			}
+		} else {
+			$encryptValue = $this->_value;
+		}
+		/**
+		 * Sets the cookie using the standard 'setcookie' function
+		 */
+		setcookie ( $this->_name, $encryptValue, $this->_expire, $this->_path, $this->_domain, $this->_secure, $this->_httpOnly );
+		return $this;
 	}
 
+	/**
+	 * Reads the cookie-related info from the SESSION to restore the cookie as it was set
+	 * This method is automatically called internally so normally you don't need to call it
+	 *
+	 * @return Leaps\Http\Cookie
+	 */
+	public function restore()
+	{
+		if (! $this->_restored) {
+			$dependencyInjector = $this->_dependencyInjector;
+			if (is_object ( $dependencyInjector )) {
+				$session = $dependencyInjector->getShared ( "session" );
+				$definition = $session->get ( "_LEAPSCOOKIE_" . $this->_name );
+				if (is_array ( $definition )) {
+					if (isset ( $definition ["expire"] )) {
+						$this->_expire = $definition ["expire"];
+					}
+					if (isset ( $definition ["domain"] )) {
+						$this->_domain = $definition ["domain"];
+					}
+
+					if (isset ( $definition ["path"] )) {
+						$this->_path = $definition ["path"];
+					}
+
+					if (isset ( $definition ["secure"] )) {
+						$this->_secure = $definition ["secure"];
+					}
+
+					if (isset ( $definition ["httpOnly"] )) {
+						$this->_httpOnly = $definition ["httpOnly"];
+					}
+				}
+			}
+			$this->_restored = true;
+		}
+		return $this;
+	}
 
 	/**
-	 * Magic method to turn a cookie object into a string without having to explicitly access [[value]].
+	 * Deletes the cookie by setting an expire time in the past
+	 */
+	public function delete()
+	{
+		$dependencyInjector = $this->_dependencyInjector;
+		if (is_object ( $dependencyInjector )) {
+			$session = $dependencyInjector->getShared ( "session" );
+			$session->remove ( "_LEAPSCOOKIE_" . $this->_name );
+		}
+		$this->_value = null;
+		setcookie ( $this->_name, null, time () - 691200, $this->_path, $this->_domain, $this->_secure, $this->_httpOnly );
+	}
+
+	/**
+	 * Sets if the cookie must be encrypted/decrypted automatically
 	 *
-	 * ~~~
-	 * if (isset($request->cookies['name'])) {
-	 * $value = (string) $request->cookies['name'];
-	 * }
-	 * ~~~
+	 * @param boolean useEncryption
+	 * @return Leaps\Http\Cookie
+	 */
+	public function useEncryption($useEncryption)
+	{
+		$this->_useEncryption = $useEncryption;
+		return $this;
+	}
+
+	/**
+	 * Check if the cookie is using implicit encryption
 	 *
-	 * @return string The value of the cookie. If the value property is null, an empty string will be returned.
+	 * @return boolean
+	 */
+	public function isUsingEncryption()
+	{
+		return $this->_useEncryption;
+	}
+
+	/**
+	 * Sets the cookie's expiration time
+	 *
+	 * @param int expire
+	 * @return Leaps\Http\Cookie
+	 */
+	public function setExpiration($expire)
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		$this->_expire = $expire;
+		return $this;
+	}
+
+	/**
+	 * Returns the current expiration time
+	 *
+	 * @return string
+	 */
+	public function getExpiration()
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		return $this->_expire;
+	}
+
+	/**
+	 * Sets the cookie's expiration time
+	 *
+	 * @param string path
+	 * @return Leaps\Http\Cookie
+	 */
+	public function setPath($path)
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		$this->_path = $path;
+		return $this;
+	}
+
+	/**
+	 * Returns the current cookie's name
+	 *
+	 * @return string
+	 */
+	public function getName()
+	{
+		return $this->_name;
+	}
+
+	/**
+	 * Returns the current cookie's path
+	 *
+	 * @return string
+	 */
+	public function getPath()
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		return $this->_path;
+	}
+
+	/**
+	 * Sets the domain that the cookie is available to
+	 *
+	 * @param string domain
+	 * @return Leaps\Http\Cookie
+	 */
+	public function setDomain($domain)
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		$this->_domain = $domain;
+		return $this;
+	}
+
+	/**
+	 * Returns the domain that the cookie is available to
+	 *
+	 * @return string
+	 */
+	public function getDomain()
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		return $this->_domain;
+	}
+
+	/**
+	 * Sets if the cookie must only be sent when the connection is secure (HTTPS)
+	 *
+	 * @param boolean secure
+	 * @return Leaps\Http\Cookie
+	 */
+	public function setSecure($secure)
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		$this->_secure = $secure;
+		return $this;
+	}
+
+	/**
+	 * Returns whether the cookie must only be sent when the connection is secure (HTTPS)
+	 *
+	 * @return boolean
+	 */
+	public function getSecure()
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		return $this->_secure;
+	}
+
+	/**
+	 * Sets if the cookie is accessible only through the HTTP protocol
+	 *
+	 * @param boolean httpOnly
+	 * @return Leaps\Http\Cookie
+	 */
+	public function setHttpOnly($httpOnly)
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		$this->_httpOnly = $httpOnly;
+		return $this;
+	}
+
+	/**
+	 * Returns if the cookie is accessible only through the HTTP protocol
+	 *
+	 * @return boolean
+	 */
+	public function getHttpOnly()
+	{
+		if (! $this->_restored) {
+			$this->restore ();
+		}
+		return $this->_httpOnly;
+	}
+
+	/**
+	 * Magic __toString method converts the cookie's value to string
+	 *
+	 * @return string
 	 */
 	public function __toString()
 	{
-		return ( string ) $this->value;
+		return ( string ) $this->getValue ();
 	}
 }

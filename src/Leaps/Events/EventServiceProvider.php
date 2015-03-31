@@ -8,24 +8,17 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Di;
+namespace Leaps\Events;
 
-use Leaps\Di\ContainerInterface;
+use Leaps\Di\ServiceProviderInterface;
 
-interface InjectionAwareInterface
+class EventServiceProvider implements ServiceProviderInterface
 {
-
-	/**
-	 * 设置依赖注入器
-	 *
-	 * @param \Leaps\Di\ContainerInterface 依赖注入器
-	 */
-	public function setDI(ContainerInterface $dependencyInjector);
-
-	/**
-	 * 获取依赖注入器
-	 *
-	 * @return Leaps\Di\ContainerInterface
-	 */
-	public function getDI();
+	public function register(\Leaps\Di\ContainerInterface $di)
+	{
+		$di->set ( 'events', function ($di)
+		{
+			return new Dispatcher ( $di );
+		} );
+	}
 }

@@ -12,7 +12,7 @@ namespace Leaps\Web;
 
 use Leaps\Kernel;
 use Leaps\Core\Base;
-use Leaps\DiInterface;
+use Leaps\Di\ContainerInterface;
 use Leaps\Web\Router\Exception;
 
 class Router extends Base implements \Leaps\Di\InjectionAwareInterface
@@ -81,7 +81,7 @@ class Router extends Base implements \Leaps\Di\InjectionAwareInterface
 	 *
 	 * @param Leaps\DiInterface dependencyInjector
 	 */
-	public function setDI(DiInterface $dependencyInjector)
+	public function setDI(ContainerInterface $dependencyInjector)
 	{
 		if (! is_object ( $dependencyInjector )) {
 			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
@@ -97,7 +97,7 @@ class Router extends Base implements \Leaps\Di\InjectionAwareInterface
 	public function getDI()
 	{
 		if (! is_object ( $this->_dependencyInjector )) {
-			$this->_dependencyInjector = \Leaps\Di::getDefault ();
+			$this->_dependencyInjector = \Leaps\Di\Container::getDefault ();
 		}
 		return $this->_dependencyInjector;
 	}

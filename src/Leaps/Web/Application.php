@@ -37,6 +37,8 @@ class Application extends \Leaps\Core\Application
 	 */
 	public function handleRequest($request)
 	{
+		print_r($this);
+		exit;
 		Kernel::setAlias ( '@webroot', dirname ( $request->getScriptFile () ) );
 		Kernel::setAlias ( '@web', $request->getBaseUrl () );
 		list ( $route, $params ) = $request->resolve ();

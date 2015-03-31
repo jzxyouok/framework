@@ -14,7 +14,7 @@ use Leaps\Di\ContainerInterface;
 use Leaps\Http\Request\Exception;
 use Leaps\Core\InvalidConfigException;
 
-class Request extends \Leaps\Core\Request
+class Request
 {
 	public $methodParam = "_method";
 	protected $_headers;
@@ -49,7 +49,7 @@ class Request extends \Leaps\Core\Request
 	{
 		$dependencyInjector = $this->_dependencyInjector;
 		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Di::getDefault ();
+			$dependencyInjector = \Leaps\Di\Container::getDefault ();
 		}
 		return $dependencyInjector;
 	}
