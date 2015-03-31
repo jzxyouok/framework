@@ -23,7 +23,7 @@ require_once 'annotations/TestClass.php';
 require_once 'annotations/TestClassNs.php';
 require_once 'helpers/xcache.php';
 
-class AnnotationsAdaptersTest extends PHPUnit_Framework_TestCase
+class AnnotationsAdaptersTest extends \PHPUnit_Framework_TestCase
 {
 
 	public function testMemoryAdapter()
