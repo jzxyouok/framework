@@ -2,19 +2,19 @@
 
 /*
 	+------------------------------------------------------------------------+
-	| Leaps Framework                                                      |
+	| Phalcon Framework                                                      |
 	+------------------------------------------------------------------------+
-	| Copyright (c) 2011-2014 Leaps Team (http://www.Leapsphp.com)       |
+	| Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
 	+------------------------------------------------------------------------+
 	| This source file is subject to the New BSD License that is bundled     |
 	| with this package in the file docs/LICENSE.txt.                        |
 	|                                                                        |
 	| If you did not receive a copy of the license and are unable to         |
 	| obtain it through the world-wide-web, please send an email             |
-	| to license@Leapsphp.com so we can send you a copy immediately.       |
+	| to license@phalconphp.com so we can send you a copy immediately.       |
 	+------------------------------------------------------------------------+
-	| Authors: Andres Gutierrez <andres@Leapsphp.com>                      |
-	|          Eduar Carvajal <eduar@Leapsphp.com>                         |
+	| Authors: Andres Gutierrez <andres@phalconphp.com>                      |
+	|          Eduar Carvajal <eduar@phalconphp.com>                         |
 	+------------------------------------------------------------------------+
 */
 
@@ -27,6 +27,7 @@ class ImageTest extends PHPUnit_Framework_TestCase
 	public function testGD()
 	{
 		if (!function_exists('gd_info')) {
+			$this->markTestSkipped("Skipped");
 			return;
 		}
 
@@ -42,11 +43,11 @@ class ImageTest extends PHPUnit_Framework_TestCase
 		@unlink('unit-tests/assets/production/gd-background.jpg');
 
 		// Create new image
-		$image = new Leaps\Image\Adapter\GD('unit-tests/assets/production/gd-new.jpg', 100, 100);
+		$image = new Phalcon\Image\Adapter\GD('unit-tests/assets/production/gd-new.jpg', 100, 100);
 		$image->save();
 		$this->assertTrue(file_exists('unit-tests/assets/production/gd-new.jpg'));
 
-		$image = new Leaps\Image\Adapter\GD('unit-tests/assets/Leapsphp.jpg');
+		$image = new Phalcon\Image\Adapter\GD('unit-tests/assets/phalconphp.jpg');
 
 		 // Resize to 200 pixels on the shortest side
 		$image->resize(200, 200)->save('unit-tests/assets/production/gd-resize.jpg');
@@ -62,7 +63,7 @@ class ImageTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($image->getHeight() <= 200);
 
 		// Resize to 200x200 pixels, keeping aspect ratio
-		//$image->resize(200, 200, Leaps\Image::INVERSE);
+		//$image->resize(200, 200, Phalcon\Image::INVERSE);
 
 		// Resize to 500 pixel width, keeping aspect ratio
 		//$image->resize(500, NULL);
@@ -71,10 +72,10 @@ class ImageTest extends PHPUnit_Framework_TestCase
 		//$image->resize(NULL, 500);
 
 		// Resize to 200x500 pixels, ignoring aspect ratio
-		//$image->resize(200, 500, Leaps\Image::NONE);
+		//$image->resize(200, 500, Phalcon\Image::NONE);
 
 		// Crop the image to 200x200 pixels, from the center
-		$image = new Leaps\Image\Adapter\GD('unit-tests/assets/Leapsphp.jpg');
+		$image = new Phalcon\Image\Adapter\GD('unit-tests/assets/phalconphp.jpg');
 		$image->crop(200, 200)->save('unit-tests/assets/production/gd-crop.jpg');
 		$this->assertTrue(file_exists('unit-tests/assets/production/gd-crop.jpg'));
 
@@ -99,11 +100,11 @@ class ImageTest extends PHPUnit_Framework_TestCase
 		//$image->rotate(-90);
 
 		// Flip the image from top to bottom
-		$image->flip(Leaps\Image::HORIZONTAL)->save('unit-tests/assets/production/gd-flip.jpg');
+		$image->flip(Phalcon\Image::HORIZONTAL)->save('unit-tests/assets/production/gd-flip.jpg');
 		$this->assertTrue(file_exists('unit-tests/assets/production/gd-flip.jpg'));
 
 		// Flip the image from left to right
-		//$image->flip(Leaps\Image::VERTICAL);
+		//$image->flip(Phalcon\Image::VERTICAL);
 
 		// Sharpen the image by 20%
 		$image->sharpen(20)->save('unit-tests/assets/production/gd-sharpen.jpg');
@@ -120,12 +121,12 @@ class ImageTest extends PHPUnit_Framework_TestCase
 		//$image->reflection(50, 60, TRUE);
 
 		// Add a watermark to the bottom right of the image
-		$mark = new Leaps\Image\Adapter\GD('unit-tests/assets/logo.png');
+		$mark = new Phalcon\Image\Adapter\GD('unit-tests/assets/logo.png');
 		$image->watermark($mark, TRUE, TRUE)->save('unit-tests/assets/production/gd-watermark.jpg');
 		$this->assertTrue(file_exists('unit-tests/assets/production/gd-watermark.jpg'));
 
 		// Mask image
-		$mask = new Leaps\Image\Adapter\GD('unit-tests/assets/logo.png');
+		$mask = new Phalcon\Image\Adapter\GD('unit-tests/assets/logo.png');
 		$image->mask($mask)->save('unit-tests/assets/production/gd-mask.jpg');
 		$this->assertTrue(file_exists('unit-tests/assets/production/gd-mask.jpg'));
 
@@ -167,10 +168,9 @@ class ImageTest extends PHPUnit_Framework_TestCase
 	public function testImagick()
 	{
 		if (!class_exists('imagick')) {
+			$this->markTestSkipped("Skipped");
 			return;
 		}
-
-		\Leaps\Image\Adapter\Imagick::setResourceLimit(6, 1);
 
 		@unlink('unit-tests/assets/production/imagick-new.jpg');
 		@unlink('unit-tests/assets/production/imagick-resize.jpg');
@@ -185,11 +185,13 @@ class ImageTest extends PHPUnit_Framework_TestCase
 		@unlink('unit-tests/assets/production/imagick-background.jpg');
 
 		// Create new image
-		$image = new Leaps\Image\Adapter\Imagick('unit-tests/assets/production/imagick-new.jpg', 100, 100);
+		$image = new Phalcon\Image\Adapter\Imagick('unit-tests/assets/production/imagick-new.jpg', 100, 100);
+		$image->setResourceLimit(6, 1);
 		$image->save();
 		$this->assertTrue(file_exists('unit-tests/assets/production/imagick-new.jpg'));
 
-		$image = new Leaps\Image\Adapter\Imagick('unit-tests/assets/Leapsphp.jpg');
+		$image = new Phalcon\Image\Adapter\Imagick('unit-tests/assets/phalconphp.jpg');
+		$image->setResourceLimit(6, 1);
 
 		 // Resize to 200 pixels on the shortest side
 		$image->resize(200, 200)->save('unit-tests/assets/production/imagick-resize.jpg');
@@ -198,7 +200,7 @@ class ImageTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($image->getHeight() <= 200);
 
 		// Resize to 200x200 pixels, keeping aspect ratio
-		//$image->resize(200, 200, Leaps\Image::INVERSE);
+		//$image->resize(200, 200, Phalcon\Image::INVERSE);
 
 		// Resize to 500 pixel width, keeping aspect ratio
 		//$image->resize(500, NULL);
@@ -207,7 +209,7 @@ class ImageTest extends PHPUnit_Framework_TestCase
 		//$image->resize(NULL, 500);
 
 		// Resize to 200x500 pixels, ignoring aspect ratio
-		//$image->resize(200, 500, Leaps\Image::NONE);
+		//$image->resize(200, 500, Phalcon\Image::NONE);
 
 		 // The images using liquid rescaling resize to 200x200
 		$image->liquidRescale(200, 200)->save('unit-tests/assets/production/imagick-liquidRescale.jpg');
@@ -220,7 +222,8 @@ class ImageTest extends PHPUnit_Framework_TestCase
 
 		// Crop the image to 200x200 pixels, from the center
 
-		$image = new Leaps\Image\Adapter\Imagick('unit-tests/assets/Leapsphp.jpg');
+		$image = new Phalcon\Image\Adapter\Imagick('unit-tests/assets/phalconphp.jpg');
+		$image->setResourceLimit(6, 1);
 		$image->crop(200, 200)->save('unit-tests/assets/production/imagick-crop.jpg');
 		$this->assertTrue(file_exists('unit-tests/assets/production/imagick-crop.jpg'));
 
@@ -238,11 +241,11 @@ class ImageTest extends PHPUnit_Framework_TestCase
 		//$image->rotate(-90);
 
 		// Flip the image from top to bottom
-		$image->flip(Leaps\Image::HORIZONTAL)->save('unit-tests/assets/production/imagick-flip.jpg');
+		$image->flip(Phalcon\Image::HORIZONTAL)->save('unit-tests/assets/production/imagick-flip.jpg');
 		$this->assertTrue(file_exists('unit-tests/assets/production/imagick-flip.jpg'));
 
 		// Flip the image from left to right
-		//$image->flip(Leaps\Image::VERTICAL);
+		//$image->flip(Phalcon\Image::VERTICAL);
 
 		// Sharpen the image by 20%
 		$image->sharpen(20)->save('unit-tests/assets/production/imagick-sharpen.jpg');
@@ -259,12 +262,14 @@ class ImageTest extends PHPUnit_Framework_TestCase
 		//$image->reflection(50, 60, TRUE);
 
 		// Add a watermark to the bottom right of the image
-		$mark = new Leaps\Image\Adapter\Imagick('unit-tests/assets/logo.png');
+		$mark = new Phalcon\Image\Adapter\Imagick('unit-tests/assets/logo.png');
+		$image->setResourceLimit(6, 1);
 		$image->watermark($mark, TRUE, TRUE)->save('unit-tests/assets/production/imagick-watermark.jpg');
 		$this->assertTrue(file_exists('unit-tests/assets/production/imagick-watermark.jpg'));
 
 		// Mask image
-		$mask = new Leaps\Image\Adapter\Imagick('unit-tests/assets/logo.png');
+		$mask = new Phalcon\Image\Adapter\Imagick('unit-tests/assets/logo.png');
+		$image->setResourceLimit(6, 1);
 		$image->mask($mask)->save('unit-tests/assets/production/imagick-mask.jpg');
 		$this->assertTrue(file_exists('unit-tests/assets/production/imagick-mask.jpg'));
 

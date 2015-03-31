@@ -2,19 +2,19 @@
 
 /*
 	+------------------------------------------------------------------------+
-	| Leaps Framework                                                      |
+	| Phalcon Framework                                                      |
 	+------------------------------------------------------------------------+
-	| Copyright (c) 2011-2014 Leaps Team (http://www.Leapsphp.com)       |
+	| Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
 	+------------------------------------------------------------------------+
 	| This source file is subject to the New BSD License that is bundled     |
 	| with this package in the file docs/LICENSE.txt.                        |
 	|                                                                        |
 	| If you did not receive a copy of the license and are unable to         |
 	| obtain it through the world-wide-web, please send an email             |
-	| to license@Leapsphp.com so we can send you a copy immediately.       |
+	| to license@phalconphp.com so we can send you a copy immediately.       |
 	+------------------------------------------------------------------------+
-	| Authors: Andres Gutierrez <andres@Leapsphp.com>                      |
-	|          Eduar Carvajal <eduar@Leapsphp.com>                         |
+	| Authors: Andres Gutierrez <andres@phalconphp.com>                      |
+	|          Eduar Carvajal <eduar@phalconphp.com>                         |
 	|          Vladimir Kolesnikov <vladimir@extrememember.com>              |
 	+------------------------------------------------------------------------+
 */
@@ -24,7 +24,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
 	public function testHasFiles()
 	{
-		$request = new \Leaps\Http\Request();
+		$request = new \Phalcon\Http\Request();
 
 		$_FILES = array(
 			'test' => array(
@@ -150,7 +150,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
 	public function testGetUploadedFiles()
 	{
-		$request = new \Leaps\Http\Request();
+		$request = new \Phalcon\Http\Request();
 
 		$_FILES = array (
 			'photo' => array(
@@ -202,7 +202,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
 	public function testGetAuth()
 	{
-		$request = new \Leaps\Http\Request();
+		$request = new \Phalcon\Http\Request();
 
 		$_SERVER = array(
 			'PHP_AUTH_USER'	=> 'myleft',
@@ -241,9 +241,9 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
 	public function testIssues1226()
 	{
-		$di = new Leaps\DI\FactoryDefault();
+		$di = new Phalcon\DI\FactoryDefault();
 
-		$request = new \Leaps\Http\Request();
+		$request = new \Phalcon\Http\Request();
 		$request->setDI($di);
 
 		$_REQUEST = $_GET = $_POST = array(
@@ -298,9 +298,9 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
 	public function testIssues1265()
 	{
-		$di = new Leaps\DI\FactoryDefault();
+		$di = new Phalcon\DI\FactoryDefault();
 
-		$request = new \Leaps\Http\Request();
+		$request = new \Phalcon\Http\Request();
 		$request->setDI($di);
 
 		$_REQUEST = $_GET = $_POST = array(
@@ -335,13 +335,13 @@ class RequestTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testIssues1442()
 	{
-		$request = new \Leaps\Http\Request();
+		$request = new \Phalcon\Http\Request();
 
 		$_FILES = array (
 			'test' => array(
 				'name'		=> 'test',
 				'type'		=> 'text/plain',
-				'tmp_name'	=> 'unit-tests/assets/Leapsphp.jpg',
+				'tmp_name'	=> 'unit-tests/assets/phalconphp.jpg',
 				'size'		=> 1,
 				'error'		=> 0,
 			)
@@ -359,7 +359,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 		$_SERVER['HTTP_BLA_BLA'] = 'boo';
 		$_SERVER['HTTP_AUTH'] = true;
 
-		$request = new \Leaps\Http\Request();
+		$request = new \Phalcon\Http\Request();
 		
 		$oldheaders = $_SERVER;
 		$headers = array();
