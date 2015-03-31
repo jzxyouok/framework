@@ -17,6 +17,7 @@
 	|          Eduar Carvajal <eduar@phalconphp.com>                         |
 	+------------------------------------------------------------------------+
 */
+namespace LeapsTest;
 
 require_once 'annotations/TestClass.php';
 require_once 'annotations/TestClassNs.php';
