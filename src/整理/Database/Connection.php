@@ -6,7 +6,6 @@ use DateTime;
 use Leaps\Database\Query\Processors\Processor;
 class Connection implements ConnectionInterface
 {
-
     /**
      * 主动PDO连接。
      *

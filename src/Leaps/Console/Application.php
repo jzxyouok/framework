@@ -11,18 +11,19 @@
 namespace Leaps\Console;
 
 use Leaps\Arr;
+use Leaps\Core\InvalidRouteException;
 
 class Application extends \Leaps\Core\Application
 {
 	/**
-	 * The option name for specifying the application configuration file path.
+	 * 指定应用程序配置文件名称
 	 */
 	const OPTION_APPCONFIG = 'appconfig';
 
 	/**
+	 * 默认的路由
 	 *
-	 * @var string the default route of this application. Defaults to 'help',
-	 *      meaning the `help` command.
+	 * @var string
 	 */
 	public $defaultRoute = 'help';
 
@@ -36,30 +37,39 @@ class Application extends \Leaps\Core\Application
 		list ( $route, $params ) = $request->resolve ();
 		$this->requestedRoute = $route;
 		$result = $this->runAction ( $route, $params );
-	/**
-	 * if ($result instanceof Response) {
-	 * return $result;
-	 * } else {
-	 * $response = $this->getResponse();
-	 * $response->exitStatus = $result;
-	 * return $response;
-	 * }
-	 */
+		if ($result instanceof Response) {
+			return $result;
+		} else {
+			$response = $this->getResponse ();
+			$response->exitStatus = $result;
+			return $response;
+		}
+	}
+	public function runAction($route, $params = [])
+	{
+		try {
+			return ( int ) parent::runAction ( $route, $params );
+		} catch ( InvalidRouteException $e ) {
+			throw new Exception ( "Unknown command \"$route\".", 0, $e );
+		}
 	}
 
 	/**
 	 * (non-PHPdoc)
 	 *
-	 * @see \Leaps\Application::coreServices()
+	 * @see \Leaps\Core\Application::coreServices()
 	 */
 	public function coreServices()
 	{
 		return Arr::mergeArray ( parent::coreServices (), [
-				'router' => [
-						'className' => 'Leaps\Web\Router'
-				],
 				'request' => [
 						'className' => '\Leaps\Console\Request'
+				],
+				'response' => [
+						'className' => 'Leaps\Console\Response'
+				],
+				'errorHandler' => [
+						'className' => 'Leaps\Console\ErrorHandler'
 				]
 		] );
 	}

@@ -310,7 +310,6 @@ class Module extends Container
 	public function runAction($route, $params = [])
 	{
 		$parts = $this->createController ( $route );
-
 		if (is_array ( $parts )) {
 			/* @var $controller Controller */
 			list ( $controller, $actionID ) = $parts;

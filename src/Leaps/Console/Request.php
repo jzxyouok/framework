@@ -10,14 +10,16 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Console;
 
-class Request implements \Leaps\Http\RequestInterface
+use Leaps\Core\Base;
+
+class Request extends Base
 {
 	private $_params;
 
 	/**
 	 * 获取命令行参数
 	 *
-	 * @return array the command line arguments. It does not include the entry script name.
+	 * @return array
 	 */
 	public function getParams()
 	{
@@ -44,6 +46,7 @@ class Request implements \Leaps\Http\RequestInterface
 
 	/**
 	 * (non-PHPdoc)
+	 *
 	 * @see \Leaps\Http\RequestInterface::resolve()
 	 */
 	public function resolve()
