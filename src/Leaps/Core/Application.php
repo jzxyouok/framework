@@ -40,7 +40,7 @@ abstract class Application extends Module
 	 * @var string
 	 * @see sourceLanguage
 	 */
-	public $language = 'en-US';
+	public $language = 'zh-CN';
 
 	/**
 	 * 当前活跃的控制器实例

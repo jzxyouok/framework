@@ -8,5 +8,5 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-$loader = include __DIR__ . '/../../vendor/autoload.php';
-$loader->add('Leaps', __DIR__ . '/../src');
+$loader = include __DIR__ . '../../vendor/autoload.php';
+$loader->add('Leaps', __DIR__ . '../src');

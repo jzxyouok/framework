@@ -12,6 +12,9 @@ nbproject
 # windows thumbnail cache
 Thumbs.db
 
+# Dreamweaver added files
+_notes
+dwsync.xml
 
 # Mac DS_Store Files
 .DS_Store
