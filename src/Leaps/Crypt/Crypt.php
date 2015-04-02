@@ -8,15 +8,15 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Crypt;
 
 /**
- * Leaps\Crypt
+ * Leaps\Crypt\Crypt
  *
  * Provides encryption facilities to leaps applications
  *
  * <code>
- * $crypt = new \Leaps\Crypt();
+ * $crypt = new \Leaps\Crypt\Crypt();
  *
  * $key = 'le password';
  * $text = 'This is a secret text';
@@ -41,7 +41,7 @@ class Crypt implements CryptInterface
 	const PADDING_SPACE = 6;
 
 	/**
-	 * @brief Leaps\CryptInterface Leaps\Crypt::setPadding(int $scheme)
+	 * @brief Leaps\Crypt\CryptInterface Leaps\Crypt\Crypt::setPadding(int $scheme)
 	 *
 	 * @param int scheme Padding scheme
 	 * @return Leaps\CryptInterface
