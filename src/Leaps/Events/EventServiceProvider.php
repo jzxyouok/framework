@@ -10,11 +10,12 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Events;
 
+use Leaps\Di\ContainerInterface;
 use Leaps\Di\ServiceProviderInterface;
 
 class EventServiceProvider implements ServiceProviderInterface
 {
-	public function register(\Leaps\Di\ContainerInterface $di)
+	public function register(ContainerInterface $di)
 	{
 		$di->set ( 'events', function ($di)
 		{

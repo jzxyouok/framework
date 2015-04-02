@@ -10,19 +10,15 @@
 // +----------------------------------------------------------------------
 namespace Leaps\HttpClient;
 
-use Illuminate\Support\ServiceProvider;
+use Leaps\Di\ContainerInterface;
+use Leaps\Di\ServiceProviderInterface;
 
-class CookieServiceProvider extends ServiceProvider
+class CookieServiceProvider implements ServiceProviderInterface
 {
 
-	/**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 */
-	public function register()
+	public function register(ContainerInterface $di)
 	{
-		$this->app->bindShared ( 'httpclient', function ($app)
+		$di->set ( 'events', function ($di)
 		{
 			if (function_exists ( "curl_init" )) {
 				return new \Leaps\HttpClient\Adapter\Curl();

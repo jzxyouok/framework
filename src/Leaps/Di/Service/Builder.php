@@ -186,7 +186,6 @@ class Builder
 			if (!is_object($instance)) {
 				throw new Exception("The definition has setter injection parameters but the constructor didn't return an instance");
 			}
-
 			if (!is_a($definition["calls"])) {
 				throw new Exception("Setter injection parameters must be an array");
 			}
@@ -199,46 +198,32 @@ class Builder
 				/**
 				 * The call parameter must be an array of arrays
 				 */
-				if typeof method != "array" {
-					throw new Exception("Method call must be an array on position " . methodPosition);
+				if (!is_array($method)) {
+					throw new Exception("Method call must be an array on position " . $methodPosition);
 				}
 
 				/**
 				 * A param 'method' is required
 				 */
-				if !fetch methodName, method["method"] {
-					throw new Exception("The method name is required on position " . methodPosition);
+				if (!isset($method["method"])) {
+					throw new Exception("The method name is required on position " . $methodPosition);
 				}
-
 				/**
 				 * Create the method call
 				 */
-				let methodCall = [instance, methodName];
+				$methodCall = [$instance,  $method["method"]];
+				if (isset($method["arguments"] )){
 
-				if fetch arguments, method["arguments"] {
-
-					if typeof arguments != "array" {
+					if (!is_array($method["arguments"] )){
 						throw new Exception("Call arguments must be an array " . methodPosition);
 					}
+					if (count($method["arguments"] )) {
 
-					if count($arguments) {
-
-						/**
-						 * Call the method on the instance
-						 */
-						call_user_func_array($methodCall, $this->_buildParameters($dependencyInjector, $arguments));
-
-						/**
-						 * Go to next method call
-						*/
+						call_user_func_array($methodCall, $this->_buildParameters($dependencyInjector, $method["arguments"] ));
 						continue;
 					}
 
 				}
-
-				/**
-				 * Call the method on the instance without arguments
-				 */
 				call_user_func($methodCall);
 			}
 
@@ -253,7 +238,7 @@ class Builder
 				throw new Exception("The definition has properties injection parameters but the constructor didn't return an instance");
 			}
 
-			if (!is_array($definition["properties"]) {
+			if (!is_array($definition["properties"])) {
 				throw new Exception("Setter injection parameters must be an array");
 			}
 
@@ -265,7 +250,7 @@ class Builder
 				/**
 				 * The call parameter must be an array of arrays
 				 */
-				if (!is_array($property) {
+				if (!is_array($property)) {
 					throw new Exception("Property must be an array on position " . $propertyPosition);
 				}
 

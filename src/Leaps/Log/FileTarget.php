@@ -11,7 +11,7 @@
 namespace Leaps\Log;
 
 use Leaps\Kernel;
-use Leaps\InvalidConfigException;
+use Leaps\Core\InvalidConfigException;
 
 /**
  * FileTarget records log messages in a file.

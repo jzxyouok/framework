@@ -12,7 +12,7 @@ namespace Leaps\Log;
 
 use Leaps\Logger;
 use Leaps\Di\Injectable;
-use Leaps\InvalidConfigException;
+use Leaps\Core\InvalidConfigException;
 
 abstract class Target extends Injectable
 {

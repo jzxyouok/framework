@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Cache;
 
-class MemCacheServer extends \Leaps\Base
+class MemCacheServer extends \Leaps\Core\Base
 {
 	/**
 	 *

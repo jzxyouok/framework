@@ -10,6 +10,6 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Image;
 
-class Exception extends \Leaps\Exception
+class Exception extends \Leaps\Core\Exception
 {
 }

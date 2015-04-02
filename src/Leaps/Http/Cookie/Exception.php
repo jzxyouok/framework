@@ -19,6 +19,6 @@ class Exception extends \Leaps\Core\Exception
 	 */
 	public function getName()
 	{
-		return 'Response Exception';
+		return 'Cookie Exception';
 	}
 }

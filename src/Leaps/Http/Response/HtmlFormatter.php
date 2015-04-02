@@ -16,15 +16,15 @@ use Leaps\Http\ResponseFormatterInterface;
 class HtmlFormatter extends Injectable implements ResponseFormatterInterface
 {
 	/**
-	 *
-	 * @var string the Content-Type header for the response
+	 * the Content-Type header for the response
+	 * @var string
 	 */
 	public $contentType = 'text/html';
 
 	/**
 	 * 格式化指定的响应
 	 *
-	 * @param Response $response the response to be formatted.
+	 * @param Response $response
 	 */
 	public function format($response)
 	{

@@ -177,7 +177,7 @@ class ErrorHandler extends \Leaps\Core\ErrorHandler
 		} else {
 			$code = $exception->getCode ();
 		}
-		if ($exception instanceof \Leaps\Exception) {
+		if ($exception instanceof \Leaps\Core\Exception) {
 			$name = $exception->getName ();
 		} else {
 			$name = 'Error';
@@ -185,7 +185,7 @@ class ErrorHandler extends \Leaps\Core\ErrorHandler
 		if ($code) {
 			$name .= " (#$code)";
 		}
-		if ($exception instanceof \Leaps\UserException) {
+		if ($exception instanceof \Leaps\Core\UserException) {
 			$message = $exception->getMessage ();
 		} else {
 			$message = 'An internal server error occurred.';
@@ -237,7 +237,7 @@ class ErrorHandler extends \Leaps\Core\ErrorHandler
 		$view .= "<title>";
 		if ($exception instanceof \Leaps\Web\HttpException) {
 			$view .= ( int ) $exception->statusCode . ' ' . $this->htmlEncode ( $exception->getName () );
-		} elseif ($exception instanceof \Leaps\Exception) {
+		} elseif ($exception instanceof \Leaps\Core\Exception) {
 			$view .= $this->htmlEncode ( $exception->getName () . ' – ' . get_class ( $exception ) );
 		} else {
 			$view .= $this->htmlEncode ( get_class ( $exception ) );
@@ -247,13 +247,13 @@ class ErrorHandler extends \Leaps\Core\ErrorHandler
 		$view .= "</head>";
 		$view .= "<body>";
 		$view .= "<div class=\"notice\">";
-		if ($exception instanceof \Leaps\ErrorException) {
+		if ($exception instanceof \Leaps\Core\ErrorException) {
 			$view .= "<h1><span>" . $this->htmlEncode ( $exception->getName () ) . "</span> &ndash; " . $this->addTypeLinks ( get_class ( $exception ) ) . "</h1>";
 		} else {
 			$view .= "<h1>";
 			if ($exception instanceof \Leaps\Web\HttpException) {
 				$view .= '<span>' . $this->createHttpStatusLink ( $exception->statusCode, $this->htmlEncode ( $exception->getName () ) ) . '</span> &ndash; ' . $this->addTypeLinks ( get_class ( $exception ) );
-			} elseif ($exception instanceof \Leaps\Exception) {
+			} elseif ($exception instanceof \Leaps\Core\Exception) {
 				$view .= '<span>' . $this->htmlEncode ( $exception->getName () ) . '</span> &ndash; ' . $this->addTypeLinks ( get_class ( $exception ) );
 			} else {
 				$view .= '<span>' . $this->htmlEncode ( get_class ( $exception ) ) . '</span>';
@@ -391,7 +391,7 @@ class ErrorHandler extends \Leaps\Core\ErrorHandler
 			$view = "<span class=\"arrow\">&crarr;</span>";
 			$view = "<h2>";
 			$view = "<span>Caused by:</span>";
-			if ($exception instanceof \Leaps\Exception) {
+			if ($exception instanceof \Leaps\Core\Exception) {
 				$view = "<span>" . $this->htmlEncode ( $exception->getName () ) . "</span> &ndash;" . $this->addTypeLinks ( get_class ( $exception ) );
 			} else {
 				$view = "<span>" . $this->htmlEncode ( get_class ( $exception ) ) . "</span>";
@@ -544,7 +544,7 @@ class ErrorHandler extends \Leaps\Core\ErrorHandler
 	 */
 	public function getExceptionName($exception)
 	{
-		if ($exception instanceof \Leaps\Exception || $exception instanceof \Leaps\InvalidCallException || $exception instanceof \Leaps\InvalidParamException || $exception instanceof \Leaps\UnknownMethodException) {
+		if ($exception instanceof \Leaps\Core\Exception || $exception instanceof \Leaps\Core\InvalidCallException || $exception instanceof \Leaps\Core\InvalidParamException || $exception instanceof \Leaps\Core\UnknownMethodException) {
 			return $exception->getName ();
 		}
 		return null;

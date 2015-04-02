@@ -34,7 +34,7 @@ abstract class Adapter extends Base implements InjectionAwareInterface
 	 *
 	 * @param Leaps\DiInterface dependencyInjector
 	 */
-	public function setDI(\Leaps\DiInterface $dependencyInjector)
+	public function setDI(\Leaps\Di\ContainerInterface $dependencyInjector)
 	{
 		if (! is_object ( $dependencyInjector )) {
 			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
@@ -51,7 +51,7 @@ abstract class Adapter extends Base implements InjectionAwareInterface
 	{
 		$dependencyInjector = $this->_dependencyInjector;
 		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Di::getDefault ();
+			$dependencyInjector = \Leaps\Di\Container::getDefault ();
 		}
 		return $dependencyInjector;
 	}
