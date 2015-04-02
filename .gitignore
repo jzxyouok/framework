@@ -16,6 +16,11 @@ Thumbs.db
 # Mac DS_Store Files
 .DS_Store
 
+# Composer Files
+composer.lock
+/vendor
+
+
 
 
 
