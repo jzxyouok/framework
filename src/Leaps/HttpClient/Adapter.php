@@ -88,6 +88,7 @@ abstract class Adapter extends \Leaps\Core\Base
 		if (null === $method)
 			return $this->method;
 		$this->method = strtoupper ( $method );
+		return $this;
 	}
 
 	/**
@@ -101,6 +102,7 @@ abstract class Adapter extends \Leaps\Core\Base
 		$this->header = array_merge ( $this->header, [
 				$item . ": " . $value
 		] );
+		return $this;
 	}
 
 	/**
@@ -112,6 +114,7 @@ abstract class Adapter extends \Leaps\Core\Base
 	public function setHeaders($headers)
 	{
 		$this->header = array_merge ( $this->header, ( array ) $headers );
+		return $this;
 	}
 
 	/**
@@ -125,6 +128,7 @@ abstract class Adapter extends \Leaps\Core\Base
 	{
 		$this->proxyHost = $host;
 		$this->proxyPort = $port;
+		return $this;
 	}
 
 	/**
@@ -136,6 +140,7 @@ abstract class Adapter extends \Leaps\Core\Base
 	public function setHostIp($ip)
 	{
 		$this->hostIp = $ip;
+		return $this;
 	}
 
 	/**
@@ -147,6 +152,7 @@ abstract class Adapter extends \Leaps\Core\Base
 	public function setUserAgent($userAgent)
 	{
 		$this->userAgent = $userAgent;
+		return $this;
 	}
 
 	/**
@@ -158,6 +164,7 @@ abstract class Adapter extends \Leaps\Core\Base
 	public function setReferer($referer)
 	{
 		$this->referer = $referer;
+		return $this;
 	}
 
 	/**
@@ -169,6 +176,7 @@ abstract class Adapter extends \Leaps\Core\Base
 	public function setCookie($cookie)
 	{
 		$this->cookie = $cookie;
+		return $this;
 	}
 
 	/**
@@ -180,6 +188,7 @@ abstract class Adapter extends \Leaps\Core\Base
 	public function setMultiMaxNum($num = 0)
 	{
 		$this->multiExecNum = ( int ) $num;
+		return $this;
 	}
 
 	/**
@@ -191,6 +200,7 @@ abstract class Adapter extends \Leaps\Core\Base
 	public function setTimeout($timeout)
 	{
 		$this->timeout = $timeout;
+		return $this;
 	}
 
 	/**
