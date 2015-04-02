@@ -10,20 +10,18 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Di;
 
-use Leaps\Core\Base;
 use Leaps\Di\Service;
 use Leaps\Di\Exception;
 use Leaps\Di\ServiceInterface;
 use Leaps\Di\ServiceProviderInterface;
 
-class Container extends Base implements \ArrayAccess, ContainerInterface
+class Container implements \ArrayAccess, ContainerInterface
 {
 	protected $_services;
 	protected $_sharedInstances;
 	protected $_freshInstance = false;
 	protected static $_default;
-
-	public function init()
+	public function __construct()
 	{
 		if (! self::$_default) {
 			self::$_default = $this;

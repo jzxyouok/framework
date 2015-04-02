@@ -10,10 +10,11 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Core;
 
-use Leaps\Di\Container;
 use Leaps\Kernel;
+use Leaps\Di\Container;
 
-class Module extends Container
+
+class Module extends Base
 {
 	public $id;
 	public $module;
@@ -96,7 +97,6 @@ class Module extends Container
 
 	/**
 	 * 获取控制器路径
-	 * an alias for the root namespace of [[controllerNamespace]].
 	 *
 	 * @return string the directory that contains the controller classes.
 	 * @throws InvalidParamException if there is no alias defined for the root namespace of [[controllerNamespace]].
@@ -184,9 +184,7 @@ class Module extends Container
 	public function hasModule($id)
 	{
 		if (($pos = strpos ( $id, '/' )) !== false) {
-			// sub-module
 			$module = $this->getModule ( substr ( $id, 0, $pos ) );
-
 			return $module === null ? false : $module->hasModule ( substr ( $id, $pos + 1 ) );
 		} else {
 			return isset ( $this->_modules [$id] );
@@ -206,27 +204,20 @@ class Module extends Container
 	public function getModule($id, $load = true)
 	{
 		if (($pos = strpos ( $id, '/' )) !== false) {
-			// sub-module
 			$module = $this->getModule ( substr ( $id, 0, $pos ) );
-
 			return $module === null ? null : $module->getModule ( substr ( $id, $pos + 1 ), $load );
 		}
-
 		if (isset ( $this->_modules [$id] )) {
 			if ($this->_modules [$id] instanceof Module) {
 				return $this->_modules [$id];
 			} elseif ($load) {
 				Kernel::trace ( "Loading module: $id", __METHOD__ );
 				/* @var $module Module */
-				$module = Kernel::createObject ( $this->_modules [$id], [
-						$id,
-						$this
-				] );
+				$module = Kernel::createObject ( $this->_modules [$id], [$id,$this] );
 				$module->setInstance ( $module );
 				return $this->_modules [$id] = $module;
 			}
 		}
-
 		return null;
 	}
 

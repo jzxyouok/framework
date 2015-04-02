@@ -342,7 +342,7 @@ abstract class Application extends Module
 						'className' => 'Leaps\Crypt'
 				],
 				// 'event' => [
-				// 'className' => 'Leaps\Event\Dispatcher'
+				// 'className' => 'Leaps\Events\Dispatcher'
 				// ],
 				'registry' => [
 						'className' => 'Leaps\Registry'
