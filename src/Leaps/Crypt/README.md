@@ -16,7 +16,6 @@ Leaps通过 `Leaps\Crypt` 组件提供了加密和解密工具。这个类提供
 
 也可以使用同一实例加密多次：
 
-    <!-- lang: php -->
     <?php
     //创建实例
     $crypt = new Leaps\Crypt\Crypt();
