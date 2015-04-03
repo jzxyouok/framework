@@ -33,30 +33,16 @@ use Leaps\Session\AdapterInterface;
  */
 class XCache extends Adapter implements AdapterInterface
 {
-	public function init($options = array())
+	/**
+	 * (non-PHPdoc)
+	 * @see \Leaps\Session\Adapter::init()
+	 */
+	public function init()
 	{
 		if (! $this->test ()) {
 			throw new Exception ( "The xcache extension isn't available" );
 		}
-		session_set_save_handler ( [
-				$this,
-				"open"
-		], [
-				$this,
-				"close"
-		], [
-				$this,
-				"read"
-		], [
-				$this,
-				"write"
-		], [
-				$this,
-				"destroy"
-		], [
-				$this,
-				"gc"
-		] );
+		session_set_save_handler ( [$this,	"open"], [	$this,	"close"], [$this,	"read"	], [$this,	"write"], [$this,	"destroy"], [	$this,	"gc"] );
 	}
 	public function open($save_path, $session_name)
 	{

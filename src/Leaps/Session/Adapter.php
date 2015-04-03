@@ -31,6 +31,15 @@ abstract class Adapter
 		if (is_array ( $options )) {
 			$this->setOptions ( $options );
 		}
+
+		$this->init();
+	}
+
+	/**
+	 * 初始化Session
+	 */
+	public function init(){
+
 	}
 
 	/**
