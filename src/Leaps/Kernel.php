@@ -11,6 +11,9 @@
 namespace Leaps;
 
 use Leaps\Logger;
+use Leaps\Core\UnknownClassException;
+use Leaps\Core\InvalidConfigException;
+use Leaps\Core\InvalidParamException;
 
 class Kernel
 {

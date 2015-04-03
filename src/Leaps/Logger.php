@@ -11,6 +11,7 @@
 namespace Leaps;
 
 use Leaps\Di\Injectable;
+use Leaps\Core\InvalidConfigException;
 
 class Logger extends Injectable
 {
