@@ -1,24 +1,17 @@
 <?php
 
-/*
-	+------------------------------------------------------------------------+
-	| Phalcon Framework                                                      |
-	+------------------------------------------------------------------------+
-	| Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-	+------------------------------------------------------------------------+
-	| This source file is subject to the New BSD License that is bundled     |
-	| with this package in the file docs/LICENSE.txt.                        |
-	|                                                                        |
-	| If you did not receive a copy of the license and are unable to         |
-	| obtain it through the world-wide-web, please send an email             |
-	| to license@phalconphp.com so we can send you a copy immediately.       |
-	+------------------------------------------------------------------------+
-	| Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-	|          Eduar Carvajal <eduar@phalconphp.com>                         |
-	+------------------------------------------------------------------------+
-*/
+// +----------------------------------------------------------------------
+// | Leaps Framework [ WE CAN DO IT JUST THINK IT ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2011-2014 Leaps Team (http://www.tintsoft.com)
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author XuTongle <xutongle@gmail.com>
+// +----------------------------------------------------------------------
+namespace LeapsTest;
 
-class SessionTest extends PHPUnit_Framework_TestCase
+class SessionTest extends \PHPUnit_Framework_TestCase
 {
 
 	protected $stack = array();
@@ -50,7 +43,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
 	public function testSessionFiles()
 	{
 
-		$session = new Phalcon\Session\Adapter\Files();
+		$session = new \Leaps\Session\Adapter\Files();
 
 		$this->assertFalse($session->start());
 		$this->assertFalse($session->isStarted());
@@ -77,7 +70,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
 		ini_set('session.serialize_handler', 'php');
 
 		// Write
-		$session = new Phalcon\Session\Adapter\Files();
+		$session = new \Leaps\Session\Adapter\Files();
 		$session->start();
 		@session_start();
 
@@ -98,7 +91,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
 		$this->assertNotEmpty(@file_get_contents($session_file));
 
 		// Read
-		$session = new Phalcon\Session\Adapter\Files();
+		$session = new \Leaps\Session\Adapter\Files();
 		$session->start();
 		@session_start();
 
@@ -129,7 +122,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
 		ini_set('session.serialize_handler', 'php');
 
 		// Write
-		$session = new Phalcon\Session\Adapter\Files();
+		$session = new \Leaps\Session\Adapter\Files();
 		$session->start();
 		@session_start();
 
@@ -149,7 +142,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
 		$this->assertNotEmpty(@file_get_contents($session_file));
 
 		// Read
-		$session = new Phalcon\Session\Adapter\Files();
+		$session = new \Leaps\Session\Adapter\Files();
 		$session->start();
 		@session_start();
 
