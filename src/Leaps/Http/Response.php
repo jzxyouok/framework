@@ -234,7 +234,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 			}
 		}
 		if ($this->charset === null) {
-			$this->charset = Kernel::$app->charset;
+			// $this->charset = Kernel::$app->charset;
 		}
 		$formatters = $this->defaultFormatters ();
 		$this->formatters = empty ( $this->formatters ) ? $formatters : array_merge ( $formatters, $this->formatters );
@@ -295,10 +295,10 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	 */
 	public function getHeaders()
 	{
-		if ($this->_header === null) {
-			$this->_header = new Headers ();
+		if ($this->_headers === null) {
+			$this->_headers = new Headers ();
 		}
-		return $this->_header;
+		return $this->_headers;
 	}
 
 	/**
@@ -345,6 +345,29 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	{
 		$headers = $this->getHeaders ();
 		$headers->reset ();
+		return $this;
+	}
+
+	/**
+	 * Sets the response content-type mime, optionally the charset
+	 *
+	 * <code>
+	 * $response->setContentType('application/pdf');
+	 * $response->setContentType('text/plain', 'UTF-8');
+	 * </code>
+	 *
+	 * @param string contentType
+	 * @param string charset
+	 * @return Leaps\Http\ResponseInterface
+	 */
+	public function setContentType($contentType, $charset = null)
+	{
+		$headers = $this->getHeaders ();
+		if ($charset === null) {
+			$headers->set ( "Content-Type", $contentType );
+		} else {
+			$headers->set ( "Content-Type", $contentType . "; charset=" . $charset );
+		}
 		return $this;
 	}
 
@@ -756,7 +779,6 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	 */
 	protected function sendHeaders()
 	{
-
 		$statusCode = $this->getStatusCode ();
 		header ( "HTTP/{$this->version} $statusCode {$this->statusText}" );
 
