@@ -21,6 +21,10 @@ class Container implements \ArrayAccess, ContainerInterface
 	protected $_sharedInstances;
 	protected $_freshInstance = false;
 	protected static $_default;
+
+	/**
+	 * 构造方法
+	 */
 	public function __construct()
 	{
 		if (! self::$_default) {
