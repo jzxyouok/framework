@@ -21,6 +21,7 @@ class MemCache extends Adapter
 	public $password;
 	private $_cache = null;
 	private $_servers = [ ];
+
 	public function init()
 	{
 		parent::init ();
@@ -116,7 +117,6 @@ class MemCache extends Adapter
 				$this->_cache = new \Memcache ();
 			}
 		}
-
 		return $this->_cache;
 	}
 
