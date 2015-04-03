@@ -47,29 +47,14 @@ class Memcache extends Adapter implements AdapterInterface
 	protected $_memcache = NULL;
 	protected $_lifetime = 8600;
 
+	/**
+	 * (non-PHPdoc)
+	 * @see \Leaps\Session\Adapter::init()
+	 */
 	public function init()
 	{
-		parent::init ();
 		$this->addServers ( $this->getMemcache (), $this->getServers () );
-		session_set_save_handler ( [
-				$this,
-				"open"
-		], [
-				$this,
-				"close"
-		], [
-				$this,
-				"read"
-		], [
-				$this,
-				"write"
-		], [
-				$this,
-				"destroy"
-		], [
-				$this,
-				"gc"
-		] );
+		session_set_save_handler ( [$this,	"open"	], [$this,"close"], [	$this,	"read"], [	$this,	"write"], [$this,"destroy"], [$this,	"gc"] );
 	}
 
 	/**
