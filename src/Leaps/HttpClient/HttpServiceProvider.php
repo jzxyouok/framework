@@ -15,15 +15,14 @@ use Leaps\Di\ServiceProviderInterface;
 
 class CookieServiceProvider implements ServiceProviderInterface
 {
-
 	public function register(ContainerInterface $di)
 	{
 		$di->set ( 'events', function ($di)
 		{
 			if (function_exists ( "curl_init" )) {
-				return new \Leaps\HttpClient\Adapter\Curl();
+				return new \Leaps\HttpClient\Adapter\Curl ();
 			} else {
-				return new \Leaps\HttpClient\Adapter\Fsock();
+				return new \Leaps\HttpClient\Adapter\Fsock ();
 			}
 		} );
 	}

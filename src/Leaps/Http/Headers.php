@@ -11,31 +11,28 @@
 namespace Leaps\Http;
 
 use ArrayIterator;
-use Leaps\Core\Base;
 
-class HeaderCollection extends Base implements \IteratorAggregate, \ArrayAccess, \Countable
+/**
+ * Leaps\Http\Response\Headers
+ *
+ * This class is a bag to manage the response headers
+ */
+class Headers implements \Leaps\Http\HeadersInterface, \IteratorAggregate, \ArrayAccess, \Countable
 {
-	/**
-	 *
-	 * @var array the headers in this collection (indexed by the header names)
-	 */
-	private $_headers = [ ];
+	protected $_headers;
 
 	/**
-	 * Returns an iterator for traversing the headers in the collection.
-	 * This method is required by the SPL interface `IteratorAggregate`.
-	 * It will be implicitly called when you use `foreach` to traverse the collection.
+	 * 返回头集合中的一个遍历迭代器
 	 *
-	 * @return ArrayIterator an iterator for traversing the headers in the collection.
+	 * @return ArrayIterator
 	 */
 	public function getIterator()
 	{
 		return new ArrayIterator ( $this->_headers );
 	}
+
 	/**
-	 * Returns the number of headers in the collection.
-	 * This method is required by the SPL `Countable` interface.
-	 * It will be implicitly called when you use `count($collection)`.
+	 * 返回Header数量
 	 *
 	 * @return integer the number of headers in the collection.
 	 */
@@ -43,8 +40,9 @@ class HeaderCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 	{
 		return $this->getCount ();
 	}
+
 	/**
-	 * Returns the number of headers in the collection.
+	 * 返回Header数量
 	 *
 	 * @return integer the number of headers in the collection.
 	 */
@@ -52,39 +50,19 @@ class HeaderCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 	{
 		return count ( $this->_headers );
 	}
+
 	/**
-	 * Returns the named header(s).
-	 *
-	 * @param string $name the name of the header to return
-	 * @param mixed $default the value to return in case the named header does not exist
-	 * @param boolean $first whether to only return the first header of the specified name.
-	 *        If false, all headers of the specified name will be returned.
-	 * @return string|array the named header(s). If `$first` is true, a string will be returned;
-	 *         If `$first` is false, an array will be returned.
-	 */
-	public function get($name, $default = null, $first = true)
-	{
-		$name = strtolower ( $name );
-		if (isset ( $this->_headers [$name] )) {
-			return $first ? reset ( $this->_headers [$name] ) : $this->_headers [$name];
-		} else {
-			return $default;
-		}
-	}
-	/**
-	 * Adds a new header.
-	 * If there is already a header with the same name, it will be replaced.
+	 * 返回指定的头是否存在
 	 *
 	 * @param string $name the name of the header
-	 * @param string $value the value of the header
-	 * @return static the collection object itself
+	 * @return boolean whether the named header exists
 	 */
-	public function set($name, $value = '')
+	public function has($name)
 	{
 		$name = strtolower ( $name );
-		$this->_headers [$name] = ( array ) $value;
-		return $this;
+		return isset ( $this->_headers [$name] );
 	}
+
 	/**
 	 * Adds a new header.
 	 * If there is already a header with the same name, the new one will
@@ -97,44 +75,53 @@ class HeaderCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 	public function add($name, $value)
 	{
 		$name = strtolower ( $name );
-		$this->_headers [$name] [] = $value;
-		return $this;
-	}
-
-	/**
-	 * Sets a new header only if it does not exist yet.
-	 * If there is already a header with the same name, the new one will be ignored.
-	 *
-	 * @param string $name the name of the header
-	 * @param string $value the value of the header
-	 * @return static the collection object itself
-	 */
-	public function setDefault($name, $value)
-	{
-		$name = strtolower ( $name );
-		if (empty ( $this->_headers [$name] )) {
-			$this->_headers [$name] [] = $value;
+		if (! $this->has ( $name )) {
+			$this->set ( $name, $value );
 		}
 		return $this;
 	}
 
 	/**
-	 * Returns a value indicating whether the named header exists.
+	 * 设置头
 	 *
-	 * @param string $name the name of the header
-	 * @return boolean whether the named header exists
+	 * @param string name
+	 * @param string value
 	 */
-	public function has($name)
+	public function set($name, $value)
 	{
-		$name = strtolower ( $name );
-		return isset ( $this->_headers [$name] );
+		$this->_headers [$name] = $value;
 	}
 
 	/**
-	 * Removes a header.
+	 * 获取头
 	 *
-	 * @param string $name the name of the header to be removed.
-	 * @return array the value of the removed header. Null is returned if the header does not exist.
+	 * @param string name
+	 * @return string
+	 */
+	public function get($name, $default = null, $first = true)
+	{
+		$name = strtolower ( $name );
+		if (isset ( $this->_headers [$name] )) {
+			return $first ? reset ( $this->_headers [$name] ) : $this->_headers [$name];
+		} else {
+			return $default;
+		}
+	}
+
+	/**
+	 * 设置原始头
+	 *
+	 * @param string header
+	 */
+	public function setRaw($header)
+	{
+		$this->_headers [$header] = null;
+	}
+
+	/**
+	 * 删除指定的头
+	 *
+	 * @param string header Header name
 	 */
 	public function remove($name)
 	{
@@ -149,22 +136,34 @@ class HeaderCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 	}
 
 	/**
-	 * Removes all headers.
+	 * 发送头到浏览器
+	 *
+	 * @return boolean
 	 */
-	public function removeAll()
+	public function send()
+	{
+		if (! headers_sent ()) {
+			foreach ( $this->_headers as $name => $value ) {
+				if (! empty ( $value )) {
+					$name = str_replace ( ' ', '-', ucwords ( str_replace ( '-', ' ', $name ) ) );
+					header ( $name . ": " . $value, true );
+				} else {
+					header ( $name, true );
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 删除所有头
+	 */
+	public function reset()
 	{
 		$this->_headers = [ ];
 	}
-	/**
-	 * Returns the collection as a PHP array.
-	 *
-	 * @return array the array representation of the collection.
-	 *         The array keys are header names, and the array values are the corresponding header values.
-	 */
-	public function toArray()
-	{
-		return $this->_headers;
-	}
+
 	/**
 	 * Populates the header collection from an array.
 	 *
@@ -187,6 +186,17 @@ class HeaderCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 	{
 		return $this->has ( $name );
 	}
+
+	/**
+	 * Returns the current headers as an array
+	 *
+	 * @return array
+	 */
+	public function toArray()
+	{
+		return $this->_headers;
+	}
+
 	/**
 	 * Returns the header with the specified name.
 	 * This method is required by the SPL interface `ArrayAccess`.
@@ -225,5 +235,22 @@ class HeaderCollection extends Base implements \IteratorAggregate, \ArrayAccess,
 	public function offsetUnset($name)
 	{
 		$this->remove ( $name );
+	}
+
+	/**
+	 * Restore a Leaps\Http\Response\Headers object
+	 *
+	 * @param array data
+	 * @return Leaps\Http\Response\Headers
+	 */
+	public static function __set_state($data)
+	{
+		$headers = new self ();
+		if ($data ["_headers"]) {
+			foreach ( $data ["_headers"] as $key => $value ) {
+				$headers->set ( $key, $value );
+			}
+		}
+		return $headers;
 	}
 }

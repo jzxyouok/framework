@@ -12,6 +12,8 @@ namespace Leaps;
 
 use Leaps\Kernel;
 use Leaps\Di\Injectable;
+use Leaps\Core\InvalidCallException;
+use Leaps\Core\InvalidParamException;
 
 class View extends Injectable
 {

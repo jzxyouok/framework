@@ -18,5 +18,8 @@ namespace Leaps\Http;
 interface ResponseInterface
 {
 
-
+	/**
+	 * 发送响应到客户端
+	 */
+	public function send();
 }

@@ -15,6 +15,7 @@ use Leaps\Core\Base;
 use Leaps\Http\ResponseInterface;
 use Leaps\Http\Response\Exception;
 use Leaps\Di\InjectionAwareInterface;
+use Leaps\Http\Response\ResponseFormatterInterface;
 
 /**
  * Leaps\Http\Response
@@ -119,6 +120,13 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	public $acceptParams = [ ];
 
 	/**
+	 * 退出状态
+	 *
+	 * @var integer 0-254，0为正常结束。
+	 */
+	public $exitStatus = 0;
+
+	/**
 	 * HTTP状态代码列表和相应的文本
 	 *
 	 * @var array
@@ -197,6 +205,12 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	 * @var int
 	 */
 	protected $_statusCode = 200;
+
+	/**
+	 * Cookie集合
+	 *
+	 * @var \Leaps\Http\Cookies
+	 */
 	protected $_cookies;
 	protected $_dependencyInjector;
 
@@ -220,7 +234,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 			}
 		}
 		if ($this->charset === null) {
-			// $this->charset = Kernel::$app->charset;
+			$this->charset = Kernel::$app->charset;
 		}
 		$formatters = $this->defaultFormatters ();
 		$this->formatters = empty ( $this->formatters ) ? $formatters : array_merge ( $formatters, $this->formatters );
@@ -263,17 +277,75 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	}
 
 	/**
-	 * Returns the header collection.
-	 * The header collection contains the currently registered HTTP headers.
+	 * Sets a headers bag for the response externally
 	 *
-	 * @return HeaderCollection the header collection
+	 * @param Leaps\Http\Response\HeadersInterface headers
+	 * @return Leaps\Http\ResponseInterface
+	 */
+	public function setHeaders(HeadersInterface $headers)
+	{
+		$this->_headers = $headers;
+		return $this;
+	}
+
+	/**
+	 * Returns headers set by the user
+	 *
+	 * @return Leaps\Http\Response\HeadersInterface
 	 */
 	public function getHeaders()
 	{
-		if ($this->_headers === null) {
-			$this->_headers = new HeaderCollection ();
+		if ($this->_header === null) {
+			$this->_header = new Headers ();
 		}
-		return $this->_headers;
+		return $this->_header;
+	}
+
+	/**
+	 * Overwrites a header in the response
+	 *
+	 * <code>
+	 * $response->setHeader("Content-Type", "text/plain");
+	 * </code>
+	 *
+	 * @param string name
+	 * @param string value
+	 * @return Leaps\Http\ResponseInterface
+	 */
+	public function setHeader($name, $value)
+	{
+		$headers = $this->getHeaders ();
+		$headers->set ( $name, $value );
+		return $this;
+	}
+
+	/**
+	 * Send a raw header to the response
+	 *
+	 * <code>
+	 * $response->setRawHeader("HTTP/1.1 404 Not Found");
+	 * </code>
+	 *
+	 * @param string header
+	 * @return Leaps\Http\ResponseInterface
+	 */
+	public function setRawHeader($header)
+	{
+		$headers = $this->getHeaders ();
+		$headers->setRaw ( $header );
+		return $this;
+	}
+
+	/**
+	 * Resets all the stablished headers
+	 *
+	 * @return Leaps\Http\ResponseInterface
+	 */
+	public function resetHeaders()
+	{
+		$headers = $this->getHeaders ();
+		$headers->reset ();
+		return $this;
 	}
 
 	/**
@@ -591,7 +663,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	/**
 	 * 发送响应到客户端
 	 *
-	 * @return Phalcon\Http\ResponseInterface
+	 * @return Leaps\Http\ResponseInterface
 	 */
 	public function send()
 	{
@@ -602,6 +674,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 		$this->prepare ();
 		// $this->trigger(self::EVENT_AFTER_PREPARE);
 		$this->sendHeaders ();
+		$this->sendCookies ();
 		$this->sendContent ();
 		// $this->trigger(self::EVENT_AFTER_SEND);
 		$this->isSent = true;
@@ -683,24 +756,14 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	 */
 	protected function sendHeaders()
 	{
-		if (headers_sent ()) {
-			return;
-		}
+
 		$statusCode = $this->getStatusCode ();
 		header ( "HTTP/{$this->version} $statusCode {$this->statusText}" );
-		if ($this->_headers) {
-			$headers = $this->getHeaders ();
-			foreach ( $headers as $name => $values ) {
-				$name = str_replace ( ' ', '-', ucwords ( str_replace ( '-', ' ', $name ) ) );
-				// set replace for first occurrence of header but false afterwards to allow multiple
-				$replace = true;
-				foreach ( $values as $value ) {
-					header ( "$name: $value", $replace );
-					$replace = false;
-				}
-			}
+
+		if ($this->_headers instanceof HeadersInterface) {
+			$this->_headers->send ();
 		}
-		$this->sendCookies ();
+		return $this;
 	}
 
 	/**
@@ -785,6 +848,18 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 					$start,
 					$end
 			];
+		}
+	}
+
+	/**
+	 * 清除所有缓冲区数据
+	 */
+	public function clearOutputBuffers()
+	{
+		for($level = ob_get_level (); $level > 0; -- $level) {
+			if (! @ob_end_clean ()) {
+				ob_clean ();
+			}
 		}
 	}
 }

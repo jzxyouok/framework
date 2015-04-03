@@ -94,7 +94,6 @@ class Str
 	{
 		$str = "";
 		switch ($type) {
-
 			case Str::RANDOM_ALPHA :
 				$pool = array_merge ( range ( "a", "z" ), range ( "A", "Z" ) );
 				break;

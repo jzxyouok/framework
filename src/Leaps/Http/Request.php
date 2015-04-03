@@ -14,7 +14,7 @@ use Leaps\Di\ContainerInterface;
 use Leaps\Http\Request\Exception;
 use Leaps\Core\InvalidConfigException;
 
-class Request
+class Request implements RequestInterface
 {
 	public $methodParam = "_method";
 	protected $_headers;
@@ -241,7 +241,7 @@ class Request
 	public function getHeaders()
 	{
 		if ($this->_headers === null) {
-			$this->_headers = new HeaderCollection ();
+			$this->_headers = new Headers ();
 			foreach ( $_SERVER as $name => $value ) {
 				if (strncmp ( $name, 'HTTP_', 5 ) === 0) {
 					$name = str_replace ( ' ', '-', ucwords ( strtolower ( str_replace ( '_', ' ', substr ( $name, 5 ) ) ) ) );
