@@ -246,7 +246,7 @@ interface RequestInterface
 	 *
 	 * @return string
 	*/
-	public function getHTTPReferer();
+	public function getReferer();
 
 	/**
 	 * Gets array with mime/types and their quality accepted by the browser/client from $_SERVER['HTTP_ACCEPT']

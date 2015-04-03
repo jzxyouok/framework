@@ -2,8 +2,8 @@
 ###安装
 ```json
 "require" : {
-    "php" : ">=5.4.0"
-    "leaps/httpclient": "1.2.5",
+    "php" : ">=5.4.0",
+    "leaps/httpclient": "1.2.5"
 }
 ```
 ###基本使用
@@ -24,7 +24,7 @@ echo $result->getBody();
 <?php
 //Create an instance
 $HttpClient = new \Leaps\HttpClient\Adapter\Curl();
-$result = $HttpClient->get([]'http://www.baidu.com/','http://www.qq.com']);
+$result = $HttpClient->get(['http://www.baidu.com/','http://www.qq.com']);
 echo $result->getBody();
 ```
 
