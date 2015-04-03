@@ -197,6 +197,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	 * @var int
 	 */
 	protected $_statusCode = 200;
+	protected $_cookies;
 	protected $_dependencyInjector;
 
 	/**
@@ -219,7 +220,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 			}
 		}
 		if ($this->charset === null) {
-			$this->charset = Kernel::$app->charset;
+			// $this->charset = Kernel::$app->charset;
 		}
 		$formatters = $this->defaultFormatters ();
 		$this->formatters = empty ( $this->formatters ) ? $formatters : array_merge ( $formatters, $this->formatters );
@@ -243,7 +244,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	public function getDI()
 	{
 		if (! is_object ( $this->_dependencyInjector )) {
-			$this->_dependencyInjector =  \Leaps\Kernel::$app;
+			$this->_dependencyInjector = \Leaps\Kernel::$app;
 			if (! is_object ( $this->_dependencyInjector )) {
 				throw new Exception ( "A dependency injection object is required to access the 'url' service" );
 			}
@@ -289,7 +290,7 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 		}
 		$this->_statusCode = ( int ) $value;
 		if ($this->getIsInvalid ()) {
-			throw new \Leaps\InvalidParamException ( "The HTTP status code is invalid: $value" );
+			throw new \Leaps\Core\InvalidParamException ( "The HTTP status code is invalid: $value" );
 		}
 		if ($text === null) {
 			$this->statusText = isset ( static::$httpStatuses [$this->_statusCode] ) ? static::$httpStatuses [$this->_statusCode] : '';
@@ -420,6 +421,28 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 	{
 		$this->content = $content;
 		return $this;
+	}
+
+	/**
+	 * set coookies set by the user
+	 *
+	 * @param CookiesInterface $cookies
+	 * @return Response
+	 */
+	public function setCookies(CookiesInterface $cookies)
+	{
+		$this->_cookies = $cookies;
+		return $this;
+	}
+
+	/**
+	 * Returns coookies set by the user
+	 *
+	 * @return Leaps\Http\CookiesInterface
+	 */
+	public function getCookies()
+	{
+		return $this->_cookies;
 	}
 
 	/**
@@ -636,21 +659,21 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 			if ($formatter instanceof ResponseFormatterInterface) {
 				$formatter->format ( $this );
 			} else {
-				throw new \Leaps\InvalidConfigException ( "The '{$this->format}' response formatter is invalid. It must implement the ResponseFormatterInterface." );
+				throw new \Leaps\Core\InvalidConfigException ( "The '{$this->format}' response formatter is invalid. It must implement the ResponseFormatterInterface." );
 			}
 		} elseif ($this->format === self::FORMAT_RAW) {
 			$this->content = $this->data;
 		} else {
-			throw new \Leaps\InvalidConfigException ( "Unsupported response format: {$this->format}" );
+			throw new \Leaps\Core\InvalidConfigException ( "Unsupported response format: {$this->format}" );
 		}
 
 		if (is_array ( $this->content )) {
-			throw new \Leaps\InvalidParamException ( "Response content must not be an array." );
+			throw new \Leaps\Core\InvalidParamException ( "Response content must not be an array." );
 		} elseif (is_object ( $this->content )) {
 			if (method_exists ( $this->content, '__toString' )) {
 				$this->content = $this->content->__toString ();
 			} else {
-				throw new \Leaps\InvalidParamException ( "Response content must be a string or an object implementing __toString()." );
+				throw new \Leaps\Core\InvalidParamException ( "Response content must be a string or an object implementing __toString()." );
 			}
 		}
 	}
@@ -688,19 +711,8 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 		if ($this->_cookies === null) {
 			return;
 		}
-		$request = Yii::$app->getRequest();
-		if ($request->enableCookieValidation) {
-			if ($request->cookieValidationKey == '') {
-				throw new \Leaps\InvalidConfigException(get_class($request) . '::cookieValidationKey must be configured with a secret key.');
-			}
-			$validationKey = $request->cookieValidationKey;
-		}
-		foreach ($this->getCookies() as $cookie) {
-			$value = $cookie->value;
-			if ($cookie->expire != 1  && isset($validationKey)) {
-				$value = Yii::$app->getSecurity()->hashData(serialize([$cookie->name, $value]), $validationKey);
-			}
-			setcookie($cookie->name, $value, $cookie->expire, $cookie->path, $cookie->domain, $cookie->secure, $cookie->httpOnly);
+		if ($this->_cookies instanceof CookiesInterface) {
+			$this->_cookies->send ();
 		}
 	}
 

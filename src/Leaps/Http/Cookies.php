@@ -12,7 +12,7 @@ namespace Leaps\Http;
 
 use Leaps\Http\Cookie\Exception;
 
-class CookieCollection
+class Cookies implements CookiesInterface
 {
 	protected $_dependencyInjector;
 	protected $_registered = false;

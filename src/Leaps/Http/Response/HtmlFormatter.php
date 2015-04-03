@@ -11,7 +11,6 @@
 namespace Leaps\Http\Response;
 
 use Leaps\Di\Injectable;
-use Leaps\Http\ResponseFormatterInterface;
 
 class HtmlFormatter extends Injectable implements ResponseFormatterInterface
 {

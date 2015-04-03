@@ -8,7 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps\Http;
+namespace Leaps\Http\Response;
 
 interface ResponseFormatterInterface
 {
