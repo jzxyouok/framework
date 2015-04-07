@@ -25,15 +25,7 @@ class SQLite extends Grammar {
 	public function create(Table $table, Fluent $command)
 	{
 		$columns = implode(', ', $this->columns($table));
-
-		// First we will generate the base table creation statement. Other than incrementing
-		// keys, no indexes will be created during the first creation of the table since
-		// they will be added in separate commands.
 		$sql = 'CREATE TABLE '.$this->wrap($table).' ('.$columns;
-
-		// SQLite does not allow adding a primary key as a command apart from the creation
-		// of the table, so we'll need to sniff out any primary keys here and add them to
-		// the table now during this command.
 		$primary = array_first($table->commands, function($key, $value)
 		{
 			return $value->type == 'primary';

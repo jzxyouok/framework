@@ -12,7 +12,7 @@ namespace Leaps\Database;
 
 use Closure;
 use Leaps\Database;
-use Laravel\Paginator;
+use Leaps\Paginator;
 use Leaps\Database\Query\Grammars\Postgres;
 use Leaps\Database\Query\Grammars\SQLServer;
 
@@ -115,7 +115,7 @@ class Query
 	 *
 	 * @var array
 	 */
-	public $bindings = [];
+	public $bindings = [ ];
 
 	/**
 	 * Create a new query instance.
@@ -167,19 +167,11 @@ class Query
 	 */
 	public function join($table, $column1, $operator = null, $column2 = null, $type = 'INNER')
 	{
-		// If the "column" is really an instance of a Closure, the developer is
-		// trying to create a join with a complex "ON" clause. So, we will add
-		// the join, and then call the Closure with the join/
 		if ($column1 instanceof Closure) {
 			$this->joins [] = new Query\Join ( $type, $table );
 
 			call_user_func ( $column1, end ( $this->joins ) );
-		}
-
-		// If the column is just a string, we can assume that the join just
-		// has a simple on clause, and we'll create the join instance and
-		// add the clause automatically for the develoepr.
-		else {
+		} else {
 			$join = new Query\Join ( $type, $table );
 
 			$join->on ( $column1, $operator, $column2 );
@@ -212,8 +204,8 @@ class Query
 	public function reset_where()
 	{
 		list ( $this->wheres, $this->bindings ) = array (
-				array (),
-				array ()
+				[ ],
+				[ ]
 		);
 	}
 
@@ -225,13 +217,13 @@ class Query
 	 * @param string $connector
 	 * @return Query
 	 */
-	public function raw_where($where, $bindings = array(), $connector = 'AND')
+	public function raw_where($where, $bindings = [], $connector = 'AND')
 	{
-		$this->wheres [] = array (
+		$this->wheres [] = [
 				'type' => 'where_raw',
 				'connector' => $connector,
 				'sql' => $where
-		);
+		];
 
 		$this->bindings = array_merge ( $this->bindings, $bindings );
 
@@ -245,7 +237,7 @@ class Query
 	 * @param array $bindings
 	 * @return Query
 	 */
-	public function raw_or_where($where, $bindings = array())
+	public function raw_or_where($where, $bindings = [])
 	{
 		return $this->raw_where ( $where, $bindings, 'OR' );
 	}
@@ -261,19 +253,12 @@ class Query
 	 */
 	public function where($column, $operator = null, $value = null, $connector = 'AND')
 	{
-		// If a Closure is passed into the method, it means a nested where
-		// clause is being initiated, so we will take a different course
-		// of action than when the statement is just a simple where.
 		if ($column instanceof Closure) {
 			return $this->where_nested ( $column, $connector );
 		}
-
 		$type = 'where';
-
 		$this->wheres [] = compact ( 'type', 'column', 'operator', 'value', 'connector' );
-
 		$this->bindings [] = $value;
-
 		return $this;
 	}
 
@@ -313,11 +298,8 @@ class Query
 	public function where_in($column, $values, $connector = 'AND', $not = false)
 	{
 		$type = ($not) ? 'where_not_in' : 'where_in';
-
 		$this->wheres [] = compact ( 'type', 'column', 'values', 'connector' );
-
 		$this->bindings = array_merge ( $this->bindings, $values );
-
 		return $this;
 	}
 
@@ -371,12 +353,9 @@ class Query
 	public function where_between($column, $min, $max, $connector = 'AND', $not = false)
 	{
 		$type = ($not) ? 'where_not_between' : 'where_between';
-
 		$this->wheres [] = compact ( 'type', 'column', 'min', 'max', 'connector' );
-
 		$this->bindings [] = $min;
 		$this->bindings [] = $max;
-
 		return $this;
 	}
 
@@ -480,23 +459,12 @@ class Query
 	public function where_nested($callback, $connector = 'AND')
 	{
 		$type = 'where_nested';
-
-		// To handle a nested where statement, we will actually instantiate a new
-		// Query instance and run the callback over that instance, which will
-		// allow the developer to have a fresh query instance
 		$query = new Query ( $this->connection, $this->grammar, $this->from );
-
 		call_user_func ( $callback, $query );
-
-		// Once the callback has been run on the query, we will store the nested
-		// query instance on the where clause array so that it's passed to the
-		// query's query grammar instance when building.
 		if ($query->wheres !== null) {
 			$this->wheres [] = compact ( 'type', 'query', 'connector' );
 		}
-
 		$this->bindings = array_merge ( $this->bindings, $query->bindings );
-
 		return $this;
 	}
 
@@ -510,34 +478,16 @@ class Query
 	private function dynamic_where($method, $parameters)
 	{
 		$finder = substr ( $method, 6 );
-
 		$flags = PREG_SPLIT_DELIM_CAPTURE;
-
 		$segments = preg_split ( '/(_and_|_or_)/i', $finder, - 1, $flags );
-
-		// The connector variable will determine which connector will be used
-		// for the condition. We'll change it as we come across new boolean
-		// connectors in the dynamic method string.
-		//
-		// The index variable helps us get the correct parameter value for
-		// the where condition. We increment it each time we add another
-		// condition to the query's where clause.
 		$connector = 'AND';
-
 		$index = 0;
-
 		foreach ( $segments as $segment ) {
-			// If the segment is not a boolean connector, we can assume it it is
-			// a column name, and we'll add it to the query as a new constraint
-			// of the query's where clause and keep iterating the segments.
 			if ($segment != '_and_' and $segment != '_or_') {
 				$this->where ( $segment, '=', $parameters [$index], $connector );
 
 				$index ++;
-			}  // Otherwise, we will store the connector so we know how the next
-			  // where clause we find in the query should be connected to the
-			  // previous one and will add it when we find the next one.
-			else {
+			} else {
 				$connector = trim ( strtoupper ( $segment ), '_' );
 			}
 		}
@@ -567,9 +517,7 @@ class Query
 	public function having($column, $operator, $value)
 	{
 		$this->havings [] = compact ( 'column', 'operator', 'value' );
-
 		$this->bindings [] = $value;
-
 		return $this;
 	}
 
@@ -645,7 +593,6 @@ class Query
 		$sql = $this->grammar->select ( $this->select ( array (
 				$column
 		) ) );
-
 		return $this->connection->only ( $sql, $this->bindings );
 	}
 
@@ -658,12 +605,7 @@ class Query
 	public function first($columns = array('*'))
 	{
 		$columns = ( array ) $columns;
-
-		// Since we only need the first result, we'll go ahead and set the
-		// limit clause to 1, since this will be much faster than getting
-		// all of the rows and then only returning the first.
 		$results = $this->take ( 1 )->get ( $columns );
-
 		return (count ( $results ) > 0) ? $results [0] : null;
 	}
 
@@ -676,28 +618,18 @@ class Query
 	 */
 	public function lists($column, $key = null)
 	{
-		$columns = (is_null ( $key )) ? array (
+		$columns = (is_null ( $key )) ? [
 				$column
-		) : array (
+		] : [
 				$column,
 				$key
-		);
+		];
 
 		$results = $this->get ( $columns );
-
-		// First we will get the array of values for the requested column.
-		// Of course, this array will simply have numeric keys. After we
-		// have this array we will determine if we need to key the array
-		// by another column from the result set.
 		$values = array_map ( function ($row) use($column)
 		{
 			return $row->$column;
 		}, $results );
-
-		// If a key was provided, we will extract an array of keys and
-		// set the keys on the array of values using the array_combine
-		// function provided by PHP, which should give us the proper
-		// array form to return from the method.
 		if (! is_null ( $key ) && count ( $results )) {
 			return array_combine ( array_map ( function ($row) use($key)
 			{
@@ -714,30 +646,19 @@ class Query
 	 * @param array $columns
 	 * @return array
 	 */
-	public function get($columns = array('*'))
+	public function get($columns = ['*'])
 	{
 		if (is_null ( $this->selects ))
 			$this->select ( $columns );
-
 		$sql = $this->grammar->select ( $this );
-
 		$results = $this->connection->query ( $sql, $this->bindings );
-
-		// If the query has an offset and we are using the SQL Server grammar,
-		// we need to spin through the results and remove the "rownum" from
-		// each of the objects since there is no "offset".
 		if ($this->offset > 0 and $this->grammar instanceof SQLServer) {
 			array_walk ( $results, function ($result)
 			{
 				unset ( $result->rownum );
 			} );
 		}
-
-		// Reset the SELECT clause so more queries can be performed using
-		// the same instance. This is helpful for getting aggregates and
-		// then getting actual results from the query.
 		$this->selects = null;
-
 		return $results;
 	}
 
@@ -750,20 +671,10 @@ class Query
 	 */
 	public function aggregate($aggregator, $columns)
 	{
-		// We'll set the aggregate value so the grammar does not try to compile
-		// a SELECT clause on the query. If an aggregator is present, it's own
-		// grammar function will be used to build the SQL syntax.
 		$this->aggregate = compact ( 'aggregator', 'columns' );
-
 		$sql = $this->grammar->select ( $this );
-
 		$result = $this->connection->only ( $sql, $this->bindings );
-
-		// Reset the aggregate so more queries can be performed using the same
-		// instance. This is helpful for getting aggregates and then getting
-		// actual results from the query such as during paging.
 		$this->aggregate = null;
-
 		return $result;
 	}
 
@@ -776,25 +687,14 @@ class Query
 	 */
 	public function paginate($per_page = 20, $columns = array('*'))
 	{
-		// Because some database engines may throw errors if we leave orderings
-		// on the query when retrieving the total number of records, we'll drop
-		// all of the ordreings and put them back on the query.
 		list ( $orderings, $this->orderings ) = array (
 				$this->orderings,
 				null
 		);
-
 		$total = $this->count ( reset ( $columns ) );
-
 		$page = Paginator::page ( $total, $per_page );
-
 		$this->orderings = $orderings;
-
-		// Now we're ready to get the actual pagination results from the table
-		// using the for_page and get methods. The "for_page" method provides
-		// a convenient way to set the paging limit and offset.
 		$results = $this->for_page ( $page, $per_page )->get ( $columns );
-
 		return Paginator::make ( $results, $total, $per_page );
 	}
 
@@ -807,9 +707,9 @@ class Query
 	public function insert($values)
 	{
 		if (! is_array ( reset ( $values ) ))
-			$values = array (
+			$values = [
 					$values
-			);
+			];
 
 		$bindings = [ ];
 		foreach ( $values as $value ) {

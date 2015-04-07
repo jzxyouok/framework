@@ -147,11 +147,9 @@ class Table {
 		// the index that can be used when dropping indexes.
 		if (is_null($name))
 		{
-			$name = str_replace(array('-', '.'), '_', $this->name);
-
+			$name = str_replace(['-', '.'], '_', $this->name);
 			$name = $name.'_'.implode('_', $columns).'_'.$type;
 		}
-
 		return $this->command($type, compact('name', 'columns'));
 	}
 
@@ -411,7 +409,7 @@ class Table {
 	 * @param  array   $parameters
 	 * @return Fluent
 	 */
-	protected function command($type, $parameters = array())
+	protected function command($type, $parameters = [])
 	{
 		$parameters = array_merge(compact('type'), $parameters);
 
@@ -425,10 +423,9 @@ class Table {
 	 * @param  array   $parameters
 	 * @return Fluent
 	 */
-	protected function column($type, $parameters = array())
+	protected function column($type, $parameters = [])
 	{
 		$parameters = array_merge(compact('type'), $parameters);
-
 		return $this->columns[] = new Fluent($parameters);
 	}
 
