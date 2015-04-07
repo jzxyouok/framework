@@ -339,20 +339,21 @@ abstract class Application extends Module
 						'className' => 'Leaps\Filesystem\Filesystem'
 				],
 				'crypt' => [
-						'className' => 'Leaps\Crypt'
-				],
-				// 'event' => [
-				// 'className' => 'Leaps\Events\Dispatcher'
-				// ],
-				'registry' => [
-						'className' => 'Leaps\Registry'
-				],
-				'log' => [
-						'className' => 'Leaps\Logger'
+						'className' => 'Leaps\Crypt\Crypt'
 				],
 				'cache' => [
 						'className' => 'Leaps\Cache\FileCache'
+				],
+				'registry' => [
+						'className' => 'Leaps\Core\Registry'
+				],
+				'event' => [
+						'className' => 'Leaps\Events\Dispatcher'
+				],
+				'log' => [
+						'className' => 'Leaps\Logger'
 				]
-		];
+		]
+		;
 	}
 }
