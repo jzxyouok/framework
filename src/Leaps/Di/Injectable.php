@@ -19,7 +19,7 @@ use Leaps\Core\InvalidCallException;
  * This class allows to access services in the services container by just only accessing a public property
  * with the same name of a registered service
  */
-abstract class Injectable extends Base implements \Leaps\Di\InjectionAwareInterface
+abstract class Injectable extends Base implements InjectionAwareInterface
 {
 
 	/**
@@ -30,11 +30,18 @@ abstract class Injectable extends Base implements \Leaps\Di\InjectionAwareInterf
 	protected $_dependencyInjector;
 
 	/**
+	 * Events Manager
+	 *
+	 * @var Phalcon\Events\ManagerInterface
+	 */
+	protected $_eventsManager;
+
+	/**
 	 * 设置依赖注入器
 	 *
-	 * @param Leaps\DiInterface dependencyInjector
+	 * @param \Leaps\Di\ContainerInterface dependencyInjector
 	 */
-	public function setDI(\Leaps\Di\ContainerInterface $dependencyInjector)
+	public function setDI(ContainerInterface $dependencyInjector)
 	{
 		if (! is_object ( $dependencyInjector )) {
 			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
@@ -45,15 +52,35 @@ abstract class Injectable extends Base implements \Leaps\Di\InjectionAwareInterf
 	/**
 	 * 返回依赖注入器实例
 	 *
-	 * @return Leaps\Di\DiInterface
+	 * @return \Leaps\Di\ContainerInterface
 	 */
 	public function getDI()
 	{
 		$dependencyInjector = $this->_dependencyInjector;
 		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Kernel::$app;
+			$dependencyInjector = Container::getDefault ();
 		}
 		return $dependencyInjector;
+	}
+
+	/**
+	 * Sets the event manager
+	 *
+	 * @param Leaps\Events\ManagerInterface eventsManager
+	 */
+	public function setEventsManager(ManagerInterface $eventsManager)
+	{
+		$this->_eventsManager = $eventsManager;
+	}
+
+	/**
+	 * Returns the internal event manager
+	 *
+	 * @return Leaps\Events\ManagerInterface
+	 */
+	public function getEventsManager()
+	{
+		return $this->_eventsManager;
 	}
 
 	/**
@@ -65,7 +92,7 @@ abstract class Injectable extends Base implements \Leaps\Di\InjectionAwareInterf
 	{
 		$dependencyInjector = $this->_dependencyInjector;
 		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Kernel::$app;
+			$dependencyInjector = Container::getDefault ();
 			if (! is_object ( $dependencyInjector )) {
 				throw new \Leaps\Di\Exception ( "A dependency injection object is required to access the application services" );
 			}

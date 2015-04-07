@@ -399,23 +399,15 @@ class Container implements \ArrayAccess, ContainerInterface
 	}
 
 	/**
-	 * 获取自身实例
-	 */
-	public static function getInstance()
-	{
-		if (! self::$_default) {
-			self::$_default = new static ();
-		}
-		return self::$_default;
-	}
-
-	/**
 	 * Return the lastest DI created
 	 *
 	 * @return Phalcon\DiInterface
 	 */
 	public static function getDefault()
 	{
+		if (! self::$_default) {
+			self::$_default = new static ();
+		}
 		return self::$_default;
 	}
 
