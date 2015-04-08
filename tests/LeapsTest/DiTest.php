@@ -61,21 +61,20 @@ class Service1242
 {
 }
 
-class DiTest extends PHPUnit_Framework_TestCase
+class DiTest extends \PHPUnit_Framework_TestCase
 {
 
 	protected $_di;
 
 	public function setUp()
 	{
-		Phalcon\Di::reset();
-		$this->_di = new \Phalcon\Di();
+		$this->_di = new \Leaps\Di\Container();
 	}
 
 	public function testSetString()
 	{
 
-		$this->_di->set('request1', 'Phalcon\Http\Request');
+		$this->_di->set('request1', 'Leaps\Http\Request');
 
 		$request = $this->_di->get('request1');
 		$this->assertEquals(get_class($request), 'Phalcon\Http\Request');
@@ -85,7 +84,7 @@ class DiTest extends PHPUnit_Framework_TestCase
 	{
 
 		$this->_di->set('request2', function(){
-			return new Phalcon\Http\Request();
+			return new \Leaps\Http\Request();
 		});
 
 		$request = $this->_di->get('request2');
@@ -100,14 +99,14 @@ class DiTest extends PHPUnit_Framework_TestCase
 		));
 
 		$request = $this->_di->get('request3');
-		$this->assertEquals(get_class($request), 'Phalcon\Http\Request');
+		$this->assertEquals(get_class($request), 'Leaps\Http\Request');
 	}
 
 	public function testAtempt()
 	{
 
 		$this->_di->set('request4', function(){
-			return new Phalcon\Http\Request();
+			return new \Leaps\Http\Request();
 		});
 
 		$this->_di->attempt('request4', function(){
