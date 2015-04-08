@@ -17,8 +17,8 @@
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
   +------------------------------------------------------------------------+
 */
-
-class ResponseTest extends PHPUnit_Framework_TestCase
+namespace LeapsTest;
+class ResponseTest extends \PHPUnit_Framework_TestCase
 {
 
 	private $_response;

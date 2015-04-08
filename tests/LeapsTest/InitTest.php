@@ -17,13 +17,13 @@
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
   +------------------------------------------------------------------------+
 */
-
-class InitTest extends PHPUnit_Framework_TestCase
+namespace LeapsTest;
+class InitTest extends \PHPUnit_Framework_TestCase
 {
 
 	public function testExtensionLoaded()
 	{
-		$this->assertTrue(in_array('phalcon', get_loaded_extensions()));
+		$this->assertTrue(in_array('leaps', get_loaded_extensions()));
 	}
 
 }

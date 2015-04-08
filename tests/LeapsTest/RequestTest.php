@@ -18,8 +18,8 @@
 	|          Vladimir Kolesnikov <vladimir@extrememember.com>              |
 	+------------------------------------------------------------------------+
 */
-
-class RequestTest extends PHPUnit_Framework_TestCase
+namespace LeapsTest;
+class RequestTest extends \PHPUnit_Framework_TestCase
 {
 
 	public function testHasFiles()
@@ -349,7 +349,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
 		foreach ($request->getUploadedFiles(TRUE) as $file) {
 			$this->assertEquals($file->getType(), 'text/plain');
-			$this->assertEquals($file->getRealType(), 'image/jpeg');			
+			$this->assertEquals($file->getRealType(), 'image/jpeg');
 		}
 	}
 
@@ -360,7 +360,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 		$_SERVER['HTTP_AUTH'] = true;
 
 		$request = new \Phalcon\Http\Request();
-		
+
 		$oldheaders = $_SERVER;
 		$headers = array();
 
