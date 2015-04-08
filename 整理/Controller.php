@@ -72,7 +72,7 @@ abstract class Controller extends Injectable// implements ViewContextInterface
 	 */
 	public function getUniqueId()
 	{
-		return $this->module instanceof \Leaps\Application ? $this->id : $this->module->getUniqueId () . '/' . $this->id;
+		return $this->module instanceof \Leaps\Core\Application ? $this->id : $this->module->getUniqueId () . '/' . $this->id;
 	}
 
 	/**

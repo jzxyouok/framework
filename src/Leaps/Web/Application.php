@@ -38,24 +38,22 @@ class Application extends \Leaps\Core\Application
 	 */
 	public function handleRequest($request)
 	{
-		Kernel::setAlias ( '@webroot', dirname ( $request->getScriptFile () ) );
-		Kernel::setAlias ( '@web', $request->getBaseUrl () );
+		Kernel::setAlias ( '@Webroot', dirname ( $request->getScriptFile () ) );
+		Kernel::setAlias ( '@Web', $request->getBaseUrl () );
 		list ( $route, $params ) = $request->resolve ();
 		try {
 			kernel::trace ( "Route requested: '$route'", __METHOD__ );
 			$this->requestedRoute = $route;
 			$result = $this->runAction ( $route, $params );
-			echo 999;
-			exit ();
-			// if ($result instanceof Response) {
-			// return $result;
-			// } else {
-			// $response = $this->getResponse ();
-			// if ($result !== null) {
-			// $response->data = $result;
-			// }
-			// return $response;
-			// }
+			if ($result instanceof Response) {
+				return $result;
+			} else {
+				$response = $this->getShared ( 'response' );
+				if ($result !== null) {
+					$response->data = $result;
+				}
+				return $response;
+			}
 		} catch ( RouteException $e ) {
 			throw new NotFoundHttpException ( 'Page not found.', $e->getCode (), $e );
 		}

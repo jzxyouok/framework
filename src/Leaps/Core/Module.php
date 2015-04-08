@@ -304,10 +304,10 @@ class Module extends Container
 		if (is_array ( $parts )) {
 			/* @var $controller Controller */
 			list ( $controller, $actionID ) = $parts;
-			$oldController = Kernel::$app->controller;
-			Kernel::$app->controller = $controller;
-			$result = $controller->runActionInstance ( $actionID, $params );
-			Kernel::$app->controller = $oldController;
+			$oldController = Kernel::getDi()->controller;
+			Kernel::getDi()->controller = $controller;
+			$result = $controller->execAction ( $actionID, $params );
+			Kernel::getDi()->controller = $oldController;
 			return $result;
 		} else {
 			throw new \Leaps\Web\Router\Exception ( 'Unable to resolve the request "' . $route . '".' );

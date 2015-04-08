@@ -8,12 +8,14 @@
 // +----------------------------------------------------------------------
 // | Author XuTongle <xutongle@gmail.com>
 // +----------------------------------------------------------------------
-namespace Leaps;
+namespace Leaps\Core;
 
-interface ViewContextInterface{
+interface ViewContextInterface
+{
 
 	/**
 	 * 获取模板视图路径
+	 *
 	 * @return string
 	 */
 	public function getViewPath();

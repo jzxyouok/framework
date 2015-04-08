@@ -52,11 +52,11 @@ class Kernel
 	public static $loadedModules = [ ];
 
 	/**
-	 * 依赖注入器
+	 * 核心实例DI
 	 *
 	 * @var Leaps\Di\ContainerInteface
 	 */
-	protected static $_dependencyInjector;
+	protected static $app;
 
 	/**
 	 * classMap
@@ -362,7 +362,7 @@ class Kernel
 	public static function trace($message, $category = 'application')
 	{
 		if (static::$env == static::DEVELOPMENT) {
-			// static::getDi()->get ( 'log' )->log ( $message, Logger::LEVEL_TRACE, $category );
+			static::getShared ( 'log' )->log ( $message, Logger::LEVEL_TRACE, $category );
 		}
 	}
 
@@ -376,7 +376,7 @@ class Kernel
 	 */
 	public static function error($message, $category = 'application')
 	{
-		static::$_dependencyInjector->get ( 'log' )->log ( $message, Logger::LEVEL_ERROR, $category );
+		static::getShared ( 'log' )->log ( $message, Logger::LEVEL_ERROR, $category );
 	}
 
 	/**
@@ -389,7 +389,7 @@ class Kernel
 	 */
 	public static function warning($message, $category = 'application')
 	{
-		static::$_dependencyInjector->get ( 'log' )->log ( $message, Logger::LEVEL_WARNING, $category );
+		static::getShared ( 'log' )->log ( $message, Logger::LEVEL_WARNING, $category );
 	}
 
 	/**
@@ -402,7 +402,7 @@ class Kernel
 	 */
 	public static function info($message, $category = 'application')
 	{
-		static::$_dependencyInjector->get ( 'log' )->log ( $message, Logger::LEVEL_INFO, $category );
+		static::getShared ( 'log' )->log ( $message, Logger::LEVEL_INFO, $category );
 	}
 
 	/**
@@ -425,7 +425,7 @@ class Kernel
 	 */
 	public static function beginProfile($token, $category = 'application')
 	{
-		static::$_dependencyInjector->get ( 'log' )->log ( $token, Logger::LEVEL_PROFILE_BEGIN, $category );
+		static::getShared ( 'log' )->log ( $token, Logger::LEVEL_PROFILE_BEGIN, $category );
 	}
 
 	/**
@@ -438,7 +438,7 @@ class Kernel
 	 */
 	public static function endProfile($token, $category = 'application')
 	{
-		static::$_dependencyInjector->get ( 'log' )->log ( $token, Logger::LEVEL_PROFILE_END, $category );
+		static::getShared ( 'log' )->log ( $token, Logger::LEVEL_PROFILE_END, $category );
 	}
 
 	/**
@@ -452,14 +452,31 @@ class Kernel
 	}
 
 	/**
+	 * 通过配置文件解析服务配置
+	 *
+	 * @param string name
+	 * @param array parameters
+	 * @return mixed
+	 */
+	public static function get($name, $parameters = null)
+	{
+		return static::getDi()->get ( $name, $parameters = null );
+	}
+
+	public static function getShared($name, $parameters = null)
+	{
+		return static::getDi()->getShared ( $name, $parameters = null );
+	}
+
+	/**
 	 * 获取DI实例
 	 */
 	public static function getDi()
 	{
-		if (! static::$_dependencyInjector) {
+		if (! static::$app) {
 			throw new DiException ( "A dependency injection object is required to access the application services" );
 		}
-		return static::$_dependencyInjector;
+		return static::$app;
 	}
 
 	/**
@@ -469,6 +486,6 @@ class Kernel
 	 */
 	public static function setDi(ContainerInterface $dependencyInjector)
 	{
-		static::$_dependencyInjector = $dependencyInjector;
+		static::$app = $dependencyInjector;
 	}
 }

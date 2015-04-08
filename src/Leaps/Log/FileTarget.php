@@ -72,6 +72,8 @@ class FileTarget extends Target
 	 */
 	public $rotateByCopy = true;
 
+	private $file;
+
 
 	/**
 	 * Initializes the route.
@@ -80,19 +82,20 @@ class FileTarget extends Target
 	public function init()
 	{
 		parent::init();
-
+		if (! is_object ( $this->file )) {
+			$this->_dependencyInjector = $this->getDI ();
+			if (! is_object ( $this->_dependencyInjector )) {
+				throw new \Leaps\Di\Exception ( "A dependency injection object is required to access the 'file' service" );
+			}
+			$this->file = $this->_dependencyInjector->getShared ( 'file' );
+		}
 		$this->logFile = Kernel::getAlias ( $this->logFile );
-
 		$logPath = dirname ( $this->logFile );
 		if (! $this->file->isDirectory( $logPath )) {
 			$this->file->createDirectory ( $logPath, $this->dirMode, true );
 		}
-
 		if ($this->maxLogFiles < 1) {
 			$this->maxLogFiles = 1;
-		}
-		if ($this->maxFileSize < 1) {
-			$this->maxFileSize = 1;
 		}
 	}
 
