@@ -10,55 +10,29 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Http;
 
-use Leaps\Di\ContainerInterface;
+use Leaps\Di\Injectable;
 use Leaps\Http\Request\Exception;
 use Leaps\Core\InvalidConfigException;
 
-class Request implements RequestInterface
+class Request extends Injectable //implements RequestInterface
 {
 	public $methodParam = "_method";
+	protected $router;
 	protected $_headers;
-	protected $_dependencyInjector;
 	protected $_rawBody;
 	protected $_url;
 	protected $_hostInfo;
 	protected $_scriptUrl;
 	protected $_baseUrl;
 	protected $_pathInfo;
-	private $_router;
 
-	/**
-	 * 设置依赖注入器
-	 *
-	 * @param Leaps\DiInterface dependencyInjector
-	 */
-	public function setDI(ContainerInterface $dependencyInjector)
-	{
-		if (! is_object ( $dependencyInjector )) {
-			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
-		}
-		$this->_dependencyInjector = $dependencyInjector;
-	}
-
-	/**
-	 * 返回依赖注入器实例
-	 *
-	 * @return Leaps\Di\ContainerInterface
-	 */
-	public function getDI()
-	{
-		$dependencyInjector = $this->_dependencyInjector;
-		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Di\Container::getDefault ();
-		}
-		return $dependencyInjector;
-	}
 
 	/**
 	 * 初始化
 	 */
 	public function init()
 	{
+
 	}
 
 	/**
@@ -68,13 +42,14 @@ class Request implements RequestInterface
 	 */
 	public function resolve()
 	{
-		if (! is_object ( $this->_router )) {
-			if (! is_object ( $this->_dependencyInjector )) {
+		if (! is_object ( $this->router )) {
+			$dependencyInjector = $this->getDI();
+			if (! is_object ( $dependencyInjector )) {
 				throw new Exception ( "A dependency injection object is required to access the 'router' service" );
 			}
-			$this->_router = $this->_dependencyInjector->getShared ( "router" );
+			$this->router = $dependencyInjector->getShared ( "router" );
 		}
-		$result = $this->_router->parseRequest ( $this );
+		$result = $this->router->parseRequest ( $this );
 		if ($result !== false) {
 			list ( $route, $params ) = $result;
 			$_GET = array_merge ( $_GET, $params );
@@ -897,6 +872,4 @@ class Request implements RequestInterface
 
 		return ( string ) $pathInfo;
 	}
-
-
 }

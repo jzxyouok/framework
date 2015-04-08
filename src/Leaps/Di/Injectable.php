@@ -11,7 +11,6 @@
 namespace Leaps\Di;
 
 use Leaps\Core\Base;
-use Leaps\Core\InvalidCallException;
 
 /**
  * Leaps\Di\Injectable
@@ -25,16 +24,9 @@ abstract class Injectable extends Base implements InjectionAwareInterface
 	/**
 	 * 依赖注入器
 	 *
-	 * @var Leaps\Di\DiInteface
+	 * @var Leaps\Di\ContainerInterface
 	 */
 	protected $_dependencyInjector;
-
-	/**
-	 * Events Manager
-	 *
-	 * @var Phalcon\Events\ManagerInterface
-	 */
-	protected $_eventsManager;
 
 	/**
 	 * 设置依赖注入器
@@ -44,7 +36,7 @@ abstract class Injectable extends Base implements InjectionAwareInterface
 	public function setDI(ContainerInterface $dependencyInjector)
 	{
 		if (! is_object ( $dependencyInjector )) {
-			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
+			throw new Exception ( "Dependency Injector is invalid" );
 		}
 		$this->_dependencyInjector = $dependencyInjector;
 	}
@@ -56,31 +48,10 @@ abstract class Injectable extends Base implements InjectionAwareInterface
 	 */
 	public function getDI()
 	{
-		$dependencyInjector = $this->_dependencyInjector;
-		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = Container::getDefault ();
+		if (! is_object ( $this->_dependencyInjector )) {
+			$this->_dependencyInjector = \Leaps\Kernel::getDi ();
 		}
-		return $dependencyInjector;
-	}
-
-	/**
-	 * Sets the event manager
-	 *
-	 * @param Leaps\Events\ManagerInterface eventsManager
-	 */
-	public function setEventsManager(ManagerInterface $eventsManager)
-	{
-		$this->_eventsManager = $eventsManager;
-	}
-
-	/**
-	 * Returns the internal event manager
-	 *
-	 * @return Leaps\Events\ManagerInterface
-	 */
-	public function getEventsManager()
-	{
-		return $this->_eventsManager;
+		return $this->_dependencyInjector;
 	}
 
 	/**
@@ -90,46 +61,28 @@ abstract class Injectable extends Base implements InjectionAwareInterface
 	 */
 	public function __get($propertyName)
 	{
-		$dependencyInjector = $this->_dependencyInjector;
-		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = Container::getDefault ();
-			if (! is_object ( $dependencyInjector )) {
+		if (! is_object ( $this->_dependencyInjector )) {
+			$this->_dependencyInjector = \Leaps\Kernel::getDi ();
+			if (! is_object ( $this->_dependencyInjector )) {
 				throw new \Leaps\Di\Exception ( "A dependency injection object is required to access the application services" );
 			}
 		}
 		/**
 		 * Fallback to the PHP userland if the cache is not available
 		 */
-		if ($dependencyInjector->has ( $propertyName )) {
-			$service = $dependencyInjector->getShared ( $propertyName );
+		if ($this->_dependencyInjector->has ( $propertyName )) {
+			$service = $this->_dependencyInjector->getShared ( $propertyName );
 			$this->$propertyName = $service;
 			return $service;
 		}
 		if ($propertyName == "di") {
-			$this->$propertyName = $dependencyInjector;
-			return $dependencyInjector;
+			$this->$propertyName = $this->_dependencyInjector;
+			return $this->_dependencyInjector;
 		}
 		/**
 		 * A notice is shown if the property is not defined and isn't a valid service
 		 */
 		trigger_error ( "Access to undefined property " . $propertyName );
 		return null;
-	}
-
-	/**
-	 * 魔术方法__set
-	 *
-	 * @param string $name
-	 * @param unknown $value
-	 * @throws InvalidCallException
-	 */
-	public function __set($name, $value)
-	{
-		$setter = 'set' . $name;
-		if (method_exists ( $this, $setter )) {
-			$this->$setter ( $value );
-		} else {
-			$this->$name = $value;
-		}
 	}
 }

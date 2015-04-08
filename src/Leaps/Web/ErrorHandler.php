@@ -324,7 +324,7 @@ class ErrorHandler extends \Leaps\Core\ErrorHandler
 	 */
 	public function htmlEncode($text)
 	{
-		return htmlspecialchars ( $text, ENT_QUOTES, Kernel::$app->charset );
+		return htmlspecialchars ( $text, ENT_QUOTES, Kernel::getDi()->charset );
 	}
 
 	/**

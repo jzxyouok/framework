@@ -12,16 +12,10 @@ namespace Leaps\Core;
 
 use Leaps\Kernel;
 use Leaps\Debug\Dump;
+use Leaps\Di\Injectable;
 
-abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInterface
+abstract class errorHandler extends Injectable
 {
-
-	/**
-	 * 依赖注入器
-	 *
-	 * @var Leaps\Di\DiInteface
-	 */
-	protected $_dependencyInjector;
 
 	/**
 	 *
@@ -49,33 +43,6 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 	 * @var string Used to reserve memory for fatal error handler.
 	 */
 	private $_memoryReserve;
-
-	/**
-	 * 设置依赖注入器
-	 *
-	 * @param Leaps\DiInterface dependencyInjector
-	 */
-	public function setDI(\Leaps\Di\ContainerInterface $dependencyInjector)
-	{
-		if (! is_object ( $dependencyInjector )) {
-			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
-		}
-		$this->_dependencyInjector = $dependencyInjector;
-	}
-
-	/**
-	 * 返回依赖注入器实例
-	 *
-	 * @return Leaps\Di\DiInterface
-	 */
-	public function getDI()
-	{
-		$dependencyInjector = $this->_dependencyInjector;
-		if (! is_object ( $dependencyInjector )) {
-			//$dependencyInjector = \Leaps\Di::getDefault ();
-		}
-		return $dependencyInjector;
-	}
 
 	/**
 	 * 监听异常
@@ -154,7 +121,7 @@ abstract class errorHandler extends Base implements \Leaps\Di\InjectionAwareInte
 				if (PHP_SAPI === 'cli') {
 					echo $msg . "\n";
 				} else {
-					echo '<pre>' . htmlspecialchars ( $msg, ENT_QUOTES, Kernel::$app->charset ) . '</pre>';
+					echo '<pre>' . htmlspecialchars ( $msg, ENT_QUOTES, Kernel::getDi()->charset ) . '</pre>';
 				}
 			}
 			$msg .= "\n\$_SERVER = " . Dump::export ( $_SERVER );

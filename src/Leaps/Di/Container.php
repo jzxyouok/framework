@@ -10,27 +10,18 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Di;
 
+use Leaps\Core\Base;
 use Leaps\Di\Service;
 use Leaps\Di\Exception;
 use Leaps\Di\ServiceInterface;
 use Leaps\Di\ServiceProviderInterface;
 
-class Container implements \ArrayAccess, ContainerInterface
+
+class Container extends Base implements \ArrayAccess, ContainerInterface
 {
-	protected $_services;
+	private $_services;
 	protected $_sharedInstances;
 	protected $_freshInstance = false;
-	protected static $_default;
-
-	/**
-	 * 构造方法
-	 */
-	public function __construct()
-	{
-		if (! self::$_default) {
-			self::$_default = $this;
-		}
-	}
 
 	/**
 	 * 注册一个服务到服务容器
@@ -69,16 +60,6 @@ class Container implements \ArrayAccess, ContainerInterface
 	public function remove($name)
 	{
 		unset ( $this->_services [$name] );
-	}
-
-	/**
-	 * Set a default dependency injection container to be obtained into static methods
-	 *
-	 * @param Leaps\Di\DiInterface dependencyInjector
-	 */
-	public static function setDefault(\Leaps\Di\ContainerInterface $dependencyInjector)
-	{
-		self::$_default = $dependencyInjector;
 	}
 
 	/**
@@ -152,44 +133,12 @@ class Container implements \ArrayAccess, ContainerInterface
 	public function get($name, $parameters = null)
 	{
 		if (isset ( $this->_services [$name] )) {
-
 			/**
 			 * 服务已经注册
 			 */
-			$instance = $this->_services [$name]->resolve ( $parameters, $this );
+			$instance = $this->_services [$name]->resolve ( $parameters );
 		} else {
-			/**
-			 * The DI also acts as builder for any class even if it isn't defined in the DI
-			 */
-			if (class_exists ( $name )) {
-				if (is_array ( $parameters )) {
-					if (count ( $parameters )) {
-						if (version_compare ( PHP_VERSION, '5.6.0', '>=' )) {
-							$reflection = new \ReflectionClass ( $name );
-							$instance = $reflection->newInstanceArgs ( $parameters );
-						} else {
-							$reflection = new \ReflectionClass ( $name );
-							$instance = $reflection->newInstanceArgs ( $parameters );
-						}
-					} else {
-						if (version_compare ( PHP_VERSION, '5.6.0', '>=' )) {
-							$reflection = new \ReflectionClass ( $name );
-							$instance = $reflection->newInstance ();
-						} else {
-							$instance = new $name ();
-						}
-					}
-				} else {
-					if (version_compare ( PHP_VERSION, '5.6.0', '>=' )) {
-						$reflection = new \ReflectionClass ( $name );
-						$instance = $reflection->newInstance ();
-					} else {
-						$instance = new $name ();
-					}
-				}
-			} else {
-				throw new Exception ( "Service '" . $name . "' wasn't found in the dependency injection container" );
-			}
+			throw new Exception ( "Service '" . $name . "' wasn't found in the dependency injection container" );
 		}
 
 		/**
@@ -396,26 +345,5 @@ class Container implements \ArrayAccess, ContainerInterface
 	{
 		$provider->register ( $this );
 		return $this;
-	}
-
-	/**
-	 * Return the lastest DI created
-	 *
-	 * @return Phalcon\DiInterface
-	 */
-	public static function getDefault()
-	{
-		if (! self::$_default) {
-			self::$_default = new static ();
-		}
-		return self::$_default;
-	}
-
-	/**
-	 * 重置DI
-	 */
-	public static function reset()
-	{
-		self::$_default = null;
 	}
 }

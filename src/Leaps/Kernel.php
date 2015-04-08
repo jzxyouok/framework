@@ -11,9 +11,11 @@
 namespace Leaps;
 
 use Leaps\Logger;
+use Leaps\Di\ContainerInterface;
 use Leaps\Core\UnknownClassException;
 use Leaps\Core\InvalidConfigException;
 use Leaps\Core\InvalidParamException;
+use Leaps\Di\Exception as DiException;
 
 class Kernel
 {
@@ -47,13 +49,15 @@ class Kernel
 	 * @var string The Leaps environment
 	 */
 	public static $env = Kernel::PRODUCTION;
+	public static $loadedModules = [ ];
 
 	/**
-	 * 应用程序实例
+	 * 依赖注入器
 	 *
-	 * @var unknown
+	 * @var Leaps\Di\ContainerInteface
 	 */
-	public static $app;
+	protected static $_dependencyInjector;
+
 	/**
 	 * classMap
 	 *
@@ -61,7 +65,6 @@ class Kernel
 	 */
 	private static $classMap = [ ];
 	private static $aliases = [ ];
-	public static $loadedModules = [ ];
 
 	/**
 	 * 自动装载器
@@ -225,50 +228,65 @@ class Kernel
 	}
 
 	/**
-	 * 使用给定的配置创建一个新的对象。
+	 * 创建新的对象
+	 * 直接传类名来创建对象
+	 * \Leaps\Kernel::createObject('Leaps\HttpClient\Adapter\Curl');
+	 * //直接传匿名方法来创建支持参数
+	 * \Leaps\Kernel::createObject(function(){
+	 * return new \Leaps\HttpClient\Adapter\Curl();
+	 * },[]);
+	 * 使用类构造方法来创建对象
+	 * \Leaps\Kernel::createObject(['className'=>'Leaps\HttpClient\Adapter\Curl','hostIp'=>'127.0.0.1']);
 	 *
-	 * 配置可以是一个字符串或一个数组。
-	 * 如果是字符串将被视为类名,如果是数组,必须包含'class'键指定对象类,数组的其他键值将用于初始化类的对应属性.
-	 *
-	 * @param string|array $config the configuration. It can be either a string representing the class name
-	 *        or an array representing the object configuration.
-	 * @return mixed the created object
-	 * @throws InvalidConfigException if the configuration is invalid.
+	 * @param string/array $definition
+	 * @param array $parameters
+	 * @throws InvalidConfigException
+	 * @return object
 	 */
-	public static function createObject($config, $params = [])
+	public static function createObject($definition, $parameters = [], $throwException = true)
 	{
-		static $reflections = [ ];
-
-		if (is_string ( $config )) {
-			$class = $config;
-			$config = [ ];
-		} elseif (isset ( $config ['className'] )) {
-			$class = $config ['className'];
-			unset ( $config ['className'] );
-		} else {
-			throw new InvalidConfigException ( 'Object configuration must be an array containing a "class" element.' );
-		}
-
-		$class = ltrim ( $class, '\\' );
-		if (($n = func_num_args ()) > 1) {
-			/**
-			 *
-			 * @var \ReflectionClass $reflection
-			 */
-			if (isset ( $reflections [$class] )) {
-				$reflection = $reflections [$class];
+		$instance = null;
+		if (is_string ( $definition )) {
+			if (class_exists ( $definition )) {
+				$reflection = new \ReflectionClass ( $definition );
+				if (is_array ( $parameters )) {
+					$instance = $reflection->newInstanceArgs ( $parameters );
+				} else {
+					$instance = $reflection->newInstance ();
+				}
+			}
+		} elseif (is_object ( $definition )) {
+			if ($definition instanceof \Closure) {
+				if (is_array ( $definition )) {
+					$instance = call_user_func_array ( $definition, $parameters );
+				} else {
+					$instance = call_user_func ( $definition );
+				}
 			} else {
-				$reflection = $reflections [$class] = new \ReflectionClass ( $class );
+				$instance = $definition;
 			}
-			$args = func_get_args ();
-			array_shift ( $args ); // remove $config
-			if (! empty ( $config )) {
-				$args [] = $config;
+		} elseif (is_array ( $definition ) && isset ( $definition ['className'] )) {
+			$className = $definition ['className'];
+			unset ( $definition ['className'] );
+			$reflection = new \ReflectionClass ( $className );
+			if (! empty ( $parameters )) { // 模块初始化
+				$parameters [] = $definition;
+				$instance = $reflection->newInstanceArgs ( $parameters );
+			} else {
+				if (empty ( $definition )) {
+					$instance = $reflection->newInstance ();
+				} else {
+					$instance = $reflection->newInstanceArgs ( [
+							$definition
+					] );
+				}
 			}
-			return $reflection->newInstanceArgs ( $args );
-		} else {
-			return empty ( $config ) ? new $class () : new $class ( $config );
+		} elseif (is_array ( $definition ) && $throwException) {
+			throw new InvalidConfigException ( 'Object configuration must be an array containing a "className" element.' );
+		} elseif ($throwException) {
+			throw new InvalidConfigException ( "Unsupported configuration type: " . gettype ( $definition ) );
 		}
+		return $instance;
 	}
 
 	/**
@@ -344,7 +362,7 @@ class Kernel
 	public static function trace($message, $category = 'application')
 	{
 		if (static::$env == static::DEVELOPMENT) {
-			static::$app->get ( 'log' )->log ( $message, Logger::LEVEL_TRACE, $category );
+			// static::getDi()->get ( 'log' )->log ( $message, Logger::LEVEL_TRACE, $category );
 		}
 	}
 
@@ -358,7 +376,7 @@ class Kernel
 	 */
 	public static function error($message, $category = 'application')
 	{
-		static::$app->get ( 'log' )->log ( $message, Logger::LEVEL_ERROR, $category );
+		static::$_dependencyInjector->get ( 'log' )->log ( $message, Logger::LEVEL_ERROR, $category );
 	}
 
 	/**
@@ -371,7 +389,7 @@ class Kernel
 	 */
 	public static function warning($message, $category = 'application')
 	{
-		static::$app->get ( 'log' )->log ( $message, Logger::LEVEL_WARNING, $category );
+		static::$_dependencyInjector->get ( 'log' )->log ( $message, Logger::LEVEL_WARNING, $category );
 	}
 
 	/**
@@ -384,7 +402,7 @@ class Kernel
 	 */
 	public static function info($message, $category = 'application')
 	{
-		static::$app->get ( 'log' )->log ( $message, Logger::LEVEL_INFO, $category );
+		static::$_dependencyInjector->get ( 'log' )->log ( $message, Logger::LEVEL_INFO, $category );
 	}
 
 	/**
@@ -407,7 +425,7 @@ class Kernel
 	 */
 	public static function beginProfile($token, $category = 'application')
 	{
-		static::$app->get ( 'log' )->log ( $token, Logger::LEVEL_PROFILE_BEGIN, $category );
+		static::$_dependencyInjector->get ( 'log' )->log ( $token, Logger::LEVEL_PROFILE_BEGIN, $category );
 	}
 
 	/**
@@ -420,7 +438,7 @@ class Kernel
 	 */
 	public static function endProfile($token, $category = 'application')
 	{
-		static::$app->get ( 'log' )->log ( $token, Logger::LEVEL_PROFILE_END, $category );
+		static::$_dependencyInjector->get ( 'log' )->log ( $token, Logger::LEVEL_PROFILE_END, $category );
 	}
 
 	/**
@@ -431,5 +449,26 @@ class Kernel
 	public static function powered()
 	{
 		return 'Powered by <a href="http://www.tintsoft.com/" rel="external">Leaps Framework</a>';
+	}
+
+	/**
+	 * 获取DI实例
+	 */
+	public static function getDi()
+	{
+		if (! static::$_dependencyInjector) {
+			throw new DiException ( "A dependency injection object is required to access the application services" );
+		}
+		return static::$_dependencyInjector;
+	}
+
+	/**
+	 * Set a default dependency injection container to be obtained into static methods
+	 *
+	 * @param Leaps\Di\ContainerInterface dependencyInjector
+	 */
+	public static function setDi(ContainerInterface $dependencyInjector)
+	{
+		static::$_dependencyInjector = $dependencyInjector;
 	}
 }

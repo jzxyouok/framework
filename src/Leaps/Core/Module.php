@@ -13,8 +13,7 @@ namespace Leaps\Core;
 use Leaps\Kernel;
 use Leaps\Di\Container;
 
-
-class Module extends Base
+class Module extends Container
 {
 	public $id;
 	public $module;
@@ -44,7 +43,6 @@ class Module extends Base
 	 */
 	public function init()
 	{
-		parent::init();
 		if ($this->controllerNamespace === null) {
 			$class = get_class ( $this );
 			if (($pos = strrpos ( $class, '\\' )) !== false) {
@@ -213,8 +211,10 @@ class Module extends Base
 			} elseif ($load) {
 				Kernel::trace ( "Loading module: $id", __METHOD__ );
 				/* @var $module Module */
-				$module = Kernel::createObject ( $this->_modules [$id], [$id,$this] );
-				$module->setInstance ( $module );
+				$module = Kernel::createObject ( $this->_modules [$id], [
+						$id,
+						$this
+				] );
 				return $this->_modules [$id] = $module;
 			}
 		}
@@ -401,18 +401,17 @@ class Module extends Base
 
 		$className = str_replace ( ' ', '', ucwords ( str_replace ( '-', ' ', $className ) ) ) . 'Controller';
 		$className = ltrim ( $this->controllerNamespace . '\\' . str_replace ( '/', '\\', $prefix ) . $className, '\\' );
-
 		if (strpos ( $className, '-' ) !== false || ! class_exists ( $className )) {
 			return null;
 		}
 
-		if (is_subclass_of ( $className, 'Leaps\Controller' )) {
+		if (is_subclass_of ( $className, 'Leaps\Core\Controller' )) {
 			return Kernel::createObject ( $className, [
 					$id,
 					$this
 			] );
 		} elseif (Kernel::$env == Kernel::DEVELOPMENT) {
-			throw new InvalidConfigException ( "Controller class must extend from \\Leaps\\Controller." );
+			throw new InvalidConfigException ( "Controller class must extend from \\Leaps\\Core\\Controller." );
 		} else {
 			return null;
 		}

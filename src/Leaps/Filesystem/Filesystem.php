@@ -10,10 +10,10 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Filesystem;
 
+use Leaps\Core\Base;
 use FilesystemIterator;
-use Leaps\Di\Injectable;
 
-class Filesystem extends Injectable
+class Filesystem extends Base
 {
 	/**
 	 * 判断文件是否存在
@@ -353,11 +353,12 @@ class Filesystem extends Injectable
 	/**
 	 * Determines the MIME type based on the extension name of the specified file.
 	 * This method will use a local map between extension names and MIME types.
+	 *
 	 * @param string $fileName the file name.
 	 * @return string the MIME type. Null is returned if the MIME type cannot be determined.
 	 */
 	public function getMimeType($fileName)
 	{
-		return MimeType::getMimeType($fileName);
+		return MimeType::getMimeType ( $fileName );
 	}
 }

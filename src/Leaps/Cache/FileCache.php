@@ -11,6 +11,7 @@
 namespace Leaps\Cache;
 
 use Leaps\Kernel;
+use Leaps\Di\Exception;
 
 class FileCache extends Adapter
 {
@@ -71,8 +72,13 @@ class FileCache extends Adapter
 	 */
 	public function init()
 	{
-		parent::init ();
-		$this->file = $this->getDI ()->get ( 'file' );
+		if (! is_object ( $this->file )) {
+			$this->_dependencyInjector = $this->getDI ();
+			if (! is_object ( $this->_dependencyInjector )) {
+				throw new Exception ( "A dependency injection object is required to access the 'file' service" );
+			}
+			$this->file = $this->_dependencyInjector->getShared ( 'file' );
+		}
 		$this->cachePath = Kernel::getAlias ( $this->cachePath );
 		if (! is_dir ( $this->cachePath )) {
 			$this->file->createDirectory ( $this->cachePath, $this->dirMode, true );

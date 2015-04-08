@@ -10,8 +10,8 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Core;
 
-use Leaps\Arr;
 use Leaps\Kernel;
+use Leaps\Utility\Arr;
 
 abstract class Application extends Module
 {
@@ -84,7 +84,7 @@ abstract class Application extends Module
 	 */
 	public function __construct($config = [])
 	{
-		Kernel::$app = $this;
+		Kernel::setDi($this);
 		$this->preInit ( $config );
 		$this->init ();
 	}
@@ -153,9 +153,7 @@ abstract class Application extends Module
 		}
 
 		$config ['services'] = Arr::mergeArray ( $this->coreServices (), $config ['services'] );
-		foreach ( $config ['services'] as $id => $service ) {
-			$this->set ( $id, $service );
-		}
+		$this->setServices($config ['services']);
 		if (Kernel::$env == Kernel::DEVELOPMENT) {
 			if (! $this->has ( 'errorHandler' )) {
 				echo "Error: no errorHandler service is configured.\n";
@@ -193,9 +191,6 @@ abstract class Application extends Module
 	public function run()
 	{
 		try {
-			$this->registerServiceProvider ( new \Leaps\Events\EventServiceProvider () );
-			print_r ( \Leaps\Di\Container::getDefault () );
-			exit ();
 			// $this->getEvent()->trigger ( self::EVENT_BEFORE_REQUEST );
 			$response = $this->handleRequest ( $this->getRequest () );
 			// $this->getEvent()->trigger ( self::EVENT_AFTER_REQUEST );
@@ -226,7 +221,7 @@ abstract class Application extends Module
 	public function setBasePath($path)
 	{
 		parent::setBasePath ( $path );
-		Kernel::setAlias ( '@app', $this->getBasePath () );
+		Kernel::setAlias ( '@App', $this->getBasePath () );
 		Kernel::setAlias ( '@Module', $this->getBasePath () . '/Module' );
 	}
 
@@ -353,7 +348,6 @@ abstract class Application extends Module
 				'log' => [
 						'className' => 'Leaps\Logger'
 				]
-		]
-		;
+		];
 	}
 }

@@ -11,11 +11,10 @@
 namespace Leaps\Web;
 
 use Leaps\Kernel;
-use Leaps\Core\Base;
-use Leaps\Di\ContainerInterface;
+use Leaps\Di\Injectable;
 use Leaps\Web\Router\Exception;
 
-class Router extends Base implements \Leaps\Di\InjectionAwareInterface
+class Router extends Injectable
 {
 
 	/**
@@ -53,6 +52,12 @@ class Router extends Base implements \Leaps\Di\InjectionAwareInterface
 	 * @var string
 	 */
 	public $suffix = '';
+
+	/**
+	 * 缓存组件名称
+	 *
+	 * @var unknown
+	 */
 	public $cache = 'cache';
 
 	/**
@@ -65,64 +70,28 @@ class Router extends Base implements \Leaps\Di\InjectionAwareInterface
 			'className' => 'Leaps\Web\UrlRule'
 	];
 	public $routeParam = 'r';
-
-	/**
-	 * 依赖注入器
-	 *
-	 * @var Leaps\Di\DiInteface
-	 */
-	protected $_dependencyInjector;
 	private $_baseUrl;
 	private $_hostInfo;
 	private $request;
 
 	/**
-	 * 设置依赖注入器
-	 *
-	 * @param Leaps\DiInterface dependencyInjector
-	 */
-	public function setDI(ContainerInterface $dependencyInjector)
-	{
-		if (! is_object ( $dependencyInjector )) {
-			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
-		}
-		$this->_dependencyInjector = $dependencyInjector;
-	}
-
-	/**
-	 * 返回依赖注入器实例
-	 *
-	 * @return Leaps\Di\DiInterface
-	 */
-	public function getDI()
-	{
-		if (! is_object ( $this->_dependencyInjector )) {
-			$this->_dependencyInjector = \Leaps\Di\Container::getDefault ();
-		}
-		return $this->_dependencyInjector;
-	}
-
-	/**
-	 * (non-PHPdoc)
+	 * 被构造方法调用，此时类相当于还在实例化过程中，所以DI实例在该方法内无效，只能通过全局方法获取
 	 *
 	 * @see \Leaps\Base::init()
 	 */
 	public function init()
 	{
-		parent::init ();
 		if (! $this->enablePrettyUrl || empty ( $this->rules )) {
 			return;
 		}
-		if (is_string ( $this->cache )) {
-			print_r($this->_dependencyInjector);
-			exit;
-			$dependencyInjector = $this->_dependencyInjector;
-			if (! is_object ( $dependencyInjector )) {
-				throw new Exception ( "A dependency injection object is required to access the '" . $this->cache . "' service" );
-			}
-			$this->cache = $dependencyInjector->get ( 'cache' );
-		}
 		if ($this->enableRuleCache) {
+			if (! is_object ( $this->cache )) {
+				$this->_dependencyInjector = $this->getDI ();
+				if (! is_object ( $this->_dependencyInjector )) {
+					throw new Exception ( "A dependency injection object is required to access the '" . $this->cache . "' service" );
+				}
+				$this->cache = $this->_dependencyInjector->getShared ( $this->cache );
+			}
 			$cacheKey = __CLASS__;
 			$hash = md5 ( json_encode ( $this->rules ) );
 			if (($data = $this->cache->get ( $cacheKey )) !== false && isset ( $data [1] ) && $data [1] === $hash) {

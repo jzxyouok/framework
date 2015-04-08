@@ -50,12 +50,12 @@ class Service implements ServiceInterface
 
 	/**
 	 *
-	 * @var Object 服务实例
+	 * @var Object 服务共享实例
 	 */
 	protected $_sharedInstance;
 
 	/**
-	 * Leaps\Di\Service
+	 * 构造方法
 	 *
 	 * @param string name 服务名称
 	 * @param mixed definition 定义
@@ -99,7 +99,7 @@ class Service implements ServiceInterface
 	}
 
 	/**
-	 * 设置或重置共享服务的相关实例
+	 * 设置或重置服务的共享实例
 	 *
 	 * @param mixed sharedInstance
 	 */
@@ -135,7 +135,7 @@ class Service implements ServiceInterface
 	 * @param Leaps\Di\DiInterface dependencyInjector
 	 * @return mixed
 	 */
-	public function resolve($parameters = null, \Leaps\Di\ContainerInterface $dependencyInjector = null)
+	public function resolve($parameters = null)
 	{
 		/**
 		 * 判断服务是否是共享的
@@ -145,143 +145,22 @@ class Service implements ServiceInterface
 				return $this->_sharedInstance;
 			}
 		}
-		$found = true;
-		$instance = null;
-
 		$definition = $this->_definition;
-		if (is_string ( $definition )) {
-			/**
-			 * 定义是字符串
-			 */
-			if (class_exists ( $definition )) {
-				if (is_array ( $parameters )) {
-					if (count ( $parameters )) {
-						if (version_compare ( PHP_VERSION, '5.6.0', '>=' )) {
-							$reflection = new \ReflectionClass ( $definition );
-							$instance = $reflection->newInstanceArgs ( $parameters );
-						} else {
-							$reflection = new \ReflectionClass ( $definition );
-							$instance = $reflection->newInstanceArgs ( $parameters );
-						}
-					} else {
-						if (version_compare ( PHP_VERSION, '5.6.0', '>=' )) {
-							$reflection = new \ReflectionClass ( $definition );
-							$instance = $reflection->newInstance ();
-						} else {
-							$instance = new $definition ();
-						}
-					}
-				} else {
-					if (version_compare ( PHP_VERSION, '5.6.0', '>=' )) {
-						$reflection = new \ReflectionClass ( $definition );
-						$instance = $reflection->newInstance ();
-					} else {
-						$instance = new $definition ();
-					}
-				}
-			} else {
-				$found = false;
-			}
-		} else {
-			/**
-			 * 对象定义
-			 */
-			if (gettype ( $definition ) == "object") {
-				if ($definition instanceof \Closure) {
-					if (is_array ( $definition )) {
-						$instance = call_user_func_array ( $definition, $parameters );
-					} else {
-						$instance = call_user_func ( $definition );
-					}
-				} else {
-					$instance = $definition;
-				}
-			} else {
-				/**
-				 * 数组定义需要'className'参数
-				 */
-				if (is_array ( $definition )) {
-					$instance = Kernel::createObject ( $definition );
-				} else {
-					$found = false;
-				}
-			}
-		}
-
+		$instance = Kernel::createObject ( $definition, $parameters, false );
 		/**
 		 * 创建失败抛出异常
 		 */
-		if ($found === false) {
+		if (! is_object ( $instance )) {
 			throw new Exception ( "Service '" . $this->_name . "' cannot be resolved" );
 		}
-
 		/**
 		 * 更新服务共享实例
 		 */
 		if ($this->_shared) {
 			$this->_sharedInstance = $instance;
 		}
-
 		$this->_resolved = true;
-
 		return $instance;
-	}
-
-	/**
-	 * 改变服务参数
-	 *
-	 * @param int position
-	 * @param array parameter
-	 * @return Leaps\Di\Service
-	 */
-	public function setParameter($position, $parameter)
-	{
-		$definition = $this->_definition;
-		if (! is_array ( $definition )) {
-			throw new Exception ( "Definition must be an array to update its parameters" );
-		}
-
-		/**
-		 * 更新参数
-		 */
-		if (isset ( $definition ["arguments"] )) {
-			$arguments = $definition ["arguments"];
-			$arguments [$position] = $parameter;
-		} else {
-			$arguments = [
-					$position => $parameter
-			];
-		}
-
-		/**
-		 * Re-update the arguments
-		 */
-		$definition ["arguments"] = $arguments;
-
-		/**
-		 * Re-update the definition
-		 */
-		$this->_definition = $definition;
-		return $this;
-	}
-
-	/**
-	 * 返回参数
-	 *
-	 * @param int position
-	 * @return array
-	 */
-	public function getParameter($position)
-	{
-		$definition = $this->_definition;
-		if (! is_array ( $definition )) {
-			throw new Exception ( "Definition must be an array to obtain its parameters" );
-		}
-		if (isset ( $definition [$position] )) {
-			return $definition [$position];
-		}
-
-		return null;
 	}
 
 	/**

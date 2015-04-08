@@ -10,8 +10,8 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Web;
 
-use Leaps\Arr;
 use Leaps\Kernel;
+use Leaps\Utility\Arr;
 use Leaps\Web\Router\Exception as RouteException;
 
 class Application extends \Leaps\Core\Application
@@ -33,12 +33,11 @@ class Application extends \Leaps\Core\Application
 	/**
 	 * (non-PHPdoc)
 	 *
-	 * @see \Leaps\Application::handleRequest()
+	 * @param resource Leaps\Http\Request
+	 * @see \Leaps\Core\Application::handleRequest()
 	 */
 	public function handleRequest($request)
 	{
-		print_r($this);
-		exit;
 		Kernel::setAlias ( '@webroot', dirname ( $request->getScriptFile () ) );
 		Kernel::setAlias ( '@web', $request->getBaseUrl () );
 		list ( $route, $params ) = $request->resolve ();
@@ -46,6 +45,7 @@ class Application extends \Leaps\Core\Application
 			kernel::trace ( "Route requested: '$route'", __METHOD__ );
 			$this->requestedRoute = $route;
 			$result = $this->runAction ( $route, $params );
+			echo 999;
 			exit ();
 			// if ($result instanceof Response) {
 			// return $result;
@@ -115,7 +115,5 @@ class Application extends \Leaps\Core\Application
 						'className' => 'Leaps\Web\ErrorHandler'
 				]
 		] );
-
-
 	}
 }

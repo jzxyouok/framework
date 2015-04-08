@@ -10,51 +10,16 @@
 // +----------------------------------------------------------------------
 namespace Leaps\Cache;
 
-use Leaps\Core\Base;
 use Leaps\Utility\Str;
-use Leaps\Di\InjectionAwareInterface;
+use Leaps\Di\Injectable;
 
-abstract class Adapter extends Base implements InjectionAwareInterface
+abstract class Adapter extends Injectable
 {
 	/**
 	 *
 	 * @var string 缓存前置
 	 */
 	public $keyPrefix;
-
-	/**
-	 * 依赖注入器
-	 *
-	 * @var Leaps\Di\DiInteface
-	 */
-	protected $_dependencyInjector;
-
-	/**
-	 * 设置依赖注入器
-	 *
-	 * @param Leaps\DiInterface dependencyInjector
-	 */
-	public function setDI(\Leaps\Di\ContainerInterface $dependencyInjector)
-	{
-		if (! is_object ( $dependencyInjector )) {
-			throw new \Leaps\Di\Exception ( "Dependency Injector is invalid" );
-		}
-		$this->_dependencyInjector = $dependencyInjector;
-	}
-
-	/**
-	 * 返回依赖注入器实例
-	 *
-	 * @return Leaps\Di\DiInterface
-	 */
-	public function getDI()
-	{
-		$dependencyInjector = $this->_dependencyInjector;
-		if (! is_object ( $dependencyInjector )) {
-			$dependencyInjector = \Leaps\Di\Container::getDefault ();
-		}
-		return $dependencyInjector;
-	}
 
 	/**
 	 * 编译缓存的Key
