@@ -350,4 +350,16 @@ abstract class Application extends Module
 				]
 		];
 	}
+
+	/**
+	 * 设置当前活跃的控制器
+	 * @param unknown $controller
+	 */
+	public function setController($controller){
+		$this->controller = $controller;
+	}
+
+	public function getController(){
+		return $this->controller;
+	}
 }

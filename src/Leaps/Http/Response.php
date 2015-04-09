@@ -764,7 +764,8 @@ class Response extends Base implements ResponseInterface, InjectionAwareInterfac
 		}
 
 		if (is_array ( $this->content )) {
-			throw new \Leaps\Core\InvalidParamException ( "Response content must not be an array." );
+			$this->content = json_encode ( $this->content );
+			// throw new \Leaps\Core\InvalidParamException ( "Response content must not be an array." );
 		} elseif (is_object ( $this->content )) {
 			if (method_exists ( $this->content, '__toString' )) {
 				$this->content = $this->content->__toString ();

@@ -11,54 +11,58 @@
 namespace Leaps\Core;
 
 use Leaps\Kernel;
+use Leaps\Di\Injectable;
 
-class Controller extends Base implements ViewContextInterface
+class Controller extends Injectable implements ViewContextInterface
 {
 	/**
+	 * 当前控制器ID
 	 *
-	 * @var string the ID of this controller.
+	 * @var string
 	 */
 	public $id;
+
 	/**
+	 * 当前模块实例
 	 *
-	 * @var Module $module the module that this controller belongs to.
+	 * @var Module $module
 	 */
 	public $module;
+
 	/**
+	 * 默认的操作ID
 	 *
-	 * @var string the ID of the action that is used when the action ID is not specified
-	 *      in the request. Defaults to 'index'.
+	 * @var string
 	 */
 	public $defaultAction = 'index';
 
 	/**
 	 * 布局
-	 * @var string|boolean the name of the layout to be applied to this controller's views.
-	 *      This property mainly affects the behavior of [[render()]].
-	 *      Defaults to null, meaning the actual layout value should inherit that from [[module]]'s layout value.
-	 *      If false, no layout will be applied.
+	 *
+	 * @var string|boolean
 	 */
 	public $layout;
 
 	/**
+	 * 这是目前正在执行的动作。
 	 *
-	 * @var Action the action that is currently being executed. This property will be set
-	 *      by [[run()]] when it is called by [[Application]] to run an action.
+	 * @var Action
 	 */
 	public $action;
 
 	/**
+	 * 视图对象
 	 *
-	 * @var View the view object that can be used to render views or view files.
+	 * @var View
 	 */
 	private $_view;
 
 	/**
 	 * 构造方法
 	 *
-	 * @param string $id the ID of this controller.
-	 * @param Module $module the module that this controller belongs to.
-	 * @param array $config name-value pairs that will be used to initialize the object properties.
+	 * @param string $id 控制器ID
+	 * @param Module $module 模块实例
+	 * @param array $config 属性配置数组
 	 */
 	public function __construct($id, $module, $config = [])
 	{
@@ -80,54 +84,21 @@ class Controller extends Base implements ViewContextInterface
 	public function runActionInstance($id, $params = [])
 	{
 		$action = $this->createActionInstance ( $id );
-
 		if ($action === null) {
 			throw new InvalidRouteException ( 'Unable to resolve the request: ' . $this->getUniqueId () . '/' . $id );
 		}
 		Kernel::trace ( "Route to run: " . $action->getUniqueId (), __METHOD__ );
-
 		if (Kernel::getDi ()->requestedAction === null) {
 			Kernel::getDi ()->requestedAction = $action;
 		}
-
-		$oldAction = $this->action;
 		$this->action = $action;
-
-		$modules = [ ];
-		$runAction = true;
-
-		// call beforeAction on modules
-		foreach ( $this->getModules () as $module ) {
-			if ($module->beforeAction ( $action )) {
-				array_unshift ( $modules, $module );
-			} else {
-				$runAction = false;
-				break;
-			}
-		}
-
-		$result = null;
-
-		if ($runAction && $this->beforeAction ( $action )) {
-			// run the action
-			$result = $action->runWithParams ( $params );
-
-			$result = $this->afterAction ( $action, $result );
-
-			// call afterAction on modules
-			foreach ( $modules as $module ) {
-				/* @var $module Module */
-				$result = $module->afterAction ( $action, $result );
-			}
-		}
-
-		$this->action = $oldAction;
-
+		$result = $action->runWithParams ( $params );
 		return $result;
 	}
 
 	/**
 	 * 根据指定的路由执行请求
+	 *
 	 * @param string $route the route to be handled, e.g., 'view', 'comment/view', '/admin/comment/view'.
 	 * @param array $params the parameters to be passed to the action.
 	 * @return mixed the result of the action.
@@ -141,7 +112,7 @@ class Controller extends Base implements ViewContextInterface
 		} elseif ($pos > 0) {
 			return $this->module->runAction ( $route, $params );
 		} else {
-			return Kernel::getDi()->runAction ( ltrim ( $route, '/' ), $params );
+			return Kernel::getDi ()->runAction ( ltrim ( $route, '/' ), $params );
 		}
 	}
 
@@ -159,13 +130,7 @@ class Controller extends Base implements ViewContextInterface
 	}
 
 	/**
-	 * Creates an action based on the given action ID.
-	 * The method first checks if the action ID has been declared in [[actions()]]. If so,
-	 * it will use the configuration declared there to create the action object.
-	 * If not, it will look for a controller method whose name is in the format of `actionXyz`
-	 * where `Xyz` stands for the action ID. If found, an [[InlineAction]] representing that
-	 * method will be created and returned.
-	 *
+	 * 创建Action实例
 	 * @param string $id the action ID.
 	 * @return Action the newly created action instance. Null if the ID doesn't resolve into any action.
 	 */
@@ -323,7 +288,7 @@ class Controller extends Base implements ViewContextInterface
 	public function getView()
 	{
 		if ($this->_view === null) {
-			$this->_view = Kernel::$app->getView ();
+			$this->_view = Kernel::$app->get('view');
 		}
 		return $this->_view;
 	}

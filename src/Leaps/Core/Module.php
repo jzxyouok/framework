@@ -15,13 +15,52 @@ use Leaps\Di\Container;
 
 class Module extends Container
 {
+	/**
+	 * 当前模块ID
+	 * @var string
+	 */
 	public $id;
+
+	/**
+	 * 父模块实例
+	 * @var Module
+	 */
 	public $module;
+
+	/**
+	 * 控制器命名空间
+	 * @var string
+	 */
 	public $controllerNamespace;
+
+	/**
+	 * 默认路由
+	 * @var string
+	 */
 	public $defaultRoute = 'home';
+
+	/**
+	 * 已经注册的模块
+	 * @var array
+	 */
 	protected $_modules = [ ];
+
+	/**
+	 * 模块基础路径
+	 * @var string
+	 */
 	private $_basePath;
+
+	/**
+	 * 布局路径
+	 * @var string
+	 */
 	private $_layoutPath;
+
+	/**
+	 * 视图路径
+	 * @var string
+	 */
 	public $_viewPath;
 
 	/**
@@ -77,7 +116,6 @@ class Module extends Container
 
 	/**
 	 * 设置模块文件夹
-	 * This method can only be invoked at the beginning of the constructor.
 	 *
 	 * @param string $path the root directory of the module. This can be either a directory name or a path alias.
 	 * @throws InvalidParamException if the directory does not exist.
@@ -304,10 +342,10 @@ class Module extends Container
 		if (is_array ( $parts )) {
 			/* @var $controller Controller */
 			list ( $controller, $actionID ) = $parts;
-			$oldController = Kernel::getDi()->controller;
-			Kernel::getDi()->controller = $controller;
-			$result = $controller->execAction ( $actionID, $params );
-			Kernel::getDi()->controller = $oldController;
+			$oldController = Kernel::$app->getController();
+			Kernel::$app->setController($controller);
+			$result = $controller->runActionInstance ( $actionID, $params );
+			Kernel::$app->setController($oldController);
 			return $result;
 		} else {
 			throw new \Leaps\Web\Router\Exception ( 'Unable to resolve the request "' . $route . '".' );

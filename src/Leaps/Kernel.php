@@ -56,7 +56,7 @@ class Kernel
 	 *
 	 * @var Leaps\Di\ContainerInteface
 	 */
-	protected static $app;
+	public static $app;
 
 	/**
 	 * classMap
@@ -285,6 +285,12 @@ class Kernel
 			throw new InvalidConfigException ( 'Object configuration must be an array containing a "className" element.' );
 		} elseif ($throwException) {
 			throw new InvalidConfigException ( "Unsupported configuration type: " . gettype ( $definition ) );
+		}
+		/**
+		 * Pass the DI itself if the instance implements \Leaps\Di\InjectionAwareInterface
+		 */
+		if (is_object ( $instance ) && method_exists ( $instance, "setDI" )) {
+			$instance->setDI ( self::$app );
 		}
 		return $instance;
 	}
