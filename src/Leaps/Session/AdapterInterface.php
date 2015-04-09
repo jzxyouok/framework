@@ -19,7 +19,7 @@ interface AdapterInterface
 {
 
 	/**
-	 * Starts session, optionally using an adapter
+	 * 启动Session
 	 *
 	 * @param array options
 	 */
