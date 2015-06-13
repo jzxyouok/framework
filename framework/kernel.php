@@ -141,6 +141,7 @@ class Core {
 			@header ( 'Content-Type: text/html; charset=' . CHARSET );
 			@header ( 'X-Powered-By: PHP/' . PHP_VERSION . ' Leaps/' . LEAPS_VERSION );
 			// 页面压缩输出支持
+			ob_end_clean();
 			if (C ( 'config', 'gzip', true ) && function_exists ( 'ob_gzhandler' )) {
 				ob_start ( 'ob_gzhandler' );
 			} else {
